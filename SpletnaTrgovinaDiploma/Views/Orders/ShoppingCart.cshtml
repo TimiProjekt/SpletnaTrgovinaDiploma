@@ -75,7 +75,7 @@
 
     <script>
 
-        let _total = @Html.Raw(Model.ShoppingCartTotal);
+        let _total = @Html.Raw(Model.ShoppingCartTotal.ToString().Replace(",","."));
 
         paypal.Button.render({
             //Configure environment
@@ -108,7 +108,7 @@
             //Execute the payment
             onAuthorize: function (data, actions) {
                 return actions.payment.execute().then(function () {
-                    var url = '@Url.Action("CompleteOrderS", "Orders", new { })';
+                    var url = '@Url.Action("CompleteOrder", "Orders", new { })';
                     window.location.href = url;
                 });
             }
