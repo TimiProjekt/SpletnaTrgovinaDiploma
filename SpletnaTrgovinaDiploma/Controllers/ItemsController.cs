@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SpletnaTrgovinaDiploma.Data;
 using SpletnaTrgovinaDiploma.Data.Services;
+using SpletnaTrgovinaDiploma.Data.Static;
 using SpletnaTrgovinaDiploma.Models;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace SpletnaTrgovinaDiploma.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = UserRoles.Admin)]
     public class ItemsController : Controller
     {
         private readonly IItemsService _service;

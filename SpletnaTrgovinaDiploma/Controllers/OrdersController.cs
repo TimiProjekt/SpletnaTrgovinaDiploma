@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SpletnaTrgovinaDiploma.Data.Cart;
 using SpletnaTrgovinaDiploma.Data.Services;
+using SpletnaTrgovinaDiploma.Data.Static;
 using SpletnaTrgovinaDiploma.Data.ViewModels;
 using System;
 using System.Collections.Generic;

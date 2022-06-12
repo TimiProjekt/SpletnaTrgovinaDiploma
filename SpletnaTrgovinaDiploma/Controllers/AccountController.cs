@@ -92,5 +92,11 @@ namespace SpletnaTrgovinaDiploma.Controllers
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Items");
         }
+
+        public IActionResult AccessDenied(string ReturnUrl)
+        {
+            return View();
+        }
+
     }
 }
