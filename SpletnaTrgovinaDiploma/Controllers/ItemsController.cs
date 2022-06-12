@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SpletnaTrgovinaDiploma.Data;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace SpletnaTrgovinaDiploma.Controllers
 {
+    [Authorize]
     public class ItemsController : Controller
     {
         private readonly IItemsService _service;
@@ -20,6 +22,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             _service = service;
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> Index() 
         {
             var allItems = await _service.GetAllAsync(n => n.Brands_Items);
@@ -41,6 +44,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         }
 
         //GET: Items/Details/1(ItemId)
+        [AllowAnonymous]
         public async Task <IActionResult> Details(int id) 
         {
             var itemDetail = await _service.GetItemByIdAsync(id);

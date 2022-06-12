@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SpletnaTrgovinaDiploma.Data.Cart;
 using SpletnaTrgovinaDiploma.Data.Services;
 using SpletnaTrgovinaDiploma.Data.ViewModels;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace SpletnaTrgovinaDiploma.Controllers
 {
+    [Authorize]
     public class OrdersController : Controller
     {
         private readonly IItemsService _itemsService;
