@@ -80,8 +80,13 @@ namespace SpletnaTrgovinaDiploma.Controllers
             };
             var newUserResponse = await _userManager.CreateAsync(newUser, registerVM.Password);
 
-            if (newUserResponse.Succeeded)
-                await _userManager.AddToRoleAsync(newUser, UserRoles.User);
+            if (!newUserResponse.Succeeded)
+            {
+                ModelState.AddModelError("", newUserResponse.Errors.First().Description);
+                return View();
+            }
+
+            await _userManager.AddToRoleAsync(newUser, UserRoles.User);
 
             return View("RegisterCompleted");
         }

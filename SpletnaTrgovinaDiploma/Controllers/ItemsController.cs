@@ -30,6 +30,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return View(allItems);
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> Filter(string searchString)
         {
             var allItems = await _service.GetAllAsync(n => n.Brands_Items);
