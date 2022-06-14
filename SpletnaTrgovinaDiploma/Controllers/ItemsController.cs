@@ -89,6 +89,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 Id = itemDetails.Id,
                 Name = itemDetails.Name,
                 Description = itemDetails.Description,
+                ShortDescription = itemDetails.ShortDescription,
                 Price = itemDetails.Price,
                 ImageURL = itemDetails.ImageURL,
                 ItemCategory = itemDetails.ItemCategory,

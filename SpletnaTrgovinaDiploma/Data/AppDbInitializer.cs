@@ -51,7 +51,8 @@ namespace SpletnaTrgovinaDiploma.Data
                         new Item()
                         {
                             Name = "ASUS TUF Gaming H3 Wireless Headphones",
-                            Description = "To je opis za slusalice",
+                            Description = "To je opis za slusalke",
+                            ShortDescription = "To je opis za slusalke",
                             Price = 100,
                             ImageURL = "https://www.mimovrste.com/i/57789139/2000/2000",
                             ItemCategory = ItemCategory.Headphones
@@ -60,6 +61,7 @@ namespace SpletnaTrgovinaDiploma.Data
                         {
                             Name = "Razer DeathAdder V2 Gaming Mouse",
                             Description ="To je opis za misko",
+                            ShortDescription ="To je opis za misko",
                             Price = 70,
                             ImageURL = "https://www.mimovrste.com/i/45566757/2000/2000",
                             ItemCategory = ItemCategory.Mouse
@@ -68,6 +70,7 @@ namespace SpletnaTrgovinaDiploma.Data
                         {
                             Name = "Logitech G613 Mechanic Wireless Gaming Keyboard",
                             Description = "to je opis za tipkovnico",
+                            ShortDescription = "to je opis za tipkovnico",
                             Price = 149,
                             ImageURL = "https://www.mimovrste.com/i/40008353/1000/1000",
                             ItemCategory = ItemCategory.Keyboard

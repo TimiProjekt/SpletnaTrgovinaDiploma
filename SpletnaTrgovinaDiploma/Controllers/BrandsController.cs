@@ -25,7 +25,8 @@ namespace SpletnaTrgovinaDiploma.Controllers
         public async Task<IActionResult> Index()
         {
             var data = await _service.GetAllAsync();
-            return View(data);
+            var orderData = data.OrderBy(brand => brand.Name);
+            return View(orderData);
         }
 
         //Get: Brands/Create

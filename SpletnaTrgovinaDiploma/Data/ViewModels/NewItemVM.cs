@@ -20,6 +20,10 @@ namespace SpletnaTrgovinaDiploma.Models
         [Required(ErrorMessage = "Description is required")]
         public string Description { get; set; }
 
+        [Display(Name = "Short item description")]
+        [Required(ErrorMessage = "Description is required")]
+        public string ShortDescription { get; set; }
+
         [Display(Name = "Price in €")]
         [Required(ErrorMessage = "Price is required")]
         public decimal Price { get; set; }

@@ -23,6 +23,7 @@ namespace SpletnaTrgovinaDiploma.Data.Services
             {
                 Name = data.Name,
                 Description = data.Description,
+                ShortDescription = data.ShortDescription,
                 Price = data.Price,
                 ImageURL = data.ImageURL,
                 ItemCategory = data.ItemCategory
@@ -70,6 +71,7 @@ namespace SpletnaTrgovinaDiploma.Data.Services
             {
                 dbItem.Name = data.Name;
                 dbItem.Description = data.Description;
+                dbItem.ShortDescription = data.ShortDescription;
                 dbItem.Price = data.Price;
                 dbItem.ImageURL = data.ImageURL;
                 dbItem.ItemCategory = data.ItemCategory;
