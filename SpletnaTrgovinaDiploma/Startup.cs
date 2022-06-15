@@ -16,21 +16,22 @@ namespace SpletnaTrgovinaDiploma
 {
     public class Startup
     {
+        private readonly IConfiguration configuration;
+
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            this.configuration = configuration;
         }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             //DBContext configuration
-            services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString")));
+            services.AddDbContext<AppDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString")));
 
             //Services configuration
             services.AddScoped<IBrandsService, BrandsService>();
+            services.AddScoped<ICountryService, CountryService>();
             services.AddScoped<IItemsService, ItemsService>();
             services.AddScoped<IOrdersService, OrdersService>();
 
@@ -83,8 +84,7 @@ namespace SpletnaTrgovinaDiploma
             });
 
             //Seed database
-            AppDbInitializer.Seed(app);
-            AppDbInitializer.SeedUsersAndRolesAsync(app).Wait();
+            AppDbInitializer.SeedAsync(app).Wait();
         }
     }
 }

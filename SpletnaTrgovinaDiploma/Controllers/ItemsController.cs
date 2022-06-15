@@ -13,10 +13,12 @@ namespace SpletnaTrgovinaDiploma.Controllers
     public class ItemsController : Controller
     {
         private readonly IItemsService service;
+        private readonly IBrandsService brandService;
 
-        public ItemsController(IItemsService service)
+        public ItemsController(IItemsService service, IBrandsService brandService)
         {
             this.service = service;
+            this.brandService = brandService;
         }
 
         [AllowAnonymous]
@@ -52,7 +54,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         //GET: Movies/Create
         public async Task<IActionResult> Create()
         {
-            var itemDropdownsData = await service.GetNewItemDropdownsValues();
+            var itemDropdownsData = await brandService.GetDropdownValuesAsync();
 
             ViewBag.Brands = new SelectList(itemDropdownsData.Brands, "Id", "Name");
 
@@ -64,7 +66,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var itemDropdownsData = await service.GetNewItemDropdownsValues();
+                var itemDropdownsData = await brandService.GetDropdownValuesAsync();
 
                 ViewBag.Brands = new SelectList(itemDropdownsData.Brands, "Id", "Name");
 
@@ -95,7 +97,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             };
 
 
-            var itemDropdownsData = await service.GetNewItemDropdownsValues();
+            var itemDropdownsData = await brandService.GetDropdownValuesAsync();
 
             ViewBag.Brands = new SelectList(itemDropdownsData.Brands, "Id", "Name");
 
@@ -110,7 +112,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
             if (!ModelState.IsValid)
             {
-                var itemDropdownsData = await service.GetNewItemDropdownsValues();
+                var itemDropdownsData = await brandService.GetDropdownValuesAsync();
 
                 ViewBag.Brands = new SelectList(itemDropdownsData.Brands, "Id", "Name");
 

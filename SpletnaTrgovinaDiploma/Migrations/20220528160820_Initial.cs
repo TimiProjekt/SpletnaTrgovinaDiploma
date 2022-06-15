@@ -46,15 +46,15 @@ namespace SpletnaTrgovinaDiploma.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Brands_Items", x => new { x.BrandId, x.ItemId });
+                    table.PrimaryKey("PK_BrandsItems", x => new { x.BrandId, x.ItemId });
                     table.ForeignKey(
-                        name: "FK_Brands_Items_Brands_BrandId",
+                        name: "FK_BrandsItems_Brands_BrandId",
                         column: x => x.BrandId,
                         principalTable: "Brands",
                         principalColumn: "BrandId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Brands_Items_Items_ItemId",
+                        name: "FK_BrandsItems_Items_ItemId",
                         column: x => x.ItemId,
                         principalTable: "Items",
                         principalColumn: "ItemId",
@@ -62,7 +62,7 @@ namespace SpletnaTrgovinaDiploma.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Brands_Items_ItemId",
+                name: "IX_BrandsItems_ItemId",
                 table: "BrandsItems",
                 column: "ItemId");
         }

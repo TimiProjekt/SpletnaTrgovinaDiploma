@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace SpletnaTrgovinaDiploma.Data.ViewModels
 {
-    public class NewItemDropdownsViewModel
+    public class BrandDropdownViewModel
     {
-        public NewItemDropdownsViewModel()
+        public List<Brand> Brands { get; set; }
+
+        public BrandDropdownViewModel()
         {
             Brands = new List<Brand>();
         }
-
-        public List<Brand> Brands { get; set; }
     }
 }

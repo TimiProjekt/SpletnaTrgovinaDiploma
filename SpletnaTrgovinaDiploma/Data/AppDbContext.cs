@@ -26,6 +26,7 @@ namespace SpletnaTrgovinaDiploma.Data
         }
 
         public DbSet<Brand> Brands { get; set; }
+        public DbSet<Country> Countries { get; set; }
         public DbSet<Item> Items { get; set; }
         public DbSet<BrandItem> BrandsItems { get; set; }
 

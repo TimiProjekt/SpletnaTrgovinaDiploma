@@ -10,14 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Initial Values\Country.sql" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="Initial Values\Country.sql" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
 

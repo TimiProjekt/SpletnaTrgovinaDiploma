@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SpletnaTrgovinaDiploma.Data.Base;
-using SpletnaTrgovinaDiploma.Data.ViewModels;
 using SpletnaTrgovinaDiploma.Models;
 using System.Linq;
 using System.Threading.Tasks;
@@ -50,16 +49,6 @@ namespace SpletnaTrgovinaDiploma.Data.Services
                 .FirstOrDefaultAsync(n => n.Id == id);
 
             return itemDetails;
-        }
-
-        public async Task<NewItemDropdownsViewModel> GetNewItemDropdownsValues()
-        {
-            var response = new NewItemDropdownsViewModel()
-            {
-                Brands = await context.Brands.OrderBy(n => n.Name).ToListAsync()
-            };
-
-            return response;
         }
 
         public async Task UpdateItemAsync(NewItemViewModel data)
