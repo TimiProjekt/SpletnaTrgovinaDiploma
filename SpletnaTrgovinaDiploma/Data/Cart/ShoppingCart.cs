@@ -11,7 +11,7 @@ namespace SpletnaTrgovinaDiploma.Data.Cart
 {
     public class ShoppingCart
     {
-        private AppDbContext context { get; set; }
+        private readonly AppDbContext context;
 
         public string ShoppingCartId { get; set; }
         public List<ShoppingCartItem> ShoppingCartItems { get; set; }
@@ -23,10 +23,10 @@ namespace SpletnaTrgovinaDiploma.Data.Cart
 
         public static ShoppingCart GetShoppingCart(IServiceProvider services)
         {
-            ISession session = services.GetRequiredService<IHttpContextAccessor>()?.HttpContext.Session;
+            var session = services.GetRequiredService<IHttpContextAccessor>()?.HttpContext?.Session;
             var context = services.GetService<AppDbContext>();
 
-            string cartId = session.GetString("CartId") ?? Guid.NewGuid().ToString();
+            var cartId = session.GetString("CartId") ?? Guid.NewGuid().ToString();
             session.SetString("CartId", cartId);
 
             return new ShoppingCart(context) { ShoppingCartId = cartId };
@@ -36,7 +36,7 @@ namespace SpletnaTrgovinaDiploma.Data.Cart
         {
             var shoppingCartItem = context.ShoppingCartItems.FirstOrDefault(n => n.Item.Id == item.Id && n.ShoppingCartId == ShoppingCartId);
 
-            if(shoppingCartItem == null)
+            if (shoppingCartItem == null)
             {
                 shoppingCartItem = new ShoppingCartItem()
                 {
@@ -46,7 +46,8 @@ namespace SpletnaTrgovinaDiploma.Data.Cart
                 };
 
                 context.ShoppingCartItems.Add(shoppingCartItem);
-            } else
+            }
+            else
             {
                 shoppingCartItem.Amount++;
             }
@@ -59,14 +60,14 @@ namespace SpletnaTrgovinaDiploma.Data.Cart
 
             if (shoppingCartItem != null)
             {
-                if(shoppingCartItem.Amount > 1)
+                if (shoppingCartItem.Amount > 1)
                 {
                     shoppingCartItem.Amount--;
                 }
                 else
                 {
                     context.ShoppingCartItems.Remove(shoppingCartItem);
-                }             
+                }
             }
             context.SaveChanges();
         }

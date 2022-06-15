@@ -1,13 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using SpletnaTrgovinaDiploma.Data;
 using SpletnaTrgovinaDiploma.Data.Services;
 using SpletnaTrgovinaDiploma.Data.Static;
 using SpletnaTrgovinaDiploma.Models;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,24 +12,24 @@ namespace SpletnaTrgovinaDiploma.Controllers
     [Authorize(Roles = UserRoles.Admin)]
     public class ItemsController : Controller
     {
-        private readonly IItemsService _service;
+        private readonly IItemsService service;
 
-        public ItemsController(IItemsService service) 
+        public ItemsController(IItemsService service)
         {
-            _service = service;
+            this.service = service;
         }
 
         [AllowAnonymous]
-        public async Task<IActionResult> Index() 
+        public async Task<IActionResult> Index()
         {
-            var allItems = await _service.GetAllAsync(n => n.Brands_Items);
+            var allItems = await service.GetAllAsync(n => n.BrandsItems);
             return View(allItems);
         }
 
         [AllowAnonymous]
         public async Task<IActionResult> Filter(string searchString)
         {
-            var allItems = await _service.GetAllAsync(n => n.Brands_Items);
+            var allItems = await service.GetAllAsync(n => n.BrandsItems);
 
             if (!string.IsNullOrEmpty(searchString))
             {
@@ -47,16 +43,16 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
         //GET: Items/Details/1(ItemId)
         [AllowAnonymous]
-        public async Task <IActionResult> Details(int id) 
+        public async Task<IActionResult> Details(int id)
         {
-            var itemDetail = await _service.GetItemByIdAsync(id);
+            var itemDetail = await service.GetItemByIdAsync(id);
             return View(itemDetail);
         }
 
         //GET: Movies/Create
-        public async Task<IActionResult> Create() 
+        public async Task<IActionResult> Create()
         {
-            var itemDropdownsData = await _service.GetNewItemDropdownsValues();
+            var itemDropdownsData = await service.GetNewItemDropdownsValues();
 
             ViewBag.Brands = new SelectList(itemDropdownsData.Brands, "Id", "Name");
 
@@ -64,41 +60,42 @@ namespace SpletnaTrgovinaDiploma.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(NewItemVM item)
+        public async Task<IActionResult> Create(NewItemViewModel item)
         {
             if (!ModelState.IsValid)
             {
-                var itemDropdownsData = await _service.GetNewItemDropdownsValues();
+                var itemDropdownsData = await service.GetNewItemDropdownsValues();
 
                 ViewBag.Brands = new SelectList(itemDropdownsData.Brands, "Id", "Name");
 
                 return View(item);
             }
 
-            await _service.AddNewItemAsync(item);
+            await service.AddNewItemAsync(item);
             return RedirectToAction(nameof(Index));
         }
 
         //Get: Items/Edit/1
         public async Task<IActionResult> Edit(int id)
         {
-            var itemDetails = await _service.GetItemByIdAsync(id);
-            if (itemDetails == null) return View("Not Found");
+            var itemDetails = await service.GetItemByIdAsync(id);
+            if (itemDetails == null)
+                return View("NotFound");
 
-            var response = new NewItemVM()
+            var response = new NewItemViewModel()
             {
                 Id = itemDetails.Id,
                 Name = itemDetails.Name,
                 Description = itemDetails.Description,
                 ShortDescription = itemDetails.ShortDescription,
                 Price = itemDetails.Price,
-                ImageURL = itemDetails.ImageURL,
+                ImageUrl = itemDetails.ImageUrl,
                 ItemCategory = itemDetails.ItemCategory,
-                BrandIds = itemDetails.Brands_Items.Select(n => n.BrandId).ToList(),
+                BrandIds = itemDetails.BrandsItems.Select(n => n.BrandId).ToList(),
             };
 
 
-            var itemDropdownsData = await _service.GetNewItemDropdownsValues();
+            var itemDropdownsData = await service.GetNewItemDropdownsValues();
 
             ViewBag.Brands = new SelectList(itemDropdownsData.Brands, "Id", "Name");
 
@@ -106,20 +103,21 @@ namespace SpletnaTrgovinaDiploma.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, NewItemVM item)
+        public async Task<IActionResult> Edit(int id, NewItemViewModel item)
         {
-            if (id != item.Id) return View("NotFound");
+            if (id != item.Id) 
+                return View("NotFound");
 
             if (!ModelState.IsValid)
             {
-                var itemDropdownsData = await _service.GetNewItemDropdownsValues();
+                var itemDropdownsData = await service.GetNewItemDropdownsValues();
 
                 ViewBag.Brands = new SelectList(itemDropdownsData.Brands, "Id", "Name");
 
                 return View(item);
             }
 
-            await _service.UpdateItemAsync(item);
+            await service.UpdateItemAsync(item);
             return RedirectToAction(nameof(Index));
         }
 

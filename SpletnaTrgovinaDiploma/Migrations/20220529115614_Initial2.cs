@@ -17,7 +17,7 @@ namespace SpletnaTrgovinaDiploma.Migrations
                 newName: "Id");
 
             migrationBuilder.AlterColumn<string>(
-                name: "ProfilePictureURL",
+                name: "ProfilePictureUrl",
                 table: "Brands",
                 type: "nvarchar(max)",
                 nullable: false,
@@ -51,7 +51,7 @@ namespace SpletnaTrgovinaDiploma.Migrations
                 newName: "BrandId");
 
             migrationBuilder.AlterColumn<string>(
-                name: "ProfilePictureURL",
+                name: "ProfilePictureUrl",
                 table: "Brands",
                 type: "nvarchar(max)",
                 nullable: true,

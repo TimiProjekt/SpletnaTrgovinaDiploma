@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using SpletnaTrgovinaDiploma.Data.Static;
 using SpletnaTrgovinaDiploma.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,11 +13,11 @@ namespace SpletnaTrgovinaDiploma.Data
     {
         public static void Seed(IApplicationBuilder applicationBuilder)
         {
-            using (var serviceScope = applicationBuilder.ApplicationServices.CreateScope()) 
+            using (var serviceScope = applicationBuilder.ApplicationServices.CreateScope())
             {
                 var context = serviceScope.ServiceProvider.GetService<AppDbContext>();
 
-                context.Database.EnsureCreated();
+                context?.Database.EnsureCreated();
 
                 //Brands
                 if (!context.Brands.Any())
@@ -28,17 +27,17 @@ namespace SpletnaTrgovinaDiploma.Data
                         new Brand()
                         {
                             Name = "Razer",
-                            ProfilePictureURL = "https://logos-world.net/wp-content/uploads/2020/11/Razer-Logo.png"
+                            ProfilePictureUrl = "https://logos-world.net/wp-content/uploads/2020/11/Razer-Logo.png"
                         },
                         new Brand()
                         {
                             Name = "Logitech",
-                            ProfilePictureURL = "https://logos-world.net/wp-content/uploads/2020/11/Logitech-Logo.png"
+                            ProfilePictureUrl = "https://logos-world.net/wp-content/uploads/2020/11/Logitech-Logo.png"
                         },
                         new Brand()
                         {
                             Name = "Asus",
-                            ProfilePictureURL = "https://logos-world.net/wp-content/uploads/2020/07/Asus-Logo.png"
+                            ProfilePictureUrl = "https://logos-world.net/wp-content/uploads/2020/07/Asus-Logo.png"
                         }
                     });
                     context.SaveChanges();
@@ -54,7 +53,7 @@ namespace SpletnaTrgovinaDiploma.Data
                             Description = "To je opis za slusalke",
                             ShortDescription = "To je opis za slusalke",
                             Price = 100,
-                            ImageURL = "https://www.mimovrste.com/i/57789139/2000/2000",
+                            ImageUrl = "https://www.mimovrste.com/i/57789139/2000/2000",
                             ItemCategory = ItemCategory.Headphones
                         },
                         new Item()
@@ -63,7 +62,7 @@ namespace SpletnaTrgovinaDiploma.Data
                             Description ="To je opis za misko",
                             ShortDescription ="To je opis za misko",
                             Price = 70,
-                            ImageURL = "https://www.mimovrste.com/i/45566757/2000/2000",
+                            ImageUrl = "https://www.mimovrste.com/i/45566757/2000/2000",
                             ItemCategory = ItemCategory.Mouse
                         },
                         new Item()
@@ -72,28 +71,28 @@ namespace SpletnaTrgovinaDiploma.Data
                             Description = "to je opis za tipkovnico",
                             ShortDescription = "to je opis za tipkovnico",
                             Price = 149,
-                            ImageURL = "https://www.mimovrste.com/i/40008353/1000/1000",
+                            ImageUrl = "https://www.mimovrste.com/i/40008353/1000/1000",
                             ItemCategory = ItemCategory.Keyboard
                         }
                     });
                     context.SaveChanges();
                 }
                 //Brands & Items
-                if (!context.Brands_Items.Any())
+                if (!context.BrandsItems.Any())
                 {
-                    context.Brands_Items.AddRange(new List<Brand_Item>()
+                    context.BrandsItems.AddRange(new List<BrandItem>()
                     {
-                        new Brand_Item()
+                        new BrandItem()
                         {
                             BrandId = 1,
                             ItemId = 2
                         },
-                        new Brand_Item()
+                        new BrandItem()
                         {
                             BrandId = 3,
                             ItemId = 3
                         },
-                        new Brand_Item()
+                        new BrandItem()
                         {
                             BrandId = 2,
                             ItemId = 1
@@ -121,10 +120,10 @@ namespace SpletnaTrgovinaDiploma.Data
 
                 //Users
                 var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-                string adminUserEmail = "admin@spletnatrgovina.com";
+                const string adminUserEmail = "admin@spletnatrgovina.com";
 
                 var adminUser = await userManager.FindByEmailAsync(adminUserEmail);
-                if(adminUser == null)
+                if (adminUser == null)
                 {
                     var newAdminUser = new ApplicationUser()
                     {
@@ -137,8 +136,8 @@ namespace SpletnaTrgovinaDiploma.Data
                     await userManager.AddToRoleAsync(newAdminUser, UserRoles.Admin);
                 }
 
-                
-                string appUserEmail = "user@spletnatrgovina.com";
+
+                const string appUserEmail = "user@spletnatrgovina.com";
 
                 var appUser = await userManager.FindByEmailAsync(appUserEmail);
                 if (appUser == null)

@@ -1,5 +1,3 @@
-using System;
-
 namespace SpletnaTrgovinaDiploma.Models
 {
     public class ErrorViewModel

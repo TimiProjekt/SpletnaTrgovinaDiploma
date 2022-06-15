@@ -21,7 +21,7 @@
 
             <thead>
                 <tr>
-                    <th>@Html.DisplayNameFor(model => model.ProfilePictureURL)</th>
+                    <th>@Html.DisplayNameFor(model => model.ProfilePictureUrl)</th>
                     <th>@Html.DisplayNameFor(model => model.Name)</th>
                     @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
                     {
@@ -34,7 +34,7 @@
                 {
                 <tr>
                     <td class="align-middle">
-                        <img class="rounded-circle" src="@item.ProfilePictureURL" alt="@item.Name" style="max-width: 150px" />
+                        <img class="rounded-circle" src="@item.ProfilePictureUrl" alt="@item.Name" style="max-width: 150px" />
                     </td>
                     <td class="align-middle">
                         @Html.DisplayFor(modelItem => item.Name)

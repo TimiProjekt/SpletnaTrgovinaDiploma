@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SpletnaTrgovinaDiploma.Data.ViewModels
 {
-    public class RegisterVM
+    public class RegisterViewModel
     {
         [Display(Name = "Full name")]
         [Required(ErrorMessage = "Full name is required")]

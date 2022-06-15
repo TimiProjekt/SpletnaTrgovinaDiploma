@@ -27,7 +27,7 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <img src="@Model.ImageURL" style="width: 100%" alt="@Model.Name">
+                        <img src="@Model.ImageUrl" style="width: 100%" alt="@Model.Name">
                     </div>
                     <div class="col-md-8">
                         <div class="card-body">
@@ -49,10 +49,10 @@
                                  <b>Brands:</b>
                                  <hr />
                                  <div class="row">
-                                     @foreach (var brand in Model.Brands_Items)
+                                     @foreach (var brand in Model.BrandsItems)
                                      { 
                                          <div class="card-columns text-center">
-                                             <img class="border-info rounded-circle" src="@brand.Brand.ProfilePictureURL" style="max-width: 150px" />
+                                             <img class="border-info rounded-circle" src="@brand.Brand.ProfilePictureUrl" style="max-width: 150px" />
                                              <br />
                                              <a asp-controller="Brands" asp-action="Details" asp-route-id="@brand.BrandId">@brand.Brand.Name</a>
                                          </div>

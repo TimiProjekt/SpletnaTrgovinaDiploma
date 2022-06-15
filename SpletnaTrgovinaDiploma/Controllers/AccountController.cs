@@ -5,8 +5,6 @@ using SpletnaTrgovinaDiploma.Data;
 using SpletnaTrgovinaDiploma.Data.Static;
 using SpletnaTrgovinaDiploma.Data.ViewModels;
 using SpletnaTrgovinaDiploma.Models;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,71 +12,70 @@ namespace SpletnaTrgovinaDiploma.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly AppDbContext _context; 
+        private readonly UserManager<ApplicationUser> userManager;
+        private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly AppDbContext context;
 
         public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, AppDbContext context)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _context = context;
+            this.userManager = userManager;
+            this.signInManager = signInManager;
+            this.context = context;
         }
 
         public async Task<IActionResult> Users()
         {
-            var users = await _context.Users.ToListAsync();
+            var users = await context.Users.ToListAsync();
             return View(users);
         }
 
-        public IActionResult Login() => View(new LoginVM());
+        public IActionResult Login() => View(new LoginViewModel());
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginVM loginVM)
+        public async Task<IActionResult> Login(LoginViewModel loginViewModel)
         {
-            if (!ModelState.IsValid) return View(loginVM);
+            if (!ModelState.IsValid) return View(loginViewModel);
 
-            var user = await _userManager.FindByEmailAsync(loginVM.EmailAddress);
+            var user = await userManager.FindByEmailAsync(loginViewModel.EmailAddress);
             if (user != null)
             {
-                var passwordCheck = await _userManager.CheckPasswordAsync(user, loginVM.Password);
+                var passwordCheck = await userManager.CheckPasswordAsync(user, loginViewModel.Password);
                 if (passwordCheck)
                 {
-                    var result = await _signInManager.PasswordSignInAsync(user, loginVM.Password, false, false);
+                    var result = await signInManager.PasswordSignInAsync(user, loginViewModel.Password, false, false);
                     if (result.Succeeded)
-                    {
                         return RedirectToAction("Index", "Items");
-                    }
                 }
+
                 TempData["Error"] = "Wrong credentials. Please, try again!";
-                return View(loginVM);
+                return View(loginViewModel);
             }
 
             TempData["Error"] = "Wrong credentials. Please, try again!";
-            return View(loginVM);
+            return View(loginViewModel);
         }
 
-        public IActionResult Register() => View(new RegisterVM());
+        public IActionResult Register() => View(new RegisterViewModel());
 
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterVM registerVM)
+        public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
         {
-            if (!ModelState.IsValid) return View(registerVM);
+            if (!ModelState.IsValid) return View(registerViewModel);
 
-            var user = await _userManager.FindByEmailAsync(registerVM.EmailAddress);
-            if(user != null)
+            var user = await userManager.FindByEmailAsync(registerViewModel.EmailAddress);
+            if (user != null)
             {
                 TempData["Error"] = "This email address is already in use";
-                return View(registerVM);
+                return View(registerViewModel);
             }
 
             var newUser = new ApplicationUser()
             {
-                FullName = registerVM.FullName,
-                Email = registerVM.EmailAddress,
-                UserName = registerVM.EmailAddress
+                FullName = registerViewModel.FullName,
+                Email = registerViewModel.EmailAddress,
+                UserName = registerViewModel.EmailAddress
             };
-            var newUserResponse = await _userManager.CreateAsync(newUser, registerVM.Password);
+            var newUserResponse = await userManager.CreateAsync(newUser, registerViewModel.Password);
 
             if (!newUserResponse.Succeeded)
             {
@@ -86,7 +83,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 return View();
             }
 
-            await _userManager.AddToRoleAsync(newUser, UserRoles.User);
+            await userManager.AddToRoleAsync(newUser, UserRoles.User);
 
             return View("RegisterCompleted");
         }
@@ -94,11 +91,11 @@ namespace SpletnaTrgovinaDiploma.Controllers
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            await _signInManager.SignOutAsync();
+            await signInManager.SignOutAsync();
             return RedirectToAction("Index", "Items");
         }
 
-        public IActionResult AccessDenied(string ReturnUrl)
+        public IActionResult AccessDenied()
         {
             return View();
         }

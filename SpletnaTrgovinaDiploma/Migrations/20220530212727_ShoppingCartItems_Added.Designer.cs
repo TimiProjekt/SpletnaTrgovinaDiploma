@@ -33,7 +33,7 @@ namespace SpletnaTrgovinaDiploma.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("ProfilePictureURL")
+                    b.Property<string>("ProfilePictureUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -42,7 +42,7 @@ namespace SpletnaTrgovinaDiploma.Migrations
                     b.ToTable("Brands");
                 });
 
-            modelBuilder.Entity("SpletnaTrgovinaDiploma.Models.Brand_Item", b =>
+            modelBuilder.Entity("SpletnaTrgovinaDiploma.Models.BrandItem", b =>
                 {
                     b.Property<int>("BrandId")
                         .HasColumnType("int");
@@ -54,7 +54,7 @@ namespace SpletnaTrgovinaDiploma.Migrations
 
                     b.HasIndex("ItemId");
 
-                    b.ToTable("Brands_Items");
+                    b.ToTable("BrandsItems");
                 });
 
             modelBuilder.Entity("SpletnaTrgovinaDiploma.Models.Item", b =>
@@ -67,7 +67,7 @@ namespace SpletnaTrgovinaDiploma.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ImageURL")
+                    b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ItemCategory")
@@ -153,16 +153,16 @@ namespace SpletnaTrgovinaDiploma.Migrations
                     b.ToTable("ShoppingCartItems");
                 });
 
-            modelBuilder.Entity("SpletnaTrgovinaDiploma.Models.Brand_Item", b =>
+            modelBuilder.Entity("SpletnaTrgovinaDiploma.Models.BrandItem", b =>
                 {
                     b.HasOne("SpletnaTrgovinaDiploma.Models.Brand", "Brand")
-                        .WithMany("Brands_Items")
+                        .WithMany("BrandsItems")
                         .HasForeignKey("BrandId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SpletnaTrgovinaDiploma.Models.Item", "Item")
-                        .WithMany("Brands_Items")
+                        .WithMany("BrandsItems")
                         .HasForeignKey("ItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -202,12 +202,12 @@ namespace SpletnaTrgovinaDiploma.Migrations
 
             modelBuilder.Entity("SpletnaTrgovinaDiploma.Models.Brand", b =>
                 {
-                    b.Navigation("Brands_Items");
+                    b.Navigation("BrandsItems");
                 });
 
             modelBuilder.Entity("SpletnaTrgovinaDiploma.Models.Item", b =>
                 {
-                    b.Navigation("Brands_Items");
+                    b.Navigation("BrandsItems");
                 });
 
             modelBuilder.Entity("SpletnaTrgovinaDiploma.Models.Order", b =>

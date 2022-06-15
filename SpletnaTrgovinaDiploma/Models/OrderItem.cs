@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SpletnaTrgovinaDiploma.Models
 {
     public class OrderItem
     {
-        [Key]
+        [System.ComponentModel.DataAnnotations.Key]
         public int Id { get; set; }
 
         public int Amount { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }
 
         public int ItemId { get; set; }

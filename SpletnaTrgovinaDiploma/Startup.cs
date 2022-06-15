@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -12,10 +11,6 @@ using SpletnaTrgovinaDiploma.Data;
 using SpletnaTrgovinaDiploma.Data.Cart;
 using SpletnaTrgovinaDiploma.Data.Services;
 using SpletnaTrgovinaDiploma.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SpletnaTrgovinaDiploma
 {
@@ -32,8 +27,7 @@ namespace SpletnaTrgovinaDiploma
         public void ConfigureServices(IServiceCollection services)
         {
             //DBContext configuration
-            services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString
-                ("DefaultConnectionString")));
+            services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString")));
 
             //Services configuration
             services.AddScoped<IBrandsService, BrandsService>();
@@ -41,7 +35,7 @@ namespace SpletnaTrgovinaDiploma
             services.AddScoped<IOrdersService, OrdersService>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddScoped(sc => ShoppingCart.GetShoppingCart(sc));
+            services.AddScoped(ShoppingCart.GetShoppingCart);
 
             //Authentication and authorization
             services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>();
@@ -52,7 +46,7 @@ namespace SpletnaTrgovinaDiploma
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             });
 
-            services.AddControllersWithViews(); 
+            services.AddControllersWithViews();
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
         }
 

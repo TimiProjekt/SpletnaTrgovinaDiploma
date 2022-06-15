@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace SpletnaTrgovinaDiploma.Data.Base
+﻿namespace SpletnaTrgovinaDiploma.Data.Base
 {
     public interface IEntityBase
     {

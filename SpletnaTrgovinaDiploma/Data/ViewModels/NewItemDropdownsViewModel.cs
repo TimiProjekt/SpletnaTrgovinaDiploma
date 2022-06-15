@@ -1,14 +1,11 @@
 ﻿using SpletnaTrgovinaDiploma.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SpletnaTrgovinaDiploma.Data.ViewModels
 {
-    public class NewItemDropdownsVM
+    public class NewItemDropdownsViewModel
     {
-        public NewItemDropdownsVM()
+        public NewItemDropdownsViewModel()
         {
             Brands = new List<Brand>();
         }

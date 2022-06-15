@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SpletnaTrgovinaDiploma.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,21 +8,19 @@ namespace SpletnaTrgovinaDiploma.Data.Services
 {
     public class OrdersService : IOrdersService
     {
-        private readonly AppDbContext _context;
+        private readonly AppDbContext context;
 
         public OrdersService(AppDbContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
         public async Task<List<Order>> GetOrdersByUserIdAndRoleAsync(string userId, string userRole)
         {
-            var orders = await _context.Orders.Include(n => n.OrderItems).ThenInclude(n => n.Item).Include(n => n.User).ToListAsync();
+            var orders = await context.Orders.Include(n => n.OrderItems).ThenInclude(n => n.Item).Include(n => n.User).ToListAsync();
 
-            if(userRole != "Admin")
-            {
+            if (userRole != "Admin")
                 orders = orders.Where(n => n.UserId == userId).ToList();
-            }
 
             return orders;
         }
@@ -35,8 +32,8 @@ namespace SpletnaTrgovinaDiploma.Data.Services
                 UserId = userId,
                 Email = userEmailAddress
             };
-            await _context.Orders.AddAsync(order);
-            await _context.SaveChangesAsync();
+            await context.Orders.AddAsync(order);
+            await context.SaveChangesAsync();
 
             foreach (var item in items)
             {
@@ -47,9 +44,9 @@ namespace SpletnaTrgovinaDiploma.Data.Services
                     OrderId = order.Id,
                     Price = item.Item.Price
                 };
-                await _context.OrderItems.AddAsync(orderItem);
+                await context.OrderItems.AddAsync(orderItem);
             }
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
     }
 }

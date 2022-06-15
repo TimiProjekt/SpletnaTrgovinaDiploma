@@ -38,7 +38,7 @@ namespace SpletnaTrgovinaDiploma.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Brands_Items",
+                name: "BrandsItems",
                 columns: table => new
                 {
                     ItemId = table.Column<int>(type: "int", nullable: false),
@@ -63,14 +63,14 @@ namespace SpletnaTrgovinaDiploma.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_Brands_Items_ItemId",
-                table: "Brands_Items",
+                table: "BrandsItems",
                 column: "ItemId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Brands_Items");
+                name: "BrandsItems");
 
             migrationBuilder.DropTable(
                 name: "Brands");

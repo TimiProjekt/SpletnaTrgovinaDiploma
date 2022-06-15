@@ -1,19 +1,15 @@
 ﻿using SpletnaTrgovinaDiploma.Data;
-using SpletnaTrgovinaDiploma.Data.Base;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SpletnaTrgovinaDiploma.Models
 {
-    public class NewItemVM
+    public class NewItemViewModel
     {
         public int Id { get; set; }
 
-        [Display(Name ="Item name")]
-        [Required(ErrorMessage="Name is required")]
+        [Display(Name = "Item name")]
+        [Required(ErrorMessage = "Name is required")]
         public string Name { get; set; }
 
         [Display(Name = "Item description")]
@@ -30,7 +26,7 @@ namespace SpletnaTrgovinaDiploma.Models
 
         [Display(Name = "Item image URL")]
         [Required(ErrorMessage = "Item image URL is required")]
-        public string ImageURL { get; set; }
+        public string ImageUrl { get; set; }
 
         [Display(Name = "Select a category")]
         [Required(ErrorMessage = "Item category is required")]

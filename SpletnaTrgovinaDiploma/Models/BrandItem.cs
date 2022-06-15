@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace SpletnaTrgovinaDiploma.Models
+﻿namespace SpletnaTrgovinaDiploma.Models
 {
-    public class Brand_Item
+    public class BrandItem
     {
-
         public int ItemId { get; set; }
         public Item Item { get; set; }
 

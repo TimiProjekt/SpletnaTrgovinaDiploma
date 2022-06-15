@@ -1,15 +1,21 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SpletnaTrgovinaDiploma.Models
 {
-    public class ApplicationUser:IdentityUser
+    public class ApplicationUser : IdentityUser
     {
         [Display(Name = "Full name")]
         public string FullName { get; set; }
+
+        public string StreetName { get; set; }
+
+        public string HouseNumber { get; set; }
+
+        public string City { get; set; }
+
+        public string ZipCode { get; set; }
+
+        public Country Country { get; set; }
     }
 }

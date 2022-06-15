@@ -2,11 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SpletnaTrgovinaDiploma.Data.Cart;
 using SpletnaTrgovinaDiploma.Data.Services;
-using SpletnaTrgovinaDiploma.Data.Static;
 using SpletnaTrgovinaDiploma.Data.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -15,35 +11,35 @@ namespace SpletnaTrgovinaDiploma.Controllers
     [Authorize]
     public class OrdersController : Controller
     {
-        private readonly IItemsService _itemsService;
-        private readonly ShoppingCart _shoppingCart;
-        private readonly IOrdersService _ordersService;
+        private readonly IItemsService itemsService;
+        private readonly ShoppingCart shoppingCart;
+        private readonly IOrdersService ordersService;
 
         public OrdersController(IItemsService itemsService, ShoppingCart shoppingCart, IOrdersService ordersService)
         {
-            _itemsService = itemsService;
-            _shoppingCart = shoppingCart;
-            _ordersService = ordersService;
+            this.itemsService = itemsService;
+            this.shoppingCart = shoppingCart;
+            this.ordersService = ordersService;
         }
 
         public async Task<IActionResult> Index()
         {
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            string userRole = User.FindFirstValue(ClaimTypes.Role);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
 
-            var orders = await _ordersService.GetOrdersByUserIdAndRoleAsync(userId, userRole);
+            var orders = await ordersService.GetOrdersByUserIdAndRoleAsync(userId, userRole);
             return View(orders);
         }
 
         public IActionResult ShoppingCart()
         {
-            var items = _shoppingCart.GetShoppingCartItems();
-            _shoppingCart.ShoppingCartItems = items;
+            var items = shoppingCart.GetShoppingCartItems();
+            shoppingCart.ShoppingCartItems = items;
 
-            var response = new ShoppingCartVM()
+            var response = new ShoppingCartViewModel()
             {
-                ShoppingCart = _shoppingCart,
-                ShoppingCartTotal = _shoppingCart.GetShoppingCartTotal()
+                ShoppingCart = shoppingCart,
+                ShoppingCartTotal = shoppingCart.GetShoppingCartTotal()
             };
 
             return View(response);
@@ -51,34 +47,32 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
         public async Task<IActionResult> AddItemToShoppingCart(int id)
         {
-            var item = await _itemsService.GetItemByIdAsync(id);
+            var item = await itemsService.GetItemByIdAsync(id);
 
-            if(item != null)
-            {
-                _shoppingCart.AddItemToCart(item);
-            }
+            if (item != null)
+                shoppingCart.AddItemToCart(item);
+
             return RedirectToAction(nameof(ShoppingCart));
         }
 
         public async Task<IActionResult> RemoveItemFromShoppingCart(int id)
         {
-            var item = await _itemsService.GetItemByIdAsync(id);
+            var item = await itemsService.GetItemByIdAsync(id);
 
             if (item != null)
-            {
-                _shoppingCart.RemoveItemFromCart(item);
-            }
+                shoppingCart.RemoveItemFromCart(item);
+
             return RedirectToAction(nameof(ShoppingCart));
         }
 
         public async Task<IActionResult> CompleteOrder()
         {
-            var items = _shoppingCart.GetShoppingCartItems();
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            string userEmailAddress = User.FindFirstValue(ClaimTypes.Email);
+            var items = shoppingCart.GetShoppingCartItems();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userEmailAddress = User.FindFirstValue(ClaimTypes.Email);
 
-            await _ordersService.StoreOrderAsync(items, userId, userEmailAddress);
-            await _shoppingCart.ClearShoppingCartAsync();
+            await ordersService.StoreOrderAsync(items, userId, userEmailAddress);
+            await shoppingCart.ClearShoppingCartAsync();
 
             return View("OrderCompleted");
         }
