@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using SpletnaTrgovinaDiploma.Helpers
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -12,7 +13,9 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Items" asp-action="Index">SpletnaTrgovinaDiploma</a>
+                <a class="navbar-brand @ActiveLink.GetCssClassIfHomePage(Url.Action())" asp-area="" asp-controller="Items" asp-action="Index">
+                    @ActiveLink.GetChevronIfHomePage(Url.Action()) SpletnaTrgovinaDiploma
+                </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -20,17 +23,19 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="navbar-nav flex-grow-1">
-                            @foreach (SpletnaTrgovinaDiploma.Data.ItemCategory category in Enum.GetValues(typeof(SpletnaTrgovinaDiploma.Data.ItemCategory)))
+                            @foreach (var category in Enum.GetValues(typeof(SpletnaTrgovinaDiploma.Data.ItemCategory)))
                             {
-                                <a class="nav-link text-dark" asp-controller="Category" asp-action="Index" asp-route-id="@((int)category)"><i class="badge-info"></i>@category.ToString()</a>
+                                <a class="nav-link text-dark @ActiveLink.GetCssClassIfActiveCategory(Url.Action(), (int) category)" asp-controller="Category" asp-action="Index" asp-route-id="@((int) category)">
+                                    @ActiveLink.GetChevronIfActiveCategory(Url.Action(), (int) category) @category.ToString()
+                                </a>
                             }
                         </li>
 
-                        @if(User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
                         {
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false">
+                                   aria-haspopup="true" aria-expanded="false">
                                     <i class="bi bi-gear"></i> Management
                                 </a>
 
@@ -40,7 +45,7 @@
 
                             </li>
                         }
-                        
+
                     </ul>
 
                     <form class="form-inline my-2 my-lg-0" asp-controller="Items" asp-action="Filter" style="padding-right: 25px;">
@@ -52,7 +57,7 @@
                         @await Component.InvokeAsync("ShoppingCartSummary")
                     </ul>
 
-                    <partial name="_Identity.cshtml" />
+                    <partial name="_Identity.cshtml"/>
                 </div>
             </div>
         </nav>
