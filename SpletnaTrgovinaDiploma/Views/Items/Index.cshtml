@@ -15,7 +15,7 @@
     @foreach (var item in Model)
     {
         <div class="col-md-4 col-xs-6 border-primary mb-3">
-            <div class="card mb-3" style="max-width: 540px;">
+            <div class="card mb-3" style="height:100%">
                 <div class="row g-0">
                     <div class="col-md-12">
                         <div class="card-header text-white bg-info">
@@ -31,8 +31,8 @@
                             </p>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <img src="@item.ImageURL" style="width:100%" alt="@item.Name">
+                    <div class="col-md-6" style="display: flex;justify-content: center; align-items: center;">
+                        <img src="@item.ImageURL" style="max-width: 100%; max-height: 300px;" alt="@item.Name">
                     </div>
                     <div class="col-md-6">
                         <div class="card-body">
