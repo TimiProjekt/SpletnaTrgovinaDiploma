@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SpletnaTrgovinaDiploma.Data.Cart;
 using SpletnaTrgovinaDiploma.Data.Services;
@@ -6,6 +7,7 @@ using SpletnaTrgovinaDiploma.Data.ViewModels;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using SpletnaTrgovinaDiploma.Data;
 using SpletnaTrgovinaDiploma.Models;
 
 namespace SpletnaTrgovinaDiploma.Controllers
@@ -17,13 +19,15 @@ namespace SpletnaTrgovinaDiploma.Controllers
         private readonly IOrdersService ordersService;
         private readonly ShoppingCart shoppingCart;
         private readonly UserManager<ApplicationUser> userManager;
+        private readonly AppDbContext context;
 
-        public OrdersController(IItemsService itemsService, IOrdersService ordersService, ShoppingCart shoppingCart, UserManager<ApplicationUser> userManager)
+        public OrdersController(IItemsService itemsService, IOrdersService ordersService, ShoppingCart shoppingCart, UserManager<ApplicationUser> userManager, AppDbContext context)
         {
             this.itemsService = itemsService;
             this.ordersService = ordersService;
             this.shoppingCart = shoppingCart;
             this.userManager = userManager;
+            this.context = context;
         }
 
         public async Task<IActionResult> Index()
@@ -49,6 +53,11 @@ namespace SpletnaTrgovinaDiploma.Controllers
             {
                 ShoppingCart = shoppingCart,
                 ShoppingCartTotal = shoppingCart.GetShoppingCartTotal(),
+                StreetName = user.StreetName,
+                HouseNumber = user.HouseNumber,
+                City = user.City,
+                ZipCode = user.ZipCode,
+                CountryName = context.Countries.Single(c => c.Id == user.CountryId).Name,
                 HasAddress = user.HasAddress
             };
 

@@ -19,7 +19,7 @@ namespace SpletnaTrgovinaDiploma.Data.ViewModels
         [Required(ErrorMessage = "City is required")]
         public string City { get; set; }
 
-        [Display(Name = "ZipCode")]
+        [Display(Name = "Zip code")]
         [Required(ErrorMessage = "Zip code is required")]
         public string ZipCode { get; set; }
 
