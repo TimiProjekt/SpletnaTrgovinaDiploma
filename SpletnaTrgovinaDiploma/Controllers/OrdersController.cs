@@ -49,6 +49,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             if (!user.HasAddress)
                 TempData["Error"] = "You do not have any address entered. Please go to settings and set up an address!";
 
+            var country = context.Countries.SingleOrDefault(c => c.Id == user.CountryId);
             var response = new ShoppingCartViewModel()
             {
                 ShoppingCart = shoppingCart,
@@ -57,7 +58,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 HouseNumber = user.HouseNumber,
                 City = user.City,
                 ZipCode = user.ZipCode,
-                CountryName = context.Countries.Single(c => c.Id == user.CountryId).Name,
+                CountryName = country?.Name,
                 HasAddress = user.HasAddress
             };
 

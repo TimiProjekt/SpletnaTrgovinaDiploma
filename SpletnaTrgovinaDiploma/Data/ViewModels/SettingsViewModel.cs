@@ -24,6 +24,7 @@ namespace SpletnaTrgovinaDiploma.Data.ViewModels
 
         [Display(Name = "Country")]
         [Required(ErrorMessage = "Country is required")]
+        [Range(1, int.MaxValue, ErrorMessage = "You must select a country")]
         public int? CountryId { get; set; }
     }
 }

@@ -39,7 +39,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel loginViewModel)
         {
-            if (!ModelState.IsValid) 
+            if (!ModelState.IsValid)
                 return View(loginViewModel);
 
             var user = await userManager.FindByEmailAsync(loginViewModel.EmailAddress);
@@ -66,7 +66,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
         {
-            if (!ModelState.IsValid) 
+            if (!ModelState.IsValid)
                 return View(registerViewModel);
 
             var user = await userManager.FindByEmailAsync(registerViewModel.EmailAddress);
@@ -80,8 +80,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             {
                 FullName = registerViewModel.FullName,
                 Email = registerViewModel.EmailAddress,
-                UserName = registerViewModel.EmailAddress,
-                CountryId = 1
+                UserName = registerViewModel.EmailAddress
             };
             var newUserResponse = await userManager.CreateAsync(newUser, registerViewModel.Password);
 
@@ -168,7 +167,9 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
         void LoadCountriesDropdownData()
         {
+            var defaultEmptyValue = new Country {Id = 0, Name = "-- Select a country --"};
             var itemDropdownsData = countryService.GetDropdownValuesAsync().Result;
+            itemDropdownsData.Countries.Insert(0, defaultEmptyValue);
             ViewBag.Countries = new SelectList(itemDropdownsData.Countries, "Id", "Name");
         }
     }
