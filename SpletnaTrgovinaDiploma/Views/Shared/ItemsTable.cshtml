@@ -1,29 +1,30 @@
-﻿@model IEnumerable<Item>
+﻿@using SpletnaTrgovinaDiploma.Helpers
+@model IEnumerable<Item>
 
 <div class="row">
     @foreach (var item in Model)
     {
-        <div class="col-md-4 col-xs-6 border-primary mb-3">
+        <div class="col-lg-4 col-xs-6 border-primary mb-3">
             <div class="card mb-3" style="height:100%">
-                <div class="row g-0">
+                <div class="row g-0" style="height:100%">
                     <div class="col-md-12">
                         <div class="card-header text-white bg-info">
                             <p class="card-text">
-                                <h5 class="card-title">
+                                <h7 class="card-title" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display:block">
                                     @item.Name
-                                    @if(User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+
+                                    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
                                     {
                                         <a class="text-white float-right" asp-action="Edit" asp-route-id="@item.Id"><i class="bi bi-pencil-square"></i></a>
                                     }
-                                    
-                                </h5>
+                                </h7>
                             </p>
                         </div>
                     </div>
-                    <div class="col-md-6" style="display: flex;justify-content: center; align-items: center;">
-                        <img src="@item.ImageUrl" style="max-width: 100%; max-height: 300px;" alt="@item.Name">
+                    <div class="col-md-6" style="display: flex; justify-content: center; align-items: center;">
+                        <img src="@item.ImageUrl" class="mr-1 ml-5 pt-5 pb-5" style="max-width: 100%; max-height: 300px;" alt="@item.Name">
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 height-text" >
                         <div class="card-body">
                             <p class="card-text">@item.ShortDescription</p>
                             <p class="card-text"><b>Name: </b>@item.Name</p>
@@ -32,13 +33,15 @@
                         </div>
                     </div>
                     <div class="col-md-12">
-                        <div class="card-footer ">
-                            <p class="card-text">
-                                <a class="btn btn-outline-primary float-right" asp-action="Details" asp-route-id="@item.Id">
-                                    <i class="bi bi-eye-fill"></i> Show Details
-                                </a>
-                                <a class="btn btn-success text-white" asp-controller="Orders" asp-action="AddItemToShoppingCart" asp-route-id="@item.Id"><i class="bi bi-cart-plus"></i> Add to Cart (Price @item.Price.ToString("c"))</a>
-                            </p>
+                        <div class="card-footer" style="height: 100%; display: flex; justify-content: space-between; align-items: center;">
+                            <a class="btn btn-outline-primary float-right m-2" asp-action="Details" asp-route-id="@item.Id">
+                                <i class="bi bi-eye-fill"></i> 
+                                Show Details
+                            </a>
+                            <a class="btn btn-success text-white m-2" asp-controller="Orders" asp-action="AddItemToShoppingCart" asp-route-id="@item.Id">
+                                <i class="bi bi-cart-plus"></i> 
+                                Add to Cart (Price @item.Price.ToString("c"))
+                            </a>
                         </div>
                     </div>
                 </div>

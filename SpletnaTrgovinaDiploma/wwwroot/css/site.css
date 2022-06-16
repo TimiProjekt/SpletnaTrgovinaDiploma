@@ -10,9 +10,41 @@ a.navbar-brand {
   word-break: break-all;
 }
 
+.height-text {
+    min-height: 300px;
+}
+
+.margin-log-out {
+    margin-top: 0 !important;
+    margin-left: 0.75rem !important;
+}
+
+@media only screen and (max-width: 1150px) {
+    .height-text { min-height: 420px; }
+
+    .margin-log-out {
+        margin-top: 0.75rem !important;
+        margin-left: 0 !important;
+    }
+}
+
+@media only screen and (max-width: 991px) {
+    .height-text {
+        min-height: 300px;
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .height-text {
+        min-height: 150px;
+    }
+}
+
+
+
 /* Provide sufficient contrast against white background */
 a {
-  color: #0366d6;
+    color: #0366d6;
 }
 
 .btn-primary {

@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using SpletnaTrgovinaDiploma.Models;
 
 namespace SpletnaTrgovinaDiploma.Data.ViewModels
 {

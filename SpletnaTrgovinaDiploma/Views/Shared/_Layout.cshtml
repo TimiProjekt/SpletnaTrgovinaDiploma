@@ -11,16 +11,15 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-xl navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand @ActiveLink.GetCssClassIfHomePage(Url.Action())" asp-area="" asp-controller="Items" asp-action="Index">
                     @ActiveLink.GetChevronIfHomePage(Url.Action()) SpletnaTrgovinaDiploma
                 </a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsingNavbar">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <div class="navbar-collapse collapse" id="collapsingNavbar">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="navbar-nav flex-grow-1">
                             @foreach (var category in Enum.GetValues(typeof(SpletnaTrgovinaDiploma.Data.ItemCategory)))
@@ -50,7 +49,7 @@
 
                     <form class="form-inline my-2 my-lg-0" asp-controller="Items" asp-action="Filter" style="padding-right: 25px;">
                         <input name="searchString" type="text" class="form-control" placeholder="Search for an item...">
-                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit"><i class="bi bi-search"></i></button>
+                        <button class="btn btn-outline-success my-2 my-sm-0 ml-2" type="submit"><i class="bi bi-search"></i></button>
                     </form>
 
                     <ul class="navbar-nav">
