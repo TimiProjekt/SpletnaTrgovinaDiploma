@@ -80,7 +80,8 @@ namespace SpletnaTrgovinaDiploma.Controllers
             {
                 FullName = registerViewModel.FullName,
                 Email = registerViewModel.EmailAddress,
-                UserName = registerViewModel.EmailAddress
+                UserName = registerViewModel.EmailAddress,
+                CountryId = 1
             };
             var newUserResponse = await userManager.CreateAsync(newUser, registerViewModel.Password);
 
@@ -154,7 +155,6 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return View();
         }
 
-        [HttpPost]
         public async Task<IActionResult> Logout()
         {
             await signInManager.SignOutAsync();

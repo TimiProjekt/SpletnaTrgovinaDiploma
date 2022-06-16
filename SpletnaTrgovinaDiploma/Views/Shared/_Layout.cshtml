@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - SpletnaTrgovinaDiploma</title>
+    <title>@ViewData["Title"] - SpletnaTrgovina</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css">
@@ -12,29 +12,43 @@
 <body>
     <header>
         <nav class="navbar navbar-expand-xl navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand @ActiveLink.GetCssClassIfHomePage(Url.Action())" asp-area="" asp-controller="Items" asp-action="Index">
-                    @ActiveLink.GetChevronIfHomePage(Url.Action()) SpletnaTrgovinaDiploma
+            <div class="container-fluid" style="padding-right: 0">
+                <a class="navbar-brand pl-2 pr-2" style="display: flex; justify-content: center; align-items: center; white-space: nowrap" asp-area="" asp-controller="Items" asp-action="Index">
+                    <img src="~/img/fire.gif" style="height: 48px;" alt="Fire" />
+                    Computer Parts
                 </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsingNavbar">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse" id="collapsingNavbar">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="navbar-nav flex-grow-1">
-                            @foreach (var category in Enum.GetValues(typeof(SpletnaTrgovinaDiploma.Data.ItemCategory)))
-                            {
-                                <a class="nav-link text-dark @ActiveLink.GetCssClassIfActiveCategory(Url.Action(), (int) category)" asp-controller="Category" asp-action="Index" asp-route-id="@((int) category)">
-                                    @ActiveLink.GetChevronIfActiveCategory(Url.Action(), (int) category) @category.ToString()
-                                </a>
-                            }
+                        <li class="navbar-nav dropdown flex-grow-1">
+                            <button class="btn btn-outline-danger dropdown-toggle" type="button" id="profile-btn" data-toggle="dropdown"
+                                    aria-expanded="false">
+                                Categories
+                            </button>
+                            
+                            <div class="pl-2 mt-auto mb-auto" style="word-break: keep-all; white-space: nowrap">
+                                @ActiveLink.GetCurrentCategoryName(Url.Action())
+                            </div>
+
+                            <ul class="dropdown-menu" aria-labelledby="profile-btn">
+                                @foreach (var category in Enum.GetValues(typeof(SpletnaTrgovinaDiploma.Data.ItemCategory)))
+                                {
+                                    <li>
+                                        <a class="nav-link text-dark @ActiveLink.GetCssClassIfActiveCategory(Url.Action(), (int) category)" asp-controller="Category" asp-action="Index" asp-route-id="@((int) category)">
+                                            @ActiveLink.GetChevronIfActiveCategory(Url.Action(), (int) category) @category.ToString()
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
                         </li>
 
                         @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
                         {
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-                                   aria-haspopup="true" aria-expanded="false">
+                               aria-haspopup="true" aria-expanded="false">
                                     <i class="bi bi-gear"></i> Management
                                 </a>
 
@@ -49,14 +63,14 @@
 
                     <form class="form-inline my-2 my-lg-0" asp-controller="Items" asp-action="Filter" style="padding-right: 25px;">
                         <input name="searchString" type="text" class="form-control" placeholder="Search for an item...">
-                        <button class="btn btn-outline-success my-2 my-sm-0 ml-2" type="submit"><i class="bi bi-search"></i></button>
+                        <button class="btn btn-outline-info my-2 my-sm-0 ml-2" type="submit"><i class="bi bi-search"></i></button>
                     </form>
+
+                    <partial name="_Identity.cshtml" />
 
                     <ul class="navbar-nav">
                         @await Component.InvokeAsync("ShoppingCartSummary")
                     </ul>
-
-                    <partial name="_Identity.cshtml"/>
                 </div>
             </div>
         </nav>

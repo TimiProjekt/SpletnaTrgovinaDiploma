@@ -1,4 +1,6 @@
-﻿namespace SpletnaTrgovinaDiploma.Helpers
+﻿using SpletnaTrgovinaDiploma.Data;
+
+namespace SpletnaTrgovinaDiploma.Helpers
 {
     public static class ActiveLink
     {
@@ -27,8 +29,18 @@
             return splitLink.Length == 2 && splitLink[0].Length == 0 && splitLink[1].Length == 0;
         }
 
-        public static string GetCssClassIfHomePage(string link) => IsActiveHomePage(link) ? "active-link" : "";
+        public static string GetCurrentCategoryName(string link)
+        {
+            var splitLink = link.Split('/');
 
-        public static string GetChevronIfHomePage(string link) => IsActiveHomePage(link) ? ">" : "";
+            if (splitLink.Length == 4 && splitLink[1].ToLower() == "category")
+            {
+                var isParsed = int.TryParse(splitLink[3], out var number);
+                if (isParsed)
+                    return " > " + ((ItemCategory)number).ToString();
+            }
+
+            return "";
+        }
     }
 }

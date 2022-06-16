@@ -6,17 +6,17 @@
         <i class="bi bi-box-arrow-in-right"></i> Log in
     </a>
 
-    <a class="btn btn-outline-primary my-2 my-sm-0" asp-controller="Account" asp-action="Register">
+    <a class="btn btn-outline-primary my-2 my-sm-0 ml-2" asp-controller="Account" asp-action="Register">
         <i class="bi bi-person-plus"></i> Register
     </a>
 }
 else
 {
     @*User profile section*@
-    <div class="dropdown">
+    <div class="dropdown margin-log-out">
         <button class="btn btn-outline-success dropdown-toggle" type="button" id="profile-btn" data-toggle="dropdown"
                 aria-expanded="false">
-            <i class="bi bi-person-badge"></i> Hello @userManager.GetUserName(User)
+            <i class="bi bi-person-badge"></i> Hello @userManager.FindByEmailAsync(userManager.GetUserName(User)).Result.FullName
         </button>
         <ul class="dropdown-menu" aria-labelledby="profile-btn">
             <li>
@@ -25,6 +25,9 @@ else
                 </a>
                 <a class="dropdown-item" asp-controller="Account" asp-action="Settings">
                     <i class="bi bi-wrench"></i> Settings
+                </a>
+                <a class="dropdown-item" asp-controller="Account" asp-action="Logout">
+                    <i class="bi bi-box-arrow-in-right"></i> Log out
                 </a>
             </li>
 
@@ -38,14 +41,6 @@ else
             }
         </ul>
     </div>
-
-    <form asp-controller="Account" asp-action="Logout">
-        <button class="btn btn-outline-danger my-2 my-sm-0 margin-log-out">
-            <i class="bi bi-box-arrow-in-right"></i> Log out
-        </button>
-    </form>
-
-
 }
 
 
