@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
 namespace SpletnaTrgovinaDiploma.Models
@@ -18,5 +19,9 @@ namespace SpletnaTrgovinaDiploma.Models
 
         public int CountryId { get; set; }
         public Country Country { get; set; }
+
+        public bool HasAddress => !string.IsNullOrEmpty(StreetName) && !string.IsNullOrEmpty(HouseNumber) &&
+                                  !string.IsNullOrEmpty(City) && !string.IsNullOrEmpty(ZipCode) &&
+                                  CountryId > 0;
     }
 }

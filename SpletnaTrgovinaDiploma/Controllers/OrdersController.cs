@@ -5,6 +5,8 @@ using SpletnaTrgovinaDiploma.Data.Services;
 using SpletnaTrgovinaDiploma.Data.ViewModels;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using SpletnaTrgovinaDiploma.Models;
 
 namespace SpletnaTrgovinaDiploma.Controllers
 {
@@ -12,14 +14,16 @@ namespace SpletnaTrgovinaDiploma.Controllers
     public class OrdersController : Controller
     {
         private readonly IItemsService itemsService;
-        private readonly ShoppingCart shoppingCart;
         private readonly IOrdersService ordersService;
+        private readonly ShoppingCart shoppingCart;
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public OrdersController(IItemsService itemsService, ShoppingCart shoppingCart, IOrdersService ordersService)
+        public OrdersController(IItemsService itemsService, IOrdersService ordersService, ShoppingCart shoppingCart, UserManager<ApplicationUser> userManager)
         {
             this.itemsService = itemsService;
-            this.shoppingCart = shoppingCart;
             this.ordersService = ordersService;
+            this.shoppingCart = shoppingCart;
+            this.userManager = userManager;
         }
 
         public async Task<IActionResult> Index()
@@ -36,10 +40,16 @@ namespace SpletnaTrgovinaDiploma.Controllers
             var items = shoppingCart.GetShoppingCartItems();
             shoppingCart.ShoppingCartItems = items;
 
+            var userEmailAddress = User.FindFirstValue(ClaimTypes.Email);
+            var user = userManager.FindByEmailAsync(userEmailAddress).Result;
+            if (!user.HasAddress)
+                TempData["Error"] = "You do not have any address entered. Please go to settings and set up an address!";
+
             var response = new ShoppingCartViewModel()
             {
                 ShoppingCart = shoppingCart,
-                ShoppingCartTotal = shoppingCart.GetShoppingCartTotal()
+                ShoppingCartTotal = shoppingCart.GetShoppingCartTotal(),
+                HasAddress = user.HasAddress
             };
 
             return View(response);

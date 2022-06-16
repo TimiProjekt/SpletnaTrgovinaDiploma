@@ -11,6 +11,14 @@
             <h2>Your shopping cart summary</h2>
         </div>
 
+        @if (TempData["Error"] != null)
+        {
+            <div class="col-md-12 alert alert-danger">
+                <span><b>Sorry!</b> - @TempData["Error"]</span>
+            </div>
+        }
+
+
         <table class="table">
             <thead>
                 <tr>
@@ -57,8 +65,11 @@
             <div class="btn-group">
                 @*<a class="btn btn-outline-primary" asp-action="CompleteOrder">
                     Complete order
-                        </a>*@
-                <div id="paypal-btn"></div>
+                    </a>*@
+                @if(Model.HasAddress)
+                {
+                    <div id="paypal-btn"></div>
+                }
                 <span style="padding:5px"></span>
                 <a class="btn btn-outline-success" asp-controller="Items" asp-action="Index">
                     Add more items
@@ -71,48 +82,48 @@
 
 @section Scripts{
 
-    <script src="https://www.paypalobjects.com/api/checkout.js"></script>
+<script src="https://www.paypalobjects.com/api/checkout.js"></script>
 
-    <script>
+<script>
 
-        let _total = @Html.Raw(Model.ShoppingCartTotal.ToString().Replace(",","."));
+    let _total = @Html.Raw(Model.ShoppingCartTotal.ToString().Replace(",","."));
 
-        paypal.Button.render({
-            //Configure environment
-            env: 'sandbox',
-            client: {
-                sandbox: 'AedPHZGttEHwn3tIFuG408Gbtuh71-WkeoHC4f-BiKlrLTV9KZ8G_qZWXMF2dgFEbx-yQHskJa9zugSA'
-            },
+    paypal.Button.render({
+        //Configure environment
+        env: 'sandbox',
+        client: {
+            sandbox: 'AedPHZGttEHwn3tIFuG408Gbtuh71-WkeoHC4f-BiKlrLTV9KZ8G_qZWXMF2dgFEbx-yQHskJa9zugSA'
+        },
 
-            //Customize button
-            locale: 'en_US',
-            style: {
-                size: 'small',
-                color: 'gold',
-                shape: 'pill'
-            },
-            commit: true,
+        //Customize button
+        locale: 'en_US',
+        style: {
+            size: 'small',
+            color: 'gold',
+            shape: 'pill'
+        },
+        commit: true,
 
-            //Set up a payment
-            payment: function (data, actions) {
-                return actions.payment.create({
-                    transactions: [{
-                        amount: {
-                            total: _total,
-                            currency: 'EUR'
-                        }
-                    }]
-                });
-            },
+        //Set up a payment
+        payment: function (data, actions) {
+            return actions.payment.create({
+                transactions: [{
+                    amount: {
+                        total: _total,
+                        currency: 'EUR'
+                    }
+                }]
+            });
+        },
 
-            //Execute the payment
-            onAuthorize: function (data, actions) {
-                return actions.payment.execute().then(function () {
-                    var url = '@Url.Action("CompleteOrder", "Orders", new { })';
-                    window.location.href = url;
-                });
-            }
+        //Execute the payment
+        onAuthorize: function (data, actions) {
+            return actions.payment.execute().then(function () {
+                var url = '@Url.Action("CompleteOrder", "Orders", new { })';
+                window.location.href = url;
+            });
+        }
 
-        }, '#paypal-btn');
-    </script>
+    }, '#paypal-btn');
+</script>
 }
