@@ -10,8 +10,10 @@
                     <div class="col-md-12">
                         <div class="card-header text-white bg-info">
                             <p class="card-text">
-                                <h7 class="card-title" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display:block">
-                                    @item.Name
+                                <h7 class="card-title" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block">
+                                    <a style="color: inherit;text-decoration: inherit;" asp-controller="Items" asp-action="Details" asp-route-id="@item.Id">
+                                        @item.Name
+                                    </a>
 
                                     @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
                                     {
@@ -22,11 +24,13 @@
                         </div>
                     </div>
                     <div class="col-md-6" style="display: flex; justify-content: center; align-items: center;">
-                        <img src="@item.ImageUrl" class="mr-1 ml-5 pt-5 pb-5" style="max-width: 100%; max-height: 300px;" alt="@item.Name">
+                        <a class="mr-1 ml-5 pt-5 pb-5" asp-controller="Items" asp-action="Details" asp-route-id="@item.Id">
+                            <img style="max-width: 100%; max-height: 300px;" src="@item.ImageUrl" alt="@item.Name">
+                        </a>
                     </div>
                     <div class="col-md-6 height-text" >
                         <div class="card-body">
-                            <p class="card-text">@item.ShortDescription</p>
+                            <p class="card-text" style="white-space: pre-wrap;">@item.ShortDescription</p>
                             <p class="card-text"><b>Name: </b>@item.Name</p>
                             <p class="card-text"><b>Price: </b>@item.Price €</p>
                             <p class="card-text"><b>Category: </b>@item.ItemCategory</p>
@@ -34,7 +38,7 @@
                     </div>
                     <div class="col-md-12">
                         <div class="card-footer" style="height: 100%; display: flex; justify-content: space-between; align-items: center;">
-                            <a class="btn btn-outline-primary float-right m-2" asp-action="Details" asp-route-id="@item.Id">
+                            <a class="btn btn-outline-primary float-right m-2" asp-controller="Items" asp-action="Details" asp-route-id="@item.Id">
                                 <i class="bi bi-eye-fill"></i> 
                                 Show Details
                             </a>
