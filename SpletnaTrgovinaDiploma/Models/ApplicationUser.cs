@@ -16,6 +16,7 @@ namespace SpletnaTrgovinaDiploma.Models
 
         public string ZipCode { get; set; }
 
+        public int CountryId { get; set; }
         public Country Country { get; set; }
     }
 }

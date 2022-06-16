@@ -167,7 +167,7 @@ namespace SpletnaTrgovinaDiploma.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("CountryId")
+                    b.Property<int?>("Country")
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
@@ -224,7 +224,7 @@ namespace SpletnaTrgovinaDiploma.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CountryId");
+                    b.HasIndex("Country");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -444,7 +444,7 @@ namespace SpletnaTrgovinaDiploma.Migrations
                 {
                     b.HasOne("SpletnaTrgovinaDiploma.Models.Country", "Country")
                         .WithMany()
-                        .HasForeignKey("CountryId");
+                        .HasForeignKey("Country");
 
                     b.Navigation("Country");
                 });

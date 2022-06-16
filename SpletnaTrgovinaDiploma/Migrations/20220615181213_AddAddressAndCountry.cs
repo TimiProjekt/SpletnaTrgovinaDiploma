@@ -13,7 +13,7 @@ namespace SpletnaTrgovinaDiploma.Migrations
                 nullable: true);
 
             migrationBuilder.AddColumn<int>(
-                name: "CountryId",
+                name: "Country",
                 table: "AspNetUsers",
                 type: "int",
                 nullable: true);
@@ -52,12 +52,12 @@ namespace SpletnaTrgovinaDiploma.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_CountryId",
                 table: "AspNetUsers",
-                column: "CountryId");
+                column: "Country");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_AspNetUsers_Country_CountryId",
                 table: "AspNetUsers",
-                column: "CountryId",
+                column: "Country",
                 principalTable: "Country",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
@@ -81,7 +81,7 @@ namespace SpletnaTrgovinaDiploma.Migrations
                 table: "AspNetUsers");
 
             migrationBuilder.DropColumn(
-                name: "CountryId",
+                name: "Country",
                 table: "AspNetUsers");
 
             migrationBuilder.DropColumn(

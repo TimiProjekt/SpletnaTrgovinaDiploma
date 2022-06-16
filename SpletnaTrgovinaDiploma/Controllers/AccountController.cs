@@ -7,17 +7,22 @@ using SpletnaTrgovinaDiploma.Data.ViewModels;
 using SpletnaTrgovinaDiploma.Models;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using SpletnaTrgovinaDiploma.Data.Services;
 
 namespace SpletnaTrgovinaDiploma.Controllers
 {
     public class AccountController : Controller
     {
+        private readonly ICountryService countryService;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly AppDbContext context;
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, AppDbContext context)
+        public AccountController(ICountryService countryService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, AppDbContext context)
         {
+            this.countryService = countryService;
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.context = context;
@@ -34,7 +39,8 @@ namespace SpletnaTrgovinaDiploma.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel loginViewModel)
         {
-            if (!ModelState.IsValid) return View(loginViewModel);
+            if (!ModelState.IsValid) 
+                return View(loginViewModel);
 
             var user = await userManager.FindByEmailAsync(loginViewModel.EmailAddress);
             if (user != null)
@@ -60,12 +66,13 @@ namespace SpletnaTrgovinaDiploma.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
         {
-            if (!ModelState.IsValid) return View(registerViewModel);
+            if (!ModelState.IsValid) 
+                return View(registerViewModel);
 
             var user = await userManager.FindByEmailAsync(registerViewModel.EmailAddress);
             if (user != null)
             {
-                TempData["Error"] = "This email address is already in use";
+                TempData["Error"] = "This email address is already in use.";
                 return View(registerViewModel);
             }
 
@@ -88,6 +95,65 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return View("RegisterCompleted");
         }
 
+        [Authorize(Roles = UserRoles.User)]
+
+        public IActionResult Settings()
+        {
+            var userName = userManager.GetUserName(User);
+            var user = userManager.FindByNameAsync(userName).Result;
+
+            if (user != null)
+            {
+                var settingsViewModel = new SettingsViewModel
+                {
+                    UserName = userName,
+                    StreetName = user.StreetName,
+                    HouseNumber = user.HouseNumber,
+                    City = user.City,
+                    ZipCode = user.ZipCode,
+                    CountryId = user.CountryId
+                };
+
+                LoadCountriesDropdownData();
+                return View(settingsViewModel);
+            }
+
+            TempData["Error"] = "Cannot fetch settings or email.";
+
+            return View(new SettingsViewModel());
+        }
+
+        [HttpPost]
+        [Authorize(Roles = UserRoles.User)]
+        public async Task<IActionResult> Settings(SettingsViewModel settingsViewModel)
+        {
+            LoadCountriesDropdownData();
+            if (!ModelState.IsValid)
+                return View(settingsViewModel);
+
+            if (settingsViewModel.UserName != null)
+            {
+                var user = await userManager.FindByNameAsync(settingsViewModel.UserName);
+                user.StreetName = settingsViewModel.StreetName;
+                user.HouseNumber = settingsViewModel.HouseNumber;
+                user.City = settingsViewModel.City;
+                user.ZipCode = settingsViewModel.ZipCode;
+                user.Country = context.Countries.Single(c => c.Id == settingsViewModel.CountryId);
+
+                var updateUserResponse = await userManager.UpdateAsync(user);
+                if (!updateUserResponse.Succeeded)
+                {
+                    ModelState.AddModelError("", updateUserResponse.Errors.First().Description);
+                    return View();
+                }
+
+                return View();
+            }
+
+            TempData["Error"] = "Cannot fetch settings or email";
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
@@ -100,5 +166,10 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return View();
         }
 
+        void LoadCountriesDropdownData()
+        {
+            var itemDropdownsData = countryService.GetDropdownValuesAsync().Result;
+            ViewBag.Countries = new SelectList(itemDropdownsData.Countries, "Id", "Name");
+        }
     }
 }
