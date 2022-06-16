@@ -53,15 +53,14 @@
                                 </a>
 
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" asp-controller="Brands" asp-action="Index"><i class="bi bi-camera-reels"></i> Brands</a>
+                                    <a class="dropdown-item" asp-controller="Brands" asp-action="Index"> Brands</a>
                                 </div>
-
                             </li>
                         }
 
                     </ul>
 
-                    <form class="form-inline my-2 my-lg-0" asp-controller="Items" asp-action="Filter" style="padding-right: 25px;">
+                    <form class="form-inline my-2 my-lg-0" asp-controller="Items" asp-action="Filter" style="padding-right: 10px;">
                         <input name="searchString" type="text" class="form-control" placeholder="Search for an item...">
                         <button class="btn btn-outline-info my-2 my-sm-0 ml-2" type="submit"><i class="bi bi-search"></i></button>
                     </form>

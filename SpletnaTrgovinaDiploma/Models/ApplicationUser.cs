@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using SpletnaTrgovinaDiploma.Helpers;
 
 namespace SpletnaTrgovinaDiploma.Models
 {
@@ -22,5 +23,8 @@ namespace SpletnaTrgovinaDiploma.Models
         public bool HasAddress => !string.IsNullOrEmpty(StreetName) && !string.IsNullOrEmpty(HouseNumber) &&
                                   !string.IsNullOrEmpty(City) && !string.IsNullOrEmpty(ZipCode) &&
                                   CountryId.HasValue;
+
+        public string GetFullAddress =>
+            HasAddress ? $"{StreetName} {HouseNumber}, {ZipCode} {City}, {Country?.Name}" : "No address";
     }
 }

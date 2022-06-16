@@ -1,10 +1,11 @@
 ﻿@*Define model*@
 
+@using SpletnaTrgovinaDiploma.Helpers
 @model IEnumerable<Item>
 @*Define ViewData*@
 
 @{
-    ViewData["Title"] = "List of items in category";
+    ViewData["Title"] = ActiveLink.GetCurrentCategoryName(Url.Action());
 }
 
 @await Html.PartialAsync("ItemsTable")

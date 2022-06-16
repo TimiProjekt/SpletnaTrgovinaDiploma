@@ -28,9 +28,14 @@ namespace SpletnaTrgovinaDiploma.Controllers
             this.context = context;
         }
 
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> Users()
         {
             var users = await context.Users.ToListAsync();
+
+            foreach (var user in users)
+                user.Country = context.Countries.SingleOrDefault(c => c.Id == user.CountryId);
+
             return View(users);
         }
 
@@ -95,8 +100,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return View("RegisterCompleted");
         }
 
-        [Authorize(Roles = UserRoles.User)]
-
+        [Authorize]
         public IActionResult Settings()
         {
             var userName = userManager.GetUserName(User);
@@ -124,7 +128,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = UserRoles.User)]
+        [Authorize]
         public async Task<IActionResult> Settings(SettingsViewModel settingsViewModel)
         {
             LoadCountriesDropdownData();
@@ -154,6 +158,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return View();
         }
 
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
             await signInManager.SignOutAsync();
@@ -167,7 +172,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
         void LoadCountriesDropdownData()
         {
-            var defaultEmptyValue = new Country {Id = 0, Name = "-- Select a country --"};
+            var defaultEmptyValue = new Country { Id = 0, Name = "-- Select a country --" };
             var itemDropdownsData = countryService.GetDropdownValuesAsync().Result;
             itemDropdownsData.Countries.Insert(0, defaultEmptyValue);
             ViewBag.Countries = new SelectList(itemDropdownsData.Countries, "Id", "Name");
