@@ -6,6 +6,7 @@ namespace SpletnaTrgovinaDiploma.Data.ViewModels
     {
         [Display(Name = "Email address")]
         [Required(ErrorMessage = "Email address is required")]
+        [DataType(DataType.EmailAddress)]
         public string EmailAddress { get; set; }
 
         [Required]
