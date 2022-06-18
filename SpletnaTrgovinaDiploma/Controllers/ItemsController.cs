@@ -122,6 +122,5 @@ namespace SpletnaTrgovinaDiploma.Controllers
             await service.UpdateItemAsync(item);
             return RedirectToAction(nameof(Index));
         }
-
     }
 }

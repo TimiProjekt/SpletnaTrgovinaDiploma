@@ -45,7 +45,8 @@ namespace SpletnaTrgovinaDiploma.Data.Services
         public async Task<Item> GetItemByIdAsync(int id)
         {
             var itemDetails = await context.Items
-                .Include(am => am.BrandsItems).ThenInclude(b => b.Brand)
+                .Include(am => am.BrandsItems)
+                .ThenInclude(b => b.Brand)
                 .FirstOrDefaultAsync(n => n.Id == id);
 
             return itemDetails;
