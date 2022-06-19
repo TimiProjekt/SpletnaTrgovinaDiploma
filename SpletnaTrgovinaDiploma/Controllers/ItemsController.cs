@@ -25,6 +25,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         public async Task<IActionResult> Index()
         {
             var allItems = await service.GetAllAsync(n => n.BrandsItems);
+            SetPageDetails("Home page", "Home page of Fire Computer Parts");
             return View(allItems);
         }
 
@@ -37,9 +38,11 @@ namespace SpletnaTrgovinaDiploma.Controllers
             {
                 var upperCaseSearchString = searchString.ToUpper();
                 var filteredResult = allItems.Where(n => n.Name.ToUpper().Contains(upperCaseSearchString) || n.Description.ToUpper().Contains(upperCaseSearchString));
+                SetPageDetails("Search result", $"Search result for \"{searchString}\"");
                 return View("Index", filteredResult);
             }
 
+            SetPageDetails("Home page", "Home page of Fire Computer Parts");
             return View("Index", allItems);
         }
 
@@ -121,6 +124,12 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
             await service.UpdateItemAsync(item);
             return RedirectToAction(nameof(Index));
+        }
+
+        void SetPageDetails(string title, string description)
+        {
+            ViewData["Title"] = title;
+            ViewData["Description"] = description;
         }
     }
 }
