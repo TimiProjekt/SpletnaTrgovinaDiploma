@@ -85,5 +85,11 @@ namespace SpletnaTrgovinaDiploma.Data.Cart
             context.ShoppingCartItems.RemoveRange(items);
             await context.SaveChangesAsync();
         }
+
+        public bool IsItemInCart(Item item)
+        {
+            var shoppingCartItem = context.ShoppingCartItems.FirstOrDefault(n => n.Item.Id == item.Id && n.ShoppingCartId == ShoppingCartId);
+            return shoppingCartItem != null;
+        }
     }
 }

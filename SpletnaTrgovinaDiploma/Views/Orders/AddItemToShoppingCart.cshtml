@@ -1,0 +1,39 @@
+﻿@model Item
+
+@{
+    ViewData["Title"] = "Item added to cart";
+}
+
+@*Write code*@
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card mb-12 pt-3 pb-3">
+            <div class="row g-0">
+                <div class="col-md-4" style="display: flex; justify-content: center; align-items: center;">
+                    <img src="@Model.ImageUrl" class="ml-5 mr-2" style="width: 100px" alt="@Model.Name">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <div class="text-success font-weight-bold d-flex justify-content-start align-items-center" style="font-size:18px">
+                            <div class="bi bi-check" style="font-size:36px"></div>
+                            Item was added to the shopping cart
+                        </div>
+
+                        <div class="font-weight-bold"> @Model.Name </div>
+
+                        <div class="pt-5">
+                            <a class="btn-lg rounded-pill btn-primary" asp-controller="Items" asp-action="Index">
+                                <b class=" pl-2 pr-2"> Back </b>
+                            </a>
+
+                            <a class="btn-lg rounded-pill btn-danger ml-3" asp-controller="Orders" asp-action="ShoppingCart">
+                                <b class="bi bi-cart4 pl-3 pr-3 mt-5 mb-5"> Shopping Cart </b>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

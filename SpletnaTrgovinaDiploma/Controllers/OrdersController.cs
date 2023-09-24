@@ -69,10 +69,10 @@ namespace SpletnaTrgovinaDiploma.Controllers
         {
             var item = await itemsService.GetItemByIdAsync(id);
 
-            if (item != null)
+            if (item != null && !shoppingCart.IsItemInCart(item))
                 shoppingCart.AddItemToCart(item);
 
-            return RedirectToAction(nameof(ShoppingCart));
+            return View(item);
         }
 
         public async Task<IActionResult> RemoveItemFromShoppingCart(int id)

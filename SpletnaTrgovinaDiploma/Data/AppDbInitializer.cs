@@ -172,7 +172,7 @@ namespace SpletnaTrgovinaDiploma.Data
                         Email = email,
                         EmailConfirmed = true,
                         CountryId = 1,
-                        Country = new Country{Id = 1, Name = "Slovenia"}
+                        //Country = new Country{Id = 1, Name = "Slovenia"}
                     };
                     await userManager.CreateAsync(newAdminUser, password);
                     await userManager.AddToRoleAsync(newAdminUser, userRole);
