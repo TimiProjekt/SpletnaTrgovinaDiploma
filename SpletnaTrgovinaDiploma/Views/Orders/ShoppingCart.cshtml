@@ -10,8 +10,8 @@
 
     @if (Model.ShoppingCart.ShoppingCartItems.Count == 0)
     {
-            <p class="alert alert-primary w-100 ml-4 mr-4"> You have no items in your shopping cart </p>
-            <a class="ml-4" asp-controller="Items" asp-action="Index"><u>Back to store</u></a>
+        <p class="alert alert-primary w-100 ml-4 mr-4"> You have no items in your shopping cart </p>
+        <a class="ml-4" asp-controller="Items" asp-action="Index"><u>Back to store</u></a>
     }
     else
     {
@@ -33,7 +33,11 @@
                     @foreach (var item in Model.ShoppingCart.ShoppingCartItems)
                     {
                         <tr>
-                            <td class="align-middle">@item.Item.Name</td>
+                            <td class="align-middle">
+                                <a asp-controller="Items" asp-action="Details" asp-route-id="@item.Item.Id">
+                                    @item.Item.Name
+                                </a>
+                            </td>
                             <td class="align-middle">@item.Item.Price.ToString("c")</td>
                             <td class="align-middle">@((item.Amount*item.Item.Price).ToString("c"))</td>
                             <td class="align-middle">
