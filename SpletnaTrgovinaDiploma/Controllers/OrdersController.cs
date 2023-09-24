@@ -75,6 +75,26 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return View(item);
         }
 
+        public async Task<IActionResult> IncreaseItemInShoppingCart(int id)
+        {
+            var item = await itemsService.GetItemByIdAsync(id);
+
+            if (item != null)
+                shoppingCart.IncreaseItemInCart(item);
+
+            return RedirectToAction( nameof(ShoppingCart));
+        }
+
+        public async Task<IActionResult> DecreaseItemInShoppingCart(int id)
+        {
+            var item = await itemsService.GetItemByIdAsync(id);
+
+            if (item != null)
+                shoppingCart.DecreaseItemInCart(item);
+
+            return RedirectToAction(nameof(ShoppingCart));
+        }
+
         public async Task<IActionResult> RemoveItemFromShoppingCart(int id)
         {
             var item = await itemsService.GetItemByIdAsync(id);
@@ -83,6 +103,14 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 shoppingCart.RemoveItemFromCart(item);
 
             return RedirectToAction(nameof(ShoppingCart));
+        }
+
+        public async Task SetItemAmountInShoppingCart(int id, int amount)
+        {
+            var item = await itemsService.GetItemByIdAsync(id);
+
+            if (item != null)
+                shoppingCart.SetItemAmountInCart(item, amount);
         }
 
         public async Task<IActionResult> CompleteOrder()

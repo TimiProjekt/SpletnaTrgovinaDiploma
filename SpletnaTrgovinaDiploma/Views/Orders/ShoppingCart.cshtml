@@ -6,109 +6,121 @@
 }
 
 <div class="row">
-    <div class="col-md-8 offset-md-2">
-        <p>
-            <h2>Your shopping cart summary</h2>
-        </p>
 
-        @if (TempData["Error"] != null)
-        {
-            <div class="col-md-12 alert alert-danger">
-                <span><b>Sorry!</b> - @TempData["Error"]</span>
-            </div>
-        }
-        
-        <div class="form-group">
-            <label asp-for="StreetName" class="control-label"></label>: 
-            <b>@Model.StreetName</b>
-        </div>
 
-        <div class="form-group">
-            <label asp-for="HouseNumber" class="control-label"></label>: 
-            <b>@Model.HouseNumber</b>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="ZipCode" class="control-label"></label>: 
-            <b>@Model.ZipCode</b>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="City" class="control-label"></label>: 
-            <b>@Model.City</b>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="CountryName" class="control-label"></label>: 
-            <b>@Model.CountryName</b>
-        </div>
-        
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Amount</th>
-                    <th>Item</th>
-                    <th>Price</th>
-                    <th>Subtotal</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.ShoppingCart.ShoppingCartItems)
-                {
+    @if (Model.ShoppingCart.ShoppingCartItems.Count == 0)
+    {
+            <p class="alert alert-primary w-100 ml-4 mr-4"> You have no items in your shopping cart </p>
+            <a class="ml-4" asp-controller="Items" asp-action="Index"><u>Back to store</u></a>
+    }
+    else
+    {
+        <div class="col-md-8 offset-md-2">
+            <p>
+                <h2>Your shopping cart summary</h2>
+            </p>
+            <table class="table">
+                <thead>
                     <tr>
-                        <td class="align-middle">@item.Amount</td>
-                        <td class="align-middle">@item.Item.Name</td>
-                        <td class="align-middle">@item.Item.Price.ToString("c")</td>
-                        <td class="align-middle">@((item.Amount*item.Item.Price).ToString("c"))</td>
-                        <td class="align-middle">
-                            <a class="text-danger" asp-controller="Orders" asp-action="RemoveItemFromShoppingCart" asp-route-id="@item.Item.Id">
-                                <i class="bi bi-cart-dash"></i>
-                            </a>
-
-                            <a class="text-success" asp-controller="Orders" asp-action="AddItemToShoppingCart" asp-route-id="@item.Item.Id">
-                                <i class="bi bi-cart-plus"></i>
-                            </a>
-                        </td>
+                        <th>Item</th>
+                        <th>Price</th>
+                        <th>Subtotal</th>
+                        <th>Amount</th>
+                        <th></th>
                     </tr>
-                }
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="2"></td>
-                    <td><b>Total:</b></td>
-                    <td>
-                        @Model.ShoppingCartTotal.ToString("c")
-                    </td>
-                    <td></td>
-                </tr>
-            </tfoot>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.ShoppingCart.ShoppingCartItems)
+                    {
+                        <tr>
+                            <td class="align-middle">@item.Item.Name</td>
+                            <td class="align-middle">@item.Item.Price.ToString("c")</td>
+                            <td class="align-middle">@((item.Amount*item.Item.Price).ToString("c"))</td>
+                            <td class="align-middle">
 
-        <div class="text-right">
-            <div class="btn-group">
-                @*<a class="btn btn-outline-primary" asp-action="CompleteOrder">
-                    Complete order
-                    </a>*@
-                @if(Model.HasAddress)
-                {
-                    <div id="paypal-btn"></div>
-                }
-                <span style="padding:5px"></span>
-                <a class="btn btn-outline-success" asp-controller="Items" asp-action="Index">
-                    Add more items
-                </a>
+                                @if (item.Amount > 1)
+                                {
+                                    <a asp-controller="Orders" asp-action="DecreaseItemInShoppingCart" asp-route-id="@item.Item.Id">
+                                        <i class="bi bi-cart-dash text-danger"></i>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <i disabled class="bi bi-cart-dash text-muted"></i>
+                                }
+
+                                <input type="text" id="item_@item.Item.Id" class="text-center text-amount" style="width:30px" value="@item.Amount" />
+
+                                <a class="text-success" asp-controller="Orders" asp-action="IncreaseItemInShoppingCart" asp-route-id="@item.Item.Id">
+                                    <i class="bi bi-cart-plus"></i>
+                                </a>
+
+                            </td>
+                            <td class="align-middle text-right">
+                                <a class="text-dark" asp-controller="Orders" asp-action="RemoveItemFromShoppingCart" asp-route-id="@item.Item.Id">
+                                    <i class="bi bi-cart-x"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2"></td>
+                        <td><b>Total:</b></td>
+                        <td>
+                            @Model.ShoppingCartTotal.ToString("c")
+                        </td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+            <div class="text-right">
+                <div class="btn-group">
+                    @*<a class="btn btn-outline-primary" asp-action="CompleteOrder">
+                        Complete order
+                        </a>*@
+                    @if (Model.HasAddress)
+                    {
+                        <div id="paypal-btn"></div>
+                    }
+                    <span style="padding:5px"></span>
+                    <a class="btn btn-outline-success" asp-controller="Items" asp-action="Index">
+                        Add more items
+                    </a>
+                </div>
             </div>
-        </div>
 
-    </div>
+        </div>
+    }
+
+
 </div>
 
 @section Scripts{
 
-<script src="https://www.paypalobjects.com/api/checkout.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $(".text-amount").on('change', function () {
+                var amount = $(this).val();
+                var itemId = this.id.split("_")[1];
 
-<script>
+                $.ajax({
+                    url: '/Orders/SetItemAmountInShoppingCart/' + itemId + '?amount=' + amount,
+                    type: "POST",
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    complete: function () {
+                        location.reload();
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script src="https://www.paypalobjects.com/api/checkout.js"></script>
+
+    <script>
 
     let _total = @Html.Raw(Model.ShoppingCartTotal.ToString().Replace(",","."));
 
@@ -149,5 +161,5 @@
         }
 
     }, '#paypal-btn');
-</script>
+    </script>
 }

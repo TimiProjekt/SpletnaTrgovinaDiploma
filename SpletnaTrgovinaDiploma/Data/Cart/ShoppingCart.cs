@@ -54,7 +54,18 @@ namespace SpletnaTrgovinaDiploma.Data.Cart
             context.SaveChanges();
         }
 
-        public void RemoveItemFromCart(Item item)
+        public void IncreaseItemInCart(Item item)
+        {
+            var shoppingCartItem = context.ShoppingCartItems.FirstOrDefault(n => n.Item.Id == item.Id && n.ShoppingCartId == ShoppingCartId);
+
+            if (shoppingCartItem != null)
+            {
+                shoppingCartItem.Amount++;
+            }
+            context.SaveChanges();
+        }
+
+        public void DecreaseItemInCart(Item item)
         {
             var shoppingCartItem = context.ShoppingCartItems.FirstOrDefault(n => n.Item.Id == item.Id && n.ShoppingCartId == ShoppingCartId);
 
@@ -64,10 +75,27 @@ namespace SpletnaTrgovinaDiploma.Data.Cart
                 {
                     shoppingCartItem.Amount--;
                 }
-                else
-                {
-                    context.ShoppingCartItems.Remove(shoppingCartItem);
-                }
+            }
+            context.SaveChanges();
+        }
+
+        public void RemoveItemFromCart(Item item)
+        {
+            var shoppingCartItem = context.ShoppingCartItems.FirstOrDefault(n => n.Item.Id == item.Id && n.ShoppingCartId == ShoppingCartId);
+
+            if (shoppingCartItem != null)
+            {
+                context.ShoppingCartItems.Remove(shoppingCartItem);
+            }
+            context.SaveChanges();
+        }
+
+        public void SetItemAmountInCart(Item item, int amount)
+        {
+            var shoppingCartItem = context.ShoppingCartItems.FirstOrDefault(n => n.Item.Id == item.Id && n.ShoppingCartId == ShoppingCartId);
+            if (shoppingCartItem != null)
+            {
+                shoppingCartItem.Amount = amount;
             }
             context.SaveChanges();
         }
