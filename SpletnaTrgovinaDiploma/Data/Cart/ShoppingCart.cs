@@ -15,6 +15,7 @@ namespace SpletnaTrgovinaDiploma.Data.Cart
 
         public string ShoppingCartId { get; set; }
         public List<ShoppingCartItem> ShoppingCartItems { get; set; }
+        public int TotalAmountOfItems => ShoppingCartItems.Select(i => i.Amount).Sum();
 
         public ShoppingCart(AppDbContext context)
         {

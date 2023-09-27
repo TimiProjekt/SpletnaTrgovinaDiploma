@@ -8,7 +8,7 @@
 <div class="row">
 
 
-    @if (Model.ShoppingCart.ShoppingCartItems.Count == 0)
+    @if (Model.ShoppingCart.TotalAmountOfItems == 0)
     {
         <p class="alert alert-primary w-100 ml-4 mr-4"> You have no items in your shopping cart </p>
         <a class="ml-4" asp-controller="Items" asp-action="Index"><u>Back to store</u></a>
@@ -24,8 +24,8 @@
                     <tr>
                         <th>Item</th>
                         <th>Price</th>
-                        <th>Subtotal</th>
                         <th>Amount</th>
+                        <th class="text-right">Subtotal</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -39,7 +39,7 @@
                                 </a>
                             </td>
                             <td class="align-middle">@item.Item.Price.ToString("c")</td>
-                            <td class="align-middle">@((item.Amount*item.Item.Price).ToString("c"))</td>
+
                             <td class="align-middle">
 
                                 @if (item.Amount > 1)
@@ -60,6 +60,7 @@
                                 </a>
 
                             </td>
+                            <td class="align-middle text-right">@((item.Amount*item.Item.Price).ToString("c"))</td>
                             <td class="align-middle text-right">
                                 <a class="text-dark" asp-controller="Orders" asp-action="RemoveItemFromShoppingCart" asp-route-id="@item.Item.Id">
                                     <i class="bi bi-cart-x"></i>
@@ -69,11 +70,12 @@
                     }
                 </tbody>
                 <tfoot>
-                    <tr>
-                        <td colspan="2"></td>
-                        <td><b>Total:</b></td>
+                    <tr class="text-right">
+                        <td colspan="3"></td>
                         <td>
-                            @Model.ShoppingCartTotal.ToString("c")
+                            <b>
+                                Total: @Model.ShoppingCartTotal.ToString("c")
+                            </b>
                         </td>
                         <td></td>
                     </tr>
@@ -81,16 +83,11 @@
             </table>
             <div class="text-right">
                 <div class="btn-group">
-                    @*<a class="btn btn-outline-primary" asp-action="CompleteOrder">
-                        Complete order
-                        </a>*@
-                    @if (Model.HasAddress)
-                    {
-                        <div id="paypal-btn"></div>
-                    }
-                    <span style="padding:5px"></span>
-                    <a class="btn btn-outline-success" asp-controller="Items" asp-action="Index">
+                    <a class="btn btn-primary" asp-controller="Items" asp-action="Index">
                         Add more items
+                    </a>
+                    <a class="btn btn-success ml-3" asp-controller="Orders" asp-action="ShippingAndPayment">
+                        Continue to the next step
                     </a>
                 </div>
             </div>

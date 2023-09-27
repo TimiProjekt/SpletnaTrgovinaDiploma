@@ -113,6 +113,30 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 shoppingCart.SetItemAmountInCart(item, amount);
         }
 
+        public async Task<IActionResult> ShippingAndPayment()
+        {
+            var items = shoppingCart.GetShoppingCartItems();
+            shoppingCart.ShoppingCartItems = items;
+
+            var userEmailAddress = User.FindFirstValue(ClaimTypes.Email);
+            var user = userManager.FindByEmailAsync(userEmailAddress).Result;
+
+            var country = context.Countries.SingleOrDefault(c => c.Id == user.CountryId);
+            var response = new ShoppingCartViewModel()
+            {
+                ShoppingCart = shoppingCart,
+                ShoppingCartTotal = shoppingCart.GetShoppingCartTotal(),
+                StreetName = user.StreetName,
+                HouseNumber = user.HouseNumber,
+                City = user.City,
+                ZipCode = user.ZipCode,
+                CountryName = country?.Name,
+                HasAddress = user.HasAddress
+            };
+
+            return View(response);
+        }
+
         public async Task<IActionResult> CompleteOrder()
         {
             var items = shoppingCart.GetShoppingCartItems();
