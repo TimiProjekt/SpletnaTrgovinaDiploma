@@ -9,20 +9,23 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using SpletnaTrgovinaDiploma.Data;
 using SpletnaTrgovinaDiploma.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace SpletnaTrgovinaDiploma.Controllers
 {
     [Authorize]
     public class OrdersController : Controller
     {
+        private readonly ICountryService countryService;
         private readonly IItemsService itemsService;
         private readonly IOrdersService ordersService;
         private readonly ShoppingCart shoppingCart;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly AppDbContext context;
 
-        public OrdersController(IItemsService itemsService, IOrdersService ordersService, ShoppingCart shoppingCart, UserManager<ApplicationUser> userManager, AppDbContext context)
+        public OrdersController(ICountryService countryService, IItemsService itemsService, IOrdersService ordersService, ShoppingCart shoppingCart, UserManager<ApplicationUser> userManager, AppDbContext context)
         {
+            this.countryService = countryService;
             this.itemsService = itemsService;
             this.ordersService = ordersService;
             this.shoppingCart = shoppingCart;
@@ -39,8 +42,10 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return View(orders);
         }
 
+
         public IActionResult ShoppingCart()
         {
+
             var items = shoppingCart.GetShoppingCartItems();
             shoppingCart.ShoppingCartItems = items;
 
@@ -63,8 +68,10 @@ namespace SpletnaTrgovinaDiploma.Controllers
             };
 
             return View(response);
+
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> AddItemToShoppingCart(int id)
         {
             var item = await itemsService.GetItemByIdAsync(id);
@@ -82,7 +89,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             if (item != null)
                 shoppingCart.IncreaseItemInCart(item);
 
-            return RedirectToAction( nameof(ShoppingCart));
+            return RedirectToAction(nameof(ShoppingCart));
         }
 
         public async Task<IActionResult> DecreaseItemInShoppingCart(int id)
@@ -113,7 +120,56 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 shoppingCart.SetItemAmountInCart(item, amount);
         }
 
-        public async Task<IActionResult> ShippingAndPayment()
+        public IActionResult DeliveryInfo()
+        {
+            var deliveryInfoViewModel = new DeliveryInfo
+            {
+                PersonName = "",
+                PersonSurname = "",
+                EmailAddress = "",
+                TelephoneNumber = "",
+                StreetName = "",
+                HouseNumber = "",
+                City = "",
+                ZipCode = "",
+                CountryId = null
+            };
+            LoadCountriesDropdownData();
+
+            return View(deliveryInfoViewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UserCheckout(SettingsViewModel settingsViewModel)
+        {
+            LoadCountriesDropdownData();
+            if (!ModelState.IsValid)
+                return View(settingsViewModel);
+
+            if (settingsViewModel.UserName != null)
+            {
+                var user = await userManager.FindByNameAsync(settingsViewModel.UserName);
+                user.StreetName = settingsViewModel.StreetName;
+                user.HouseNumber = settingsViewModel.HouseNumber;
+                user.City = settingsViewModel.City;
+                user.ZipCode = settingsViewModel.ZipCode;
+                user.Country = context.Countries.Single(c => c.Id == settingsViewModel.CountryId);
+
+                var updateUserResponse = await userManager.UpdateAsync(user);
+                if (!updateUserResponse.Succeeded)
+                {
+                    ModelState.AddModelError("", updateUserResponse.Errors.First().Description);
+                    return View();
+                }
+
+                return View();
+            }
+
+            TempData["Error"] = "Cannot fetch settings or email";
+            return View();
+        }
+
+        public IActionResult ShippingAndPayment()
         {
             var items = shoppingCart.GetShoppingCartItems();
             shoppingCart.ShoppingCartItems = items;
@@ -147,6 +203,14 @@ namespace SpletnaTrgovinaDiploma.Controllers
             await shoppingCart.ClearShoppingCartAsync();
 
             return View("OrderCompleted");
+        }
+
+        void LoadCountriesDropdownData()
+        {
+            var defaultEmptyValue = new Country { Id = 0, Name = "-- Select a country --" };
+            var itemDropdownsData = countryService.GetDropdownValuesAsync().Result;
+            itemDropdownsData.Countries.Insert(0, defaultEmptyValue);
+            ViewBag.Countries = new SelectList(itemDropdownsData.Countries, "Id", "Name");
         }
     }
 }

@@ -1,0 +1,133 @@
+﻿@using SpletnaTrgovinaDiploma.Data.ViewModels
+@model DeliveryInfo
+@{
+    ViewData["Title"] = "Delivery Information";
+}
+
+<div class="text-center pt-5">
+    <div class="btn-group">
+        <a class="btn btn-outline-primary" id="btn-show-unregistered" href="#" onclick="showUnregistered()">
+            Unregistered
+        </a>
+
+        <a class="btn btn-success" id="btn-show-login" href="#" onclick="showLogin()">
+            Login
+        </a>
+    </div>
+</div>
+
+<div class="table" id="unregistered-table" style="display:none">
+    <div class="row">
+        <div class="col-md-8 ml-2 offset-md-1">
+            <form asp-action="Settings">
+                <div class="form-group">
+                    <label asp-for="PersonName" class="control-label"></label>
+                    <input asp-for="PersonName" class="form-control" />
+                    <span asp-validation-for="PersonName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="PersonSurname" class="control-label"></label>
+                    <input asp-for="PersonSurname" class="form-control" />
+                    <span asp-validation-for="PersonSurname" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="EmailAddress" class="control-label"></label>
+                    <input asp-for="EmailAddress" class="form-control" />
+                    <span asp-validation-for="EmailAddress" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="TelephoneNumber" class="control-label"></label>
+                    <input asp-for="TelephoneNumber" class="form-control" />
+                    <span asp-validation-for="TelephoneNumber" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="StreetName" class="control-label"></label>
+                    <input asp-for="StreetName" class="form-control" />
+                    <span asp-validation-for="StreetName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="HouseNumber" class="control-label"></label>
+                    <input asp-for="HouseNumber" class="form-control" />
+                    <span asp-validation-for="HouseNumber" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="ZipCode" class="control-label"></label>
+                    <input asp-for="ZipCode" class="form-control" />
+                    <span asp-validation-for="ZipCode" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="City" class="control-label"></label>
+                    <input asp-for="City" class="form-control" />
+                    <span asp-validation-for="City" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="CountryId"></label>
+                    <select asp-for="CountryId" class="form-control" asp-items="ViewBag.Countries"></select>
+                    <span asp-validation-for="CountryId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <input class="btn btn-outline-success float-right" type="submit" value="Next" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="table" id="login-table">
+    <div class="row">
+        <div class="col-md-8 ml-2 offset-md-1">
+            <form asp-action="Settings">
+                <div class="form-group">
+                    <label asp-for="LoginEmail" class="control-label"></label>
+                    <input asp-for="LoginEmail" class="form-control" />
+                    <span asp-validation-for="LoginEmail" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="LoginPassword" class="control-label"></label>
+                    <input asp-for="LoginPassword" class="form-control" />
+                    <span asp-validation-for="LoginPassword" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <input class="btn btn-outline-success float-right" type="submit" value="Login" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+        function showUnregistered() {
+
+            var unregisteredTable = document.getElementById('unregistered-table')
+            var loginTable = document.getElementById('login-table')
+            var btnUnregistered = document.getElementById('btn-show-unregistered')
+            var btnLogin = document.getElementById('btn-show-login')
+            unregisteredTable.style.display = 'block'
+            loginTable.style.display = 'none'
+            btnUnregistered.classList.add('btn-primary')
+            btnUnregistered.classList.remove('btn-outline-primary')
+            btnLogin.classList.remove('btn-success')
+            btnLogin.classList.add('btn-outline-success')
+        }
+
+        function showLogin() {
+            var unregisteredTable = document.getElementById('unregistered-table')
+            var loginTable = document.getElementById('login-table')
+            var btnUnregistered = document.getElementById('btn-show-unregistered')
+            var btnLogin = document.getElementById('btn-show-login')
+            unregisteredTable.style.display = 'none'
+            loginTable.style.display = 'block'
+            btnUnregistered.classList.remove('btn-primary')
+            btnUnregistered.classList.add('btn-outline-primary')
+            btnLogin.classList.add('btn-success')
+            btnLogin.classList.remove('btn-outline-success')
+        }
+    </script>
+}
+
+
+
