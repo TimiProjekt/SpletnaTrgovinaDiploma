@@ -10,10 +10,10 @@ using Microsoft.AspNetCore.Identity;
 using SpletnaTrgovinaDiploma.Data;
 using SpletnaTrgovinaDiploma.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using SpletnaTrgovinaDiploma.Helpers;
 
 namespace SpletnaTrgovinaDiploma.Controllers
 {
-    [Authorize]
     public class OrdersController : Controller
     {
         private readonly ICountryService countryService;
@@ -21,16 +21,21 @@ namespace SpletnaTrgovinaDiploma.Controllers
         private readonly IOrdersService ordersService;
         private readonly ShoppingCart shoppingCart;
         private readonly UserManager<ApplicationUser> userManager;
+        private readonly SignInManager<ApplicationUser> signInManager;
         private readonly AppDbContext context;
+        private readonly UserHelper userHelper;
 
-        public OrdersController(ICountryService countryService, IItemsService itemsService, IOrdersService ordersService, ShoppingCart shoppingCart, UserManager<ApplicationUser> userManager, AppDbContext context)
+        public OrdersController(ICountryService countryService, IItemsService itemsService, IOrdersService ordersService, ShoppingCart shoppingCart, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, AppDbContext context)
         {
             this.countryService = countryService;
             this.itemsService = itemsService;
             this.ordersService = ordersService;
             this.shoppingCart = shoppingCart;
             this.userManager = userManager;
+            this.signInManager = signInManager;
             this.context = context;
+
+            userHelper = new UserHelper(userManager, signInManager);
         }
 
         public async Task<IActionResult> Index()
@@ -45,26 +50,13 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
         public IActionResult ShoppingCart()
         {
-
             var items = shoppingCart.GetShoppingCartItems();
             shoppingCart.ShoppingCartItems = items;
 
-            var userEmailAddress = User.FindFirstValue(ClaimTypes.Email);
-            var user = userManager.FindByEmailAsync(userEmailAddress).Result;
-            if (!user.HasAddress)
-                TempData["Error"] = "You do not have any address entered. Please go to settings and set up an address!";
-
-            var country = context.Countries.SingleOrDefault(c => c.Id == user.CountryId);
             var response = new ShoppingCartViewModel()
             {
                 ShoppingCart = shoppingCart,
                 ShoppingCartTotal = shoppingCart.GetShoppingCartTotal(),
-                StreetName = user.StreetName,
-                HouseNumber = user.HouseNumber,
-                City = user.City,
-                ZipCode = user.ZipCode,
-                CountryName = country?.Name,
-                HasAddress = user.HasAddress
             };
 
             return View(response);
@@ -122,51 +114,57 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
         public IActionResult DeliveryInfo()
         {
-            var deliveryInfoViewModel = new DeliveryInfo
+            var userName = userManager.GetUserName(User);
+            if (userName != null)
             {
-                PersonName = "",
-                PersonSurname = "",
-                EmailAddress = "",
-                TelephoneNumber = "",
-                StreetName = "",
-                HouseNumber = "",
-                City = "",
-                ZipCode = "",
-                CountryId = null
-            };
+                var user = userManager.FindByNameAsync(userName).Result;
+
+                if (user != null)
+                    return RedirectToAction(nameof(ShippingAndPayment));
+            }
+
+            var deliveryInfoViewModel = new DeliveryInfoViewModel() { IsRegistered = true };
+
             LoadCountriesDropdownData();
 
             return View(deliveryInfoViewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> UserCheckout(SettingsViewModel settingsViewModel)
+        public async Task<IActionResult> DeliveryInfo(DeliveryInfoViewModel deliveryInfoViewModel)
         {
             LoadCountriesDropdownData();
             if (!ModelState.IsValid)
-                return View(settingsViewModel);
+                return View(deliveryInfoViewModel);
 
-            if (settingsViewModel.UserName != null)
+            if (deliveryInfoViewModel.IsRegistered)
             {
-                var user = await userManager.FindByNameAsync(settingsViewModel.UserName);
-                user.StreetName = settingsViewModel.StreetName;
-                user.HouseNumber = settingsViewModel.HouseNumber;
-                user.City = settingsViewModel.City;
-                user.ZipCode = settingsViewModel.ZipCode;
-                user.Country = context.Countries.Single(c => c.Id == settingsViewModel.CountryId);
 
-                var updateUserResponse = await userManager.UpdateAsync(user);
-                if (!updateUserResponse.Succeeded)
-                {
-                    ModelState.AddModelError("", updateUserResponse.Errors.First().Description);
-                    return View();
-                }
+                var loginResult = await userHelper.Login(deliveryInfoViewModel.RegisteredUser);
+                if (loginResult.Succeeded)
+                    return RedirectToAction(nameof(ShippingAndPayment));
 
-                return View();
+                TempData["Error"] = "Wrong credentials. Please, try again!";
+                return View(deliveryInfoViewModel);
             }
 
-            TempData["Error"] = "Cannot fetch settings or email";
-            return View();
+            else
+            {
+                var registerResult = await userHelper.Register(deliveryInfoViewModel.UnregisteredUser);
+                if (registerResult.Succeeded)
+                    return RedirectToAction(nameof(ShippingAndPayment));
+
+                if (!registerResult.Succeeded)
+                {
+                    var error = registerResult.Errors.FirstOrDefault();
+                    var errorMessage = error?.Description ?? "Unknown error.";
+
+                    TempData["Error"] = errorMessage;
+                    return View(deliveryInfoViewModel);
+                }
+
+                return RedirectToAction(nameof(ShippingAndPayment));
+            }
         }
 
         public IActionResult ShippingAndPayment()
@@ -178,7 +176,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             var user = userManager.FindByEmailAsync(userEmailAddress).Result;
 
             var country = context.Countries.SingleOrDefault(c => c.Id == user.CountryId);
-            var response = new ShoppingCartViewModel()
+            var response = new ShippingAndPaymentViewModel()
             {
                 ShoppingCart = shoppingCart,
                 ShoppingCartTotal = shoppingCart.GetShoppingCartTotal(),

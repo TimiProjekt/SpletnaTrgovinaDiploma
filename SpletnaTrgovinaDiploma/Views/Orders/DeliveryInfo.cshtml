@@ -1,5 +1,5 @@
 ﻿@using SpletnaTrgovinaDiploma.Data.ViewModels
-@model DeliveryInfo
+@model DeliveryInfoViewModel
 @{
     ViewData["Title"] = "Delivery Information";
 }
@@ -16,54 +16,62 @@
     </div>
 </div>
 
-<div class="table" id="unregistered-table" style="display:none">
+@if (TempData["Error"] != null)
+{
+    <div class="col-md-12 alert alert-danger">
+        <span><b>Sorry!</b> - @TempData["Error"]</span>
+    </div>
+}
+
+<div class="table" id="unregistered-table" style="@(Model.IsRegistered ? "display:none" : "display:block")">
     <div class="row">
         <div class="col-md-8 ml-2 offset-md-1">
-            <form asp-action="Settings">
+            <form asp-action="DeliveryInfo">
+                <input name="IsRegistered" type="hidden" value="False" />
                 <div class="form-group">
-                    <label asp-for="PersonName" class="control-label"></label>
-                    <input asp-for="PersonName" class="form-control" />
-                    <span asp-validation-for="PersonName" class="text-danger"></span>
+                    <label asp-for="UnregisteredUser.PersonName" class="control-label"></label>
+                    <input asp-for="UnregisteredUser.PersonName" class="form-control" />
+                    <span asp-validation-for="UnregisteredUser.PersonName" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="PersonSurname" class="control-label"></label>
-                    <input asp-for="PersonSurname" class="form-control" />
-                    <span asp-validation-for="PersonSurname" class="text-danger"></span>
+                    <label asp-for="UnregisteredUser.PersonSurname" class="control-label"></label>
+                    <input asp-for="UnregisteredUser.PersonSurname" class="form-control" />
+                    <span asp-validation-for="UnregisteredUser.PersonSurname" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="EmailAddress" class="control-label"></label>
-                    <input asp-for="EmailAddress" class="form-control" />
-                    <span asp-validation-for="EmailAddress" class="text-danger"></span>
+                    <label asp-for="UnregisteredUser.EmailAddress" class="control-label"></label>
+                    <input asp-for="UnregisteredUser.EmailAddress" class="form-control" />
+                    <span asp-validation-for="UnregisteredUser.EmailAddress" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="TelephoneNumber" class="control-label"></label>
-                    <input asp-for="TelephoneNumber" class="form-control" />
-                    <span asp-validation-for="TelephoneNumber" class="text-danger"></span>
+                    <label asp-for="UnregisteredUser.TelephoneNumber" class="control-label"></label>
+                    <input asp-for="UnregisteredUser.TelephoneNumber" class="form-control" />
+                    <span asp-validation-for="UnregisteredUser.TelephoneNumber" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="StreetName" class="control-label"></label>
-                    <input asp-for="StreetName" class="form-control" />
-                    <span asp-validation-for="StreetName" class="text-danger"></span>
+                    <label asp-for="UnregisteredUser.StreetName" class="control-label"></label>
+                    <input asp-for="UnregisteredUser.StreetName" class="form-control" />
+                    <span asp-validation-for="UnregisteredUser.StreetName" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="HouseNumber" class="control-label"></label>
-                    <input asp-for="HouseNumber" class="form-control" />
-                    <span asp-validation-for="HouseNumber" class="text-danger"></span>
+                    <label asp-for="UnregisteredUser.HouseNumber" class="control-label"></label>
+                    <input asp-for="UnregisteredUser.HouseNumber" class="form-control" />
+                    <span asp-validation-for="UnregisteredUser.HouseNumber" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="ZipCode" class="control-label"></label>
-                    <input asp-for="ZipCode" class="form-control" />
-                    <span asp-validation-for="ZipCode" class="text-danger"></span>
+                    <label asp-for="UnregisteredUser.ZipCode" class="control-label"></label>
+                    <input asp-for="UnregisteredUser.ZipCode" class="form-control" />
+                    <span asp-validation-for="UnregisteredUser.ZipCode" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="City" class="control-label"></label>
-                    <input asp-for="City" class="form-control" />
-                    <span asp-validation-for="City" class="text-danger"></span>
+                    <label asp-for="UnregisteredUser.City" class="control-label"></label>
+                    <input asp-for="UnregisteredUser.City" class="form-control" />
+                    <span asp-validation-for="UnregisteredUser.City" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="CountryId"></label>
-                    <select asp-for="CountryId" class="form-control" asp-items="ViewBag.Countries"></select>
-                    <span asp-validation-for="CountryId" class="text-danger"></span>
+                    <label asp-for="UnregisteredUser.CountryId"></label>
+                    <select asp-for="UnregisteredUser.CountryId" class="form-control" asp-items="ViewBag.Countries"></select>
+                    <span asp-validation-for="UnregisteredUser.CountryId" class="text-danger"></span>
                 </div>
 
                 <div class="form-group">
@@ -74,19 +82,20 @@
     </div>
 </div>
 
-<div class="table" id="login-table">
+<div class="table" id="login-table" style="@(Model.IsRegistered ? "display:block" : "display:none")">
     <div class="row">
         <div class="col-md-8 ml-2 offset-md-1">
-            <form asp-action="Settings">
+            <form asp-action="DeliveryInfo">
+                <input name="IsRegistered" type="hidden" value="True" />
                 <div class="form-group">
-                    <label asp-for="LoginEmail" class="control-label"></label>
-                    <input asp-for="LoginEmail" class="form-control" />
-                    <span asp-validation-for="LoginEmail" class="text-danger"></span>
+                    <label asp-for="RegisteredUser.EmailAddress" class="control-label"></label>
+                    <input asp-for="RegisteredUser.EmailAddress" class="form-control" />
+                    <span asp-validation-for="RegisteredUser.EmailAddress" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="LoginPassword" class="control-label"></label>
-                    <input asp-for="LoginPassword" class="form-control" />
-                    <span asp-validation-for="LoginPassword" class="text-danger"></span>
+                    <label asp-for="RegisteredUser.Password" class="control-label"></label>
+                    <input asp-for="RegisteredUser.Password" class="form-control" />
+                    <span asp-validation-for="RegisteredUser.Password" class="text-danger"></span>
                 </div>
 
                 <div class="form-group">

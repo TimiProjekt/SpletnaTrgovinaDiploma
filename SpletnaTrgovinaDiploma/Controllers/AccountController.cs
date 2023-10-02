@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SpletnaTrgovinaDiploma.Data.Services;
+using SpletnaTrgovinaDiploma.Helpers;
 
 namespace SpletnaTrgovinaDiploma.Controllers
 {
@@ -19,6 +20,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly AppDbContext context;
+        private readonly UserHelper userHelper;
 
         public AccountController(ICountryService countryService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, AppDbContext context)
         {
@@ -26,6 +28,8 @@ namespace SpletnaTrgovinaDiploma.Controllers
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.context = context;
+
+            userHelper = new UserHelper(userManager, signInManager);
         }
 
         [Authorize(Roles = UserRoles.Admin)]
@@ -47,20 +51,9 @@ namespace SpletnaTrgovinaDiploma.Controllers
             if (!ModelState.IsValid)
                 return View(loginViewModel);
 
-            var user = await userManager.FindByEmailAsync(loginViewModel.EmailAddress);
-            if (user != null)
-            {
-                var passwordCheck = await userManager.CheckPasswordAsync(user, loginViewModel.Password);
-                if (passwordCheck)
-                {
-                    var result = await signInManager.PasswordSignInAsync(user, loginViewModel.Password, false, false);
-                    if (result.Succeeded)
-                        return RedirectToAction("Index", "Items");
-                }
-
-                TempData["Error"] = "Wrong credentials. Please, try again!";
-                return View(loginViewModel);
-            }
+            var loginResult = await userHelper.Login(loginViewModel);
+            if (loginResult.Succeeded)
+                return RedirectToAction("Index", "Items");
 
             TempData["Error"] = "Wrong credentials. Please, try again!";
             return View(loginViewModel);
@@ -74,28 +67,15 @@ namespace SpletnaTrgovinaDiploma.Controllers
             if (!ModelState.IsValid)
                 return View(registerViewModel);
 
-            var user = await userManager.FindByEmailAsync(registerViewModel.EmailAddress);
-            if (user != null)
+            var registerResult = await userHelper.Register(registerViewModel);
+            if (!registerResult.Succeeded)
             {
-                TempData["Error"] = "This email address is already in use.";
+                var error = registerResult.Errors.FirstOrDefault();
+                var errorMessage = error?.Description ?? "Unknown error.";
+
+                TempData["Error"] = errorMessage;
                 return View(registerViewModel);
             }
-
-            var newUser = new ApplicationUser()
-            {
-                FullName = registerViewModel.FullName,
-                Email = registerViewModel.EmailAddress,
-                UserName = registerViewModel.EmailAddress
-            };
-            var newUserResponse = await userManager.CreateAsync(newUser, registerViewModel.Password);
-
-            if (!newUserResponse.Succeeded)
-            {
-                ModelState.AddModelError("", newUserResponse.Errors.First().Description);
-                return View();
-            }
-
-            await userManager.AddToRoleAsync(newUser, UserRoles.User);
 
             return View("RegisterCompleted");
         }

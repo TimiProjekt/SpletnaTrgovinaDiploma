@@ -1,18 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using SpletnaTrgovinaDiploma.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace SpletnaTrgovinaDiploma.Models
+namespace SpletnaTrgovinaDiploma.Data.ViewModels
 {
-    public class DeliveryInfo
+    public class UnregisteredViewModel
     {
-        [Display(Name = "Email")]
-        [Required(ErrorMessage = "Email is required")]
-        public string LoginEmail { get; set; }
-
-        [Display(Name = "Password")]
-        [Required(ErrorMessage = "Password is required")]
-        public string LoginPassword { get; set; }
-
         [Display(Name = "Name")]
         [Required(ErrorMessage = "Name is required")]
         public string PersonName { get; set; }
