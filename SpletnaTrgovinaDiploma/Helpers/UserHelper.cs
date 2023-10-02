@@ -61,12 +61,14 @@ namespace SpletnaTrgovinaDiploma.Helpers
 
         public async Task<IdentityResult> Register(RegisterViewModel registerViewModel)
         {
-            var newUser = new ApplicationUser()
+            var newUser = new ApplicationUser
             {
-                FullName = registerViewModel.FullName,
                 Email = registerViewModel.EmailAddress,
                 UserName = registerViewModel.EmailAddress
             };
+
+            newUser.DeliveryInfo.PersonName = registerViewModel.PersonName;
+            newUser.DeliveryInfo.PersonSurname = registerViewModel.PersonSurname;
 
             return await Register(newUser, registerViewModel.Password);
         }
@@ -75,16 +77,18 @@ namespace SpletnaTrgovinaDiploma.Helpers
         {
             var newUser = new ApplicationUser()
             {
-                FullName = unregisteredViewModel.PersonName + " " + unregisteredViewModel.PersonSurname,
-                Email = unregisteredViewModel.EmailAddress,
-                UserName = unregisteredViewModel.EmailAddress,
-                StreetName = unregisteredViewModel.StreetName,
-                HouseNumber = unregisteredViewModel.HouseNumber,
-                ZipCode = unregisteredViewModel.ZipCode,
-                City = unregisteredViewModel.City,
-                CountryId = unregisteredViewModel.CountryId,
-                Country = unregisteredViewModel.Country
+                Email = unregisteredViewModel.DeliveryInfo.EmailAddress,
+                UserName = unregisteredViewModel.DeliveryInfo.EmailAddress,
             };
+
+            newUser.DeliveryInfo.PersonName = unregisteredViewModel.DeliveryInfo.PersonName;
+            newUser.DeliveryInfo.PersonSurname = unregisteredViewModel.DeliveryInfo.PersonSurname;
+            newUser.DeliveryInfo.StreetName = unregisteredViewModel.DeliveryInfo.StreetName;
+            newUser.DeliveryInfo.HouseNumber = unregisteredViewModel.DeliveryInfo.HouseNumber;
+            newUser.DeliveryInfo.ZipCode = unregisteredViewModel.DeliveryInfo.ZipCode;
+            newUser.DeliveryInfo.City = unregisteredViewModel.DeliveryInfo.City;
+            newUser.DeliveryInfo.CountryId = unregisteredViewModel.DeliveryInfo.CountryId;
+            newUser.DeliveryInfo.Country = unregisteredViewModel.DeliveryInfo.Country;
 
             return await Register(newUser, UNREGISTERED_PASSWORD);
         }

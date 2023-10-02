@@ -160,34 +160,40 @@ namespace SpletnaTrgovinaDiploma.Data
         {
             var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-            async Task AddNewUser(string fullName, string userName, string email, string password, string userRole)
+            async Task AddNewUser(string name, string surname, string userName, string email, string password, string userRole)
             {
                 var adminUser = await userManager.FindByEmailAsync(email);
                 if (adminUser == null)
                 {
                     var newAdminUser = new ApplicationUser()
                     {
-                        FullName = fullName,
+                        
                         UserName = userName,
                         Email = email,
                         EmailConfirmed = true,
-                        CountryId = 1,
                         //Country = new Country{Id = 1, Name = "Slovenia"}
                     };
+
+                    newAdminUser.DeliveryInfo.PersonName = name;
+                    newAdminUser.DeliveryInfo.PersonSurname = surname;
+                    newAdminUser.DeliveryInfo.CountryId = 1;
+
                     await userManager.CreateAsync(newAdminUser, password);
                     await userManager.AddToRoleAsync(newAdminUser, userRole);
                 }
             }
 
             await AddNewUser(
-                "Admin User",
+                "Admin",
+                "User",
                 "admin-user",
                 "admin@spletnatrgovina.com",
                 "Coding@1234?",
                 UserRoles.Admin);
 
             await AddNewUser(
-                "Application User",
+                "Application",
+                "User",
                 "app-user",
                 "user@spletnatrgovina.com",
                 "Coding@1234?",

@@ -38,7 +38,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             var users = await context.Users.ToListAsync();
 
             foreach (var user in users)
-                user.Country = context.Countries.SingleOrDefault(c => c.Id == user.CountryId);
+                user.DeliveryInfo.Country = context.Countries.SingleOrDefault(c => c.Id == user.DeliveryInfo.CountryId);
 
             return View(users);
         }
@@ -91,11 +91,11 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 var settingsViewModel = new SettingsViewModel
                 {
                     UserName = userName,
-                    StreetName = user.StreetName,
-                    HouseNumber = user.HouseNumber,
-                    City = user.City,
-                    ZipCode = user.ZipCode,
-                    CountryId = user.CountryId
+                    StreetName = user.DeliveryInfo.StreetName,
+                    HouseNumber = user.DeliveryInfo.HouseNumber,
+                    City = user.DeliveryInfo.City,
+                    ZipCode = user.DeliveryInfo.ZipCode,
+                    CountryId = user.DeliveryInfo.CountryId
                 };
 
                 LoadCountriesDropdownData();
@@ -118,11 +118,11 @@ namespace SpletnaTrgovinaDiploma.Controllers
             if (settingsViewModel.UserName != null)
             {
                 var user = await userManager.FindByNameAsync(settingsViewModel.UserName);
-                user.StreetName = settingsViewModel.StreetName;
-                user.HouseNumber = settingsViewModel.HouseNumber;
-                user.City = settingsViewModel.City;
-                user.ZipCode = settingsViewModel.ZipCode;
-                user.Country = context.Countries.Single(c => c.Id == settingsViewModel.CountryId);
+                user.DeliveryInfo.StreetName = settingsViewModel.StreetName;
+                user.DeliveryInfo.HouseNumber = settingsViewModel.HouseNumber;
+                user.DeliveryInfo.City = settingsViewModel.City;
+                user.DeliveryInfo.ZipCode = settingsViewModel.ZipCode;
+                user.DeliveryInfo.Country = context.Countries.Single(c => c.Id == settingsViewModel.CountryId);
 
                 var updateUserResponse = await userManager.UpdateAsync(user);
                 if (!updateUserResponse.Succeeded)

@@ -123,7 +123,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
                     return RedirectToAction(nameof(ShippingAndPayment));
             }
 
-            var deliveryInfoViewModel = new DeliveryInfoViewModel() { IsRegistered = true };
+            var deliveryInfoViewModel = new LoginOrRegisterViewModel() { IsRegistered = true };
 
             LoadCountriesDropdownData();
 
@@ -131,7 +131,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeliveryInfo(DeliveryInfoViewModel deliveryInfoViewModel)
+        public async Task<IActionResult> DeliveryInfo(LoginOrRegisterViewModel deliveryInfoViewModel)
         {
             LoadCountriesDropdownData();
             if (!ModelState.IsValid)
@@ -175,17 +175,17 @@ namespace SpletnaTrgovinaDiploma.Controllers
             var userEmailAddress = User.FindFirstValue(ClaimTypes.Email);
             var user = userManager.FindByEmailAsync(userEmailAddress).Result;
 
-            var country = context.Countries.SingleOrDefault(c => c.Id == user.CountryId);
+            var country = context.Countries.SingleOrDefault(c => c.Id == user.DeliveryInfo.CountryId);
             var response = new ShippingAndPaymentViewModel()
             {
                 ShoppingCart = shoppingCart,
                 ShoppingCartTotal = shoppingCart.GetShoppingCartTotal(),
-                StreetName = user.StreetName,
-                HouseNumber = user.HouseNumber,
-                City = user.City,
-                ZipCode = user.ZipCode,
+                StreetName = user.DeliveryInfo.StreetName,
+                HouseNumber = user.DeliveryInfo.HouseNumber,
+                City = user.DeliveryInfo.City,
+                ZipCode = user.DeliveryInfo.ZipCode,
                 CountryName = country?.Name,
-                HasAddress = user.HasAddress
+                HasAddress = user.DeliveryInfo.HasAddress
             };
 
             return View(response);

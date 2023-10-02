@@ -16,7 +16,7 @@ else
     <div class="dropdown margin-log-out">
         <button class="btn btn-outline-success dropdown-toggle" type="button" id="profile-btn" data-toggle="dropdown"
             aria-expanded="false">
-            <i class="bi bi-person-badge"></i> Hello @userManager.FindByEmailAsync(userManager.GetUserName(User)).Result?.FullName
+            <i class="bi bi-person-badge"></i> Hello @userManager.FindByEmailAsync(userManager.GetUserName(User)).Result?.DeliveryInfo.FullName
         </button>
         <ul class="dropdown-menu" aria-labelledby="profile-btn">
             <li>

@@ -45,7 +45,7 @@
                     </td>
                     @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
                     {
-                        <td class="align-middle"> @order.User.FullName </td>
+                        <td class="align-middle"> @order.User.DeliveryInfo.FullName </td>
                     }
                     </tr>
                 }

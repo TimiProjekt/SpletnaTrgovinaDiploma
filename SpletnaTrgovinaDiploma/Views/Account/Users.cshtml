@@ -12,7 +12,7 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>@Html.DisplayNameFor(model => model.FullName)</th>
+                    <th>@Html.DisplayNameFor(model => model.DeliveryInfo.FullName)</th>
                     <th>@Html.DisplayNameFor(model => model.UserName)</th>
                     <th>@Html.DisplayNameFor(model => model.Email)</th>
                     <th>Address</th>
@@ -23,7 +23,7 @@
                 {
                 <tr>
                     <td class="align-middle">
-                        @Html.DisplayFor(modelItem => item.FullName)
+                        @Html.DisplayFor(modelItem => item.DeliveryInfo.FullName)
                     </td>
                     <td class="align-middle">
                         @Html.DisplayFor(modelItem => item.UserName)
@@ -32,7 +32,7 @@
                         @Html.DisplayFor(modelItem => item.Email)
                     </td>
                     <td class="align-middle">
-                        @Html.DisplayFor(modelItem => item.GetFullAddress)
+                        @Html.DisplayFor(modelItem => item.DeliveryInfo.GetFullAddress)
                     </td>
                 </tr>
                 }
