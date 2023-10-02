@@ -22,6 +22,14 @@ namespace SpletnaTrgovinaDiploma.Controllers
         }
 
         [AllowAnonymous]
+        public async Task<IActionResult> GetByBrand(int id)
+        {
+            var allItems = await service.GetAllAsync(n => n.BrandsItems);
+            var filteredItems = allItems.Where(item => item.BrandsItems.Any(bi => bi.BrandId == id));
+            return View(filteredItems);
+        }
+
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             var allItems = await service.GetAllAsync(n => n.BrandsItems);

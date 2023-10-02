@@ -2,7 +2,6 @@
 
 @model Item
 
-
 @*Define ViewData*@
 
 @{
@@ -13,59 +12,61 @@
 
 @*Write code*@
 
-<div class="row">   
-        <div class="col-md-8 offset-md-2">
-            <div class="card mb-12">
-                <div class="row g-0">
-                    <div class="col-md-12">
-                        <div class="card-header text-white bg-info">
-                            <p class="card-text">
-                                <h5 class="card-title">
-                                    @Model.Name
-                                    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
-                                    {
-                                        <a class="text-white float-right" asp-action="Edit" asp-route-id="@Model.Id"><i class="bi bi-pencil-square"></i></a>
-                                    }
-                                </h5>
-                            </p>
-                        </div>
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card mb-12">
+            <div class="row g-0">
+                <div class="col-md-12">
+                    <div class="card-header text-white bg-info">
+                        <p class="card-text">
+                            <h5 class="card-title">
+                                @Model.Name
+                                @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                                {
+                                    <a class="text-white float-right" asp-action="Edit" asp-route-id="@Model.Id"><i class="bi bi-pencil-square"></i></a>
+                                }
+                            </h5>
+                        </p>
                     </div>
-                    <div class="col-md-4" style="display: flex; justify-content: center; align-items: center;">
-                        <img src="@Model.ImageUrl" class="ml-5 mr-2" style="width: 100%" alt="@Model.Name">
+                </div>
+                <div class="col-md-4" style="display: flex; justify-content: center; align-items: center;">
+                    <img src="@Model.ImageUrl" class="ml-5 mr-2" style="width: 100%" alt="@Model.Name">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <p class="card-text" style="white-space: pre-wrap;">@Model.Description</p>
+                        <p class="card-text"><b>Name: </b>@Model.Name</p>
+                        <p class="card-text"><b>Price: </b>@Model.Price €</p>
+                        <p class="card-text"><b>Category: </b>@Model.ItemCategory</p>
                     </div>
-                    <div class="col-md-8">
-                        <div class="card-body">
-                            <p class="card-text" style="white-space: pre-wrap;">@Model.Description</p>
-                            <p class="card-text"><b>Name: </b>@Model.Name</p>
-                            <p class="card-text"><b>Price: </b>@Model.Price €</p>
-                            <p class="card-text"><b>Category: </b>@Model.ItemCategory</p>
-                        </div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="card-footer ">
-                            <p class="card-text">
-                                <a class="btn btn-outline-primary float-right" asp-action="Index">
-                                    Back to List
-                                </a>
-                                <a class="btn btn-success text-white" asp-controller="Orders" asp-action="AddItemToShoppingCart" asp-route-id="@Model.Id"><i class="bi bi-cart-plus"></i> Add to Cart (Price @Model.Price €)</a>
-                            </p>
-                             <p class="card-text">
-                                 <b>Brands:</b>
-                                 <hr />
-                                 <div class="row">
-                                     @foreach (var brand in Model.BrandsItems)
-                                     { 
-                                         <div class="card-columns text-center">
-                                             <img class="border-info rounded-circle" src="@brand.Brand.ProfilePictureUrl" style="max-width: 150px" />
-                                             <br />
-                                             <a asp-controller="Brands" asp-action="Details" asp-route-id="@brand.BrandId">@brand.Brand.Name</a>
-                                         </div>
-                                     }
-                                 </div>
-                             </p>
-                        </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="card-footer ">
+                        <p class="card-text">
+                            <a class="btn btn-outline-primary float-right" asp-action="Index">
+                                Back to List
+                            </a>
+                            <a class="btn btn-success text-white" asp-controller="Orders" asp-action="AddItemToShoppingCart" asp-route-id="@Model.Id"><i class="bi bi-cart-plus"></i> Add to Cart (Price @Model.Price €)</a>
+                        </p>
+                        <p class="card-text">
+                            <b>Brands:</b>
+                            <hr />
+                            <div class="row">
+                                @foreach (var brand in Model.BrandsItems)
+                                {
+                                    <div class="card-columns text-center">
+                                        <a asp-controller="Items" asp-action="GetByBrand" asp-route-id="@brand.BrandId">
+                                            <img class="border-info rounded-circle" src="@brand.Brand.ProfilePictureUrl" style="max-width: 150px" />
+                                        </a>
+                                        <br />
+                                        <a asp-controller="Items" asp-action="GetByBrand" asp-route-id="@brand.BrandId">@brand.Brand.Name</a>
+                                    </div>
+                                }
+                            </div>
+                        </p>
                     </div>
                 </div>
             </div>
-        </div>    
+        </div>
+    </div>
 </div>
