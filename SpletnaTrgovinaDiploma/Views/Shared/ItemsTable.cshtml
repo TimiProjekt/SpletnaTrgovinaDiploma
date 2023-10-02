@@ -32,7 +32,7 @@
                         <div class="card-body">
                             <p class="card-text" style="white-space: pre-wrap;">@item.ShortDescription</p>
                             <p class="card-text"><b>Name: </b>@item.Name</p>
-                            <p class="card-text"><b>Price: </b>@item.Price €</p>
+                            <p class="card-text text-nowrap"><b>Price: </b>@item.Price €</p>
                             <p class="card-text"><b>Category: </b>@item.ItemCategory</p>
                         </div>
                     </div>
@@ -44,7 +44,7 @@
                             </a>
                             <a class="btn btn-success text-white m-2" asp-controller="Orders" asp-action="AddItemToShoppingCart" asp-route-id="@item.Id">
                                 <i class="bi bi-cart-plus"></i>
-                                Add to Cart (Price @item.Price €)
+                                Add to Cart (@item.Price €)
                             </a>
                         </div>
                     </div>

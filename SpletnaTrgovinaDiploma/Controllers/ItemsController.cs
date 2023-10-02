@@ -29,6 +29,13 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return View(allItems);
         }
 
+        public async Task<IActionResult> EditIndex()
+        {
+            var data = await service.GetAllAsync();
+            var orderedData = data.OrderBy(item => item.Name);
+            return View(orderedData);
+        }
+
         [AllowAnonymous]
         public async Task<IActionResult> Filter(string searchString)
         {
@@ -130,6 +137,29 @@ namespace SpletnaTrgovinaDiploma.Controllers
         {
             ViewData["Title"] = title;
             ViewData["Description"] = description;
+        }
+
+        //Get: Items/Delete/1
+        public async Task<IActionResult> Delete(int id)
+        {
+            var itemDetails = await service.GetByIdAsync(id);
+
+            if (itemDetails == null)
+                return View("NotFound");
+
+            return View(itemDetails);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var itemDetails = await service.GetByIdAsync(id);
+
+            if (itemDetails == null)
+                return View("NotFound");
+
+            await service.DeleteAsync(id);
+            return RedirectToAction(nameof(EditIndex));
         }
     }
 }

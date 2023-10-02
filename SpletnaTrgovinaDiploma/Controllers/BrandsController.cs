@@ -18,8 +18,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             this.service = service;
         }
 
-        [AllowAnonymous]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> EditIndex()
         {
             var data = await service.GetAllAsync();
             var orderedData = data.OrderBy(brand => brand.Name);
@@ -39,11 +38,10 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 return View(brand);
             
             await service.AddAsync(brand);
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(EditIndex));
         }
 
         //Get: Brands/Details/1
-        [AllowAnonymous]
         public async Task<IActionResult> Details(int id)
         {
             var brandDetails = await service.GetByIdAsync(id);
@@ -72,7 +70,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 return View(brand);
             
             await service.UpdateAsync(id, brand);
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(EditIndex));
         }
 
         //Get: Brands/Delete/1
@@ -95,7 +93,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 return View("NotFound");
 
             await service.DeleteAsync(id);
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(EditIndex));
         }
     }
 }
