@@ -88,7 +88,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
             if (user != null)
             {
-                var settingsViewModel = new SettingsViewModel
+                var settingsViewModel = new UserInfoViewModel
                 {
                     UserName = userName,
                     StreetName = user.StreetName,
@@ -104,12 +104,12 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
             TempData["Error"] = "Cannot fetch settings or email.";
 
-            return View(new SettingsViewModel());
+            return View(new UserInfoViewModel());
         }
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Settings(SettingsViewModel settingsViewModel)
+        public async Task<IActionResult> Settings(UserInfoViewModel settingsViewModel)
         {
             LoadCountriesDropdownData();
             if (!ModelState.IsValid)
@@ -156,6 +156,32 @@ namespace SpletnaTrgovinaDiploma.Controllers
             var itemDropdownsData = countryService.GetDropdownValuesAsync().Result;
             itemDropdownsData.Countries.Insert(0, defaultEmptyValue);
             ViewBag.Countries = new SelectList(itemDropdownsData.Countries, "Id", "Name");
+        }
+
+        [Authorize(Roles = UserRoles.Admin)]
+        public IActionResult GetUserInfo(string userId)
+        {
+            var user = userManager.FindByIdAsync(userId).Result;
+
+            if (user != null)
+            {
+                var userInfoViewModel = new UserInfoViewModel
+                {
+                    UserName = user.Email,
+                    StreetName = user.StreetName,
+                    HouseNumber = user.HouseNumber,
+                    City = user.City,
+                    ZipCode = user.ZipCode,
+                    CountryId = user.CountryId
+                };
+
+                LoadCountriesDropdownData();
+                return View(userInfoViewModel);
+            }
+
+            TempData["Error"] = "Cannot fetch user info";
+
+            return View(new UserInfoViewModel());
         }
     }
 }

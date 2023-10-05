@@ -47,6 +47,18 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return View(orders);
         }
 
+        public async Task<IActionResult> GetById(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+
+            var orders = await ordersService.GetOrdersByUserIdAndRoleAsync(userId, userRole);
+            var order = orders.SingleOrDefault(o => o.Id == id);
+            if (order == null)
+                return RedirectToAction("Index", "Items");
+
+            return View(order);
+        }
 
         public IActionResult ShoppingCart()
         {

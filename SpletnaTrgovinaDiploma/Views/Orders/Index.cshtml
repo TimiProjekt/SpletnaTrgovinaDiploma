@@ -1,6 +1,6 @@
 ﻿@model List<Order>
 
-@{ 
+@{
     ViewData["Title"] = "Orders";
 }
 
@@ -16,37 +16,43 @@
                     <th>Order Id</th>
                     <th>Items</th>
                     <th>Total</th>
-                    @if(User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
                     {
                         <th>User</th>
-                    } 
+                    }
 
                 </tr>
             </thead>
             <tbody>
                 @foreach (var order in Model)
                 {
-                <tr>
-                    <td class="align-middle">@order.Id</td>
-                    <td class="align-middle">
-                        <ul style="list-style-type:none">
+                    <tr>
+                        <td class="align-middle">
+                            <a asp-controller="Orders" asp-action="GetById" asp-route-id="@order.Id">
+                                @order.Id
+                            </a>
+                        </td>
+                        <td class="align-middle">
                             @foreach (var item in order.OrderItems)
                             {
-                                <li>
-                                    <div class="alert alert-info" role="alert">
+                                <div class="alert alert-info" role="alert">
+                                    <a asp-controller="Items" asp-action="Details" asp-route-id="@item.Id">
                                         <span class="badge bg-success">@item.Amount</span>[@item.Price.ToString("c")] - @item.Item.Name
-                                    </div>
-                                </li>
+                                    </a>
+                                </div>
                             }
-                        </ul>
-                    </td>
-                    <td class="align-middle">
-                        @order.OrderItems.Select(m => m.Item.Price * m.Amount).Sum().ToString("c")
-                    </td>
-                    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
-                    {
-                        <td class="align-middle"> @order.User.FullName </td>
-                    }
+                        </td>
+                        <td class="align-middle">
+                            @order.OrderItems.Select(m => m.Item.Price * m.Amount).Sum().ToString("c")
+                        </td>
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                        {
+                            <td class="align-middle"> 
+                                <a asp-controller="Account" asp-action="GetUserInfo" asp-all-route-data="@(new Dictionary<string, string> { {"userId", order.UserId} })">
+                                    @order.User.FullName
+                                </a>
+                            </td>
+                        }
                     </tr>
                 }
             </tbody>

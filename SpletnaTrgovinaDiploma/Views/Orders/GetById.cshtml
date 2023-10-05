@@ -1,0 +1,49 @@
+﻿@model Order
+
+@{
+    ViewData["Title"] = "Specific order";
+}
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <p>
+            <h4>Order with order Id @Model.Id</h4>
+        </p>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Items</th>
+                    <th>Total</th>
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                    {
+
+
+                        <th>User</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="align-middle">
+                        @foreach (var item in Model.OrderItems)
+                        {
+                            <div class="alert alert-info" role="alert">
+                                <a asp-controller="Items" asp-action="Details" asp-route-id="@item.Id">
+                                    <span class="badge bg-success">@item.Amount</span>[@item.Price.ToString("c")] - @item.Item.Name
+                                </a>
+                            </div>
+                        }
+                    </td>
+                    <td class="align-middle">
+                        @Model.OrderItems.Select(m => m.Item.Price * m.Amount).Sum().ToString("c")
+                    </td>
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                    {
+                        <td class="align-middle"> @Model.User.FullName </td>
+                    }
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

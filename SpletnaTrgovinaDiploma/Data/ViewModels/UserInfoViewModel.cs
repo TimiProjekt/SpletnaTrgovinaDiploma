@@ -2,7 +2,7 @@
 
 namespace SpletnaTrgovinaDiploma.Data.ViewModels
 {
-    public class SettingsViewModel
+    public class UserInfoViewModel
     {
         public string UserName { get; set; }
 
