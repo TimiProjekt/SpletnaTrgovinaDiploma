@@ -21,7 +21,6 @@ namespace SpletnaTrgovinaDiploma.Controllers
         private readonly IOrdersService ordersService;
         private readonly ShoppingCart shoppingCart;
         private readonly UserManager<ApplicationUser> userManager;
-        private readonly SignInManager<ApplicationUser> signInManager;
         private readonly AppDbContext context;
         private readonly UserHelper userHelper;
 
@@ -32,7 +31,6 @@ namespace SpletnaTrgovinaDiploma.Controllers
             this.ordersService = ordersService;
             this.shoppingCart = shoppingCart;
             this.userManager = userManager;
-            this.signInManager = signInManager;
             this.context = context;
 
             userHelper = new UserHelper(userManager, signInManager);
@@ -56,9 +54,10 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                var filteredOrders = allOrders.Where(n => n.Id.ToString().Contains(searchString));
-                SetPageDetails("Search result", $"Search result for \"{searchString}\"");
+                var upperCaseSearchString = searchString.ToUpper();
+                var filteredOrders = allOrders.Where(n => n.Id.ToString().Contains(upperCaseSearchString) || n.Email.Contains(upperCaseSearchString));
 
+                SetPageDetails("Search result", $"Search result for \"{searchString}\"");
                 return View("Index", filteredOrders);
             }
 
@@ -151,10 +150,10 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
         public IActionResult DeliveryInfo()
         {
-            var userName = userManager.GetUserName(User);
-            if (userName != null)
+            var emailAddress = userManager.GetUserName(User);
+            if (emailAddress != null)
             {
-                var user = userManager.FindByNameAsync(userName).Result;
+                var user = userManager.FindByNameAsync(emailAddress).Result;
 
                 if (user != null)
                     return RedirectToAction(nameof(ShippingAndPayment));
@@ -176,7 +175,6 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
             if (deliveryInfoViewModel.IsRegistered)
             {
-
                 var loginResult = await userHelper.Login(deliveryInfoViewModel.RegisteredUser);
                 if (loginResult.Succeeded)
                     return RedirectToAction(nameof(ShippingAndPayment));
@@ -184,7 +182,6 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 TempData["Error"] = "Wrong credentials. Please, try again!";
                 return View(deliveryInfoViewModel);
             }
-
             else
             {
                 var registerResult = await userHelper.Register(deliveryInfoViewModel.UnregisteredUser);

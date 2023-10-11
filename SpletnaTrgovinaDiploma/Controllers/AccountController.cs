@@ -83,14 +83,16 @@ namespace SpletnaTrgovinaDiploma.Controllers
         [Authorize]
         public IActionResult Settings()
         {
-            var userName = userManager.GetUserName(User);
-            var user = userManager.FindByNameAsync(userName).Result;
+            var emailAddress = userManager.GetUserName(User);
+            var user = userManager.FindByNameAsync(emailAddress).Result;
 
             if (user != null)
             {
                 var settingsViewModel = new UserInfoViewModel
                 {
-                    UserName = userName,
+                    EmailAddress = emailAddress,
+                    FullName = user.FullName,
+                    PhoneNumber = user.PhoneNumber,
                     StreetName = user.StreetName,
                     HouseNumber = user.HouseNumber,
                     City = user.City,
@@ -109,20 +111,22 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Settings(UserInfoViewModel settingsViewModel)
+        public async Task<IActionResult> Settings(UserInfoViewModel userInfoViewModel)
         {
             LoadCountriesDropdownData();
             if (!ModelState.IsValid)
-                return View(settingsViewModel);
+                return View(userInfoViewModel);
 
-            if (settingsViewModel.UserName != null)
+            if (userInfoViewModel.EmailAddress != null)
             {
-                var user = await userManager.FindByNameAsync(settingsViewModel.UserName);
-                user.StreetName = settingsViewModel.StreetName;
-                user.HouseNumber = settingsViewModel.HouseNumber;
-                user.City = settingsViewModel.City;
-                user.ZipCode = settingsViewModel.ZipCode;
-                user.Country = context.Countries.Single(c => c.Id == settingsViewModel.CountryId);
+                var user = await userManager.FindByNameAsync(userInfoViewModel.EmailAddress);
+                user.FullName = userInfoViewModel.FullName;
+                user.PhoneNumber = userInfoViewModel.PhoneNumber;
+                user.StreetName = userInfoViewModel.StreetName;
+                user.HouseNumber = userInfoViewModel.HouseNumber;
+                user.City = userInfoViewModel.City;
+                user.ZipCode = userInfoViewModel.ZipCode;
+                user.Country = context.Countries.Single(c => c.Id == userInfoViewModel.CountryId);
 
                 var updateUserResponse = await userManager.UpdateAsync(user);
                 if (!updateUserResponse.Succeeded)
@@ -167,7 +171,8 @@ namespace SpletnaTrgovinaDiploma.Controllers
             {
                 var userInfoViewModel = new UserInfoViewModel
                 {
-                    UserName = user.Email,
+                    EmailAddress = user.Email,
+                    PhoneNumber = user.PhoneNumber,
                     StreetName = user.StreetName,
                     HouseNumber = user.HouseNumber,
                     City = user.City,

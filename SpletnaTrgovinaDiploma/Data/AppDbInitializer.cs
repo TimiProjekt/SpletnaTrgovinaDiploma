@@ -160,7 +160,7 @@ namespace SpletnaTrgovinaDiploma.Data
         {
             var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-            async Task AddNewUser(string fullName, string userName, string email, string password, string userRole)
+            async Task AddNewUser(string fullName, string emailAddress, string email, string password, string userRole)
             {
                 var adminUser = await userManager.FindByEmailAsync(email);
                 if (adminUser == null)
@@ -168,7 +168,7 @@ namespace SpletnaTrgovinaDiploma.Data
                     var newAdminUser = new ApplicationUser()
                     {
                         FullName = fullName,
-                        UserName = userName,
+                        UserName = emailAddress,
                         Email = email,
                         EmailConfirmed = true,
                         CountryId = 1,

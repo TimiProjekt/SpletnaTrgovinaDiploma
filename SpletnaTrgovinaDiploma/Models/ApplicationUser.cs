@@ -25,5 +25,7 @@ namespace SpletnaTrgovinaDiploma.Models
 
         public string GetFullAddress =>
             HasAddress ? $"{StreetName} {HouseNumber}, {ZipCode} {City}, {Country?.Name}" : "No address";
+
+        public string EmailAddress => UserName;
     }
 }

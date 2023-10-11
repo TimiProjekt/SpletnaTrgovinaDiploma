@@ -52,7 +52,9 @@ namespace SpletnaTrgovinaDiploma.Controllers
             if (!string.IsNullOrEmpty(searchString))
             {
                 var upperCaseSearchString = searchString.ToUpper();
-                var filteredResult = allItems.Where(n => n.Name.ToUpper().Contains(upperCaseSearchString) || n.Description.ToUpper().Contains(upperCaseSearchString));
+                var filteredResult = allItems
+                    .Where(n => n.Name.ToUpper().Contains(upperCaseSearchString) || n.Description.ToUpper().Contains(upperCaseSearchString));
+
                 SetPageDetails("Search result", $"Search result for \"{searchString}\"");
                 return View("Index", filteredResult);
             }

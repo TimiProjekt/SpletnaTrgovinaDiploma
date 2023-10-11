@@ -71,19 +71,19 @@ namespace SpletnaTrgovinaDiploma.Helpers
             return await Register(newUser, registerViewModel.Password);
         }
 
-        public async Task<IdentityResult> Register(UnregisteredViewModel unregisteredViewModel)
+        public async Task<IdentityResult> Register(UserInfoViewModel unregisteredUser)
         {
             var newUser = new ApplicationUser()
             {
-                FullName = unregisteredViewModel.PersonName + " " + unregisteredViewModel.PersonSurname,
-                Email = unregisteredViewModel.EmailAddress,
-                UserName = unregisteredViewModel.EmailAddress,
-                StreetName = unregisteredViewModel.StreetName,
-                HouseNumber = unregisteredViewModel.HouseNumber,
-                ZipCode = unregisteredViewModel.ZipCode,
-                City = unregisteredViewModel.City,
-                CountryId = unregisteredViewModel.CountryId,
-                Country = unregisteredViewModel.Country
+                FullName = unregisteredUser.FullName,
+                Email = unregisteredUser.EmailAddress,
+                UserName = unregisteredUser.EmailAddress,
+                StreetName = unregisteredUser.StreetName,
+                HouseNumber = unregisteredUser.HouseNumber,
+                ZipCode = unregisteredUser.ZipCode,
+                City = unregisteredUser.City,
+                CountryId = unregisteredUser.CountryId,
+                Country = unregisteredUser.Country
             };
 
             return await Register(newUser, UNREGISTERED_PASSWORD);

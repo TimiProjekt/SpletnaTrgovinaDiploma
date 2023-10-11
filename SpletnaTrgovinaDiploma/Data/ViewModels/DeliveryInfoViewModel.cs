@@ -6,6 +6,6 @@
 
         public LoginViewModel RegisteredUser { get; set; }
 
-        public UnregisteredViewModel UnregisteredUser { get; set; }
+        public UserInfoViewModel UnregisteredUser { get; set; }
     }
 }
