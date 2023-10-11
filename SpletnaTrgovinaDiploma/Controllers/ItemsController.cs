@@ -63,6 +63,24 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return View("Index", allItems);
         }
 
+        public async Task<IActionResult> FilterAdmin(string searchString)
+        {
+            var allItems = await service.GetAllAsync(n => n.BrandsItems);
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                var upperCaseSearchString = searchString.ToUpper();
+                var filteredResult = allItems
+                    .Where(n => n.Name.ToUpper().Contains(upperCaseSearchString) || n.Description.ToUpper().Contains(upperCaseSearchString));
+
+                SetPageDetails("Search result", $"Search result for \"{searchString}\"");
+                return View("EditIndex", filteredResult);
+            }
+
+            SetPageDetails("Items", "Search result");
+            return View("EditIndex", allItems);
+        }
+
         //GET: Items/Details/1(ItemId)
         [AllowAnonymous]
         public async Task<IActionResult> Details(int id)

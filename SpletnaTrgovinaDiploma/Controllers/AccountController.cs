@@ -43,6 +43,24 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return View(users);
         }
 
+        public async Task<IActionResult> Filter(string searchString)
+        {
+            var users = await context.Users.ToListAsync();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                var upperCaseSearchString = searchString.ToUpper();
+                var filteredResult = users
+                    .Where(n => n.FullName.ToUpper().Contains(upperCaseSearchString) || n.EmailAddress.ToUpper().Contains(upperCaseSearchString));
+
+                SetPageDetails("Search result", $"Search result for \"{searchString}\"");
+                return View("Users", filteredResult);
+            }
+
+            SetPageDetails("Users", "Search result");
+            return View("Users", users);
+        }
+
         public IActionResult Login() => View(new LoginViewModel());
 
         [HttpPost]
@@ -187,6 +205,12 @@ namespace SpletnaTrgovinaDiploma.Controllers
             TempData["Error"] = "Cannot fetch user info";
 
             return View(new UserInfoViewModel());
+        }
+
+        void SetPageDetails(string title, string description)
+        {
+            ViewData["Title"] = title;
+            ViewData["Description"] = description;
         }
     }
 }

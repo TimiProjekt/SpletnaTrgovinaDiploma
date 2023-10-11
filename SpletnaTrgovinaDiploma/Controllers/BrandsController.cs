@@ -25,6 +25,30 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return View(orderedData);
         }
 
+        public async Task<IActionResult> Filter(string searchString)
+        {
+            var allBrands = await service.GetAllAsync(n => n.BrandsItems);
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                var upperCaseSearchString = searchString.ToUpper();
+                var filteredResult = allBrands
+                    .Where(n => n.Name.ToUpper().Contains(upperCaseSearchString));
+
+                SetPageDetails("Search result", $"Search result for \"{searchString}\"");
+                return View("EditIndex", filteredResult);
+            }
+
+            SetPageDetails("Home page", "Home page of Fire Computer Parts");
+            return View("EditIndex", allBrands);
+        }
+
+        void SetPageDetails(string title, string description)
+        {
+            ViewData["Title"] = title;
+            ViewData["Description"] = description;
+        }
+
         //Get: Brands/Create
         public IActionResult Create()
         {

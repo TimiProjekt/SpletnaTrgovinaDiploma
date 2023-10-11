@@ -7,6 +7,13 @@
 <div class="row">
     <div class="col-md-8 offset-md-2">
 
+        <h3 class="pb-1"> @ViewData["Description"] </h3>
+
+        <form class="form-inline my-2 my-lg-0" asp-controller="Brands" asp-action="Filter" style="padding-right: 10px;">
+            <input name="searchString" type="text" class="form-control" placeholder="Search for a brand...">
+            <button class="btn btn-outline-info my-2 my-sm-0 ml-2" type="submit"><i class="bi bi-search"></i></button>
+        </form>
+
         <table class="table">
 
             <thead>
