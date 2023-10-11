@@ -42,9 +42,34 @@ namespace SpletnaTrgovinaDiploma.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var userRole = User.FindFirstValue(ClaimTypes.Role);
-
+            
             var orders = await ordersService.GetOrdersByUserIdAndRoleAsync(userId, userRole);
+            SetPageDetails("Orders", "Orders");
             return View(orders);
+        }
+
+        public async Task<IActionResult> Filter(string searchString)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+            var allOrders = await ordersService.GetOrdersByUserIdAndRoleAsync(userId, userRole);
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                var filteredOrders = allOrders.Where(n => n.Id.ToString().Contains(searchString));
+                SetPageDetails("Search result", $"Search result for \"{searchString}\"");
+
+                return View("Index", filteredOrders);
+            }
+
+            SetPageDetails("Orders","Orders");
+            return View("Index", allOrders);
+        }
+
+        void SetPageDetails(string title, string description)
+        {
+            ViewData["Title"] = title;
+            ViewData["Description"] = description;
         }
 
         public async Task<IActionResult> GetById(int id)

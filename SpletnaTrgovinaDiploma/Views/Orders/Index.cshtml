@@ -1,4 +1,4 @@
-﻿@model List<Order>
+﻿@model IEnumerable<Order>
 
 @{
     ViewData["Title"] = "Orders";
@@ -7,8 +7,13 @@
 <div class="row">
     <div class="col-md-8 offset-md-2">
         <p>
-            <h4>Orders</h4>
+            <h3 class="pb-1"> @ViewData["Description"] </h3>
         </p>
+
+        <form class="form-inline my-2 my-lg-0" asp-controller="Orders" asp-action="Filter" style="padding-right: 10px;">
+            <input name="searchString" type="text" class="form-control" placeholder="Search for an order...">
+            <button class="btn btn-outline-info my-2 my-sm-0 ml-2" type="submit"><i class="bi bi-search"></i></button>
+        </form>
 
         <table class="table">
             <thead>
@@ -47,7 +52,7 @@
                         </td>
                         @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
                         {
-                            <td class="align-middle"> 
+                            <td class="align-middle">
                                 <a asp-controller="Account" asp-action="GetUserInfo" asp-all-route-data="@(new Dictionary<string, string> { {"userId", order.UserId} })">
                                     @order.User.FullName
                                 </a>
