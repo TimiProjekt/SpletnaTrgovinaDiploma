@@ -1,7 +1,8 @@
-﻿@*Define model*@
+﻿@using SpletnaTrgovinaDiploma.Helpers
+
+@*Define model*@
 
 @model Item
-
 @*Define ViewData*@
 
 @{
@@ -37,7 +38,12 @@
                         <p class="card-text" style="white-space: pre-wrap;">@Model.Description</p>
                         <p class="card-text"><b>Name: </b>@Model.Name</p>
                         <p class="card-text"><b>Price: </b>@Model.Price €</p>
-                        <p class="card-text"><b>Category: </b>@Model.ItemCategory</p>
+                        <p class="card-text">
+                            <b>Category: </b>
+                            <a class="nav-link text-dark @ActiveLink.GetCssClassIfActiveCategory(Url.Action(), (int) Model.ItemCategory)" asp-controller="Category" asp-action="Index" asp-route-id="@((int) Model.ItemCategory)">
+                                @ActiveLink.GetChevronIfActiveCategory(Url.Action(), (int)Model.ItemCategory) @Model.ItemCategory.ToString()
+                            </a>
+                        </p>
                     </div>
                 </div>
                 <div class="col-md-12">
