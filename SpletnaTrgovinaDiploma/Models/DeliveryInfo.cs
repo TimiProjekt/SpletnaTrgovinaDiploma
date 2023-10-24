@@ -1,13 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Runtime.Serialization;
-
-namespace SpletnaTrgovinaDiploma.Models
+﻿namespace SpletnaTrgovinaDiploma.Models
 {
-    public class ApplicationUser : IdentityUser, IDeliveryInfo
+    public interface IDeliveryInfo
     {
-        public string EmailAddress => UserName;
-
         public string FullName { get; set; }
 
         public string DeliveryEmailAddress { get; set; }
@@ -22,9 +16,7 @@ namespace SpletnaTrgovinaDiploma.Models
 
         public string City { get; set; }
 
-        [ForeignKey(nameof(Country))]
         public int? CountryId { get; set; }
-        [IgnoreDataMember]
         public Country Country { get; set; }
 
         public bool HasAddress => !string.IsNullOrEmpty(StreetName) && !string.IsNullOrEmpty(HouseNumber) &&

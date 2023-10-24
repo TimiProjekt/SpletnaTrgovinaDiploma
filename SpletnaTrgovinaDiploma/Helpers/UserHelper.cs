@@ -65,7 +65,8 @@ namespace SpletnaTrgovinaDiploma.Helpers
             {
                 FullName = registerViewModel.FullName,
                 Email = registerViewModel.EmailAddress,
-                UserName = registerViewModel.EmailAddress
+                UserName = registerViewModel.EmailAddress,
+                DeliveryEmailAddress = registerViewModel.EmailAddress,
             };
 
             return await Register(newUser, registerViewModel.Password);
@@ -78,6 +79,9 @@ namespace SpletnaTrgovinaDiploma.Helpers
                 FullName = unregisteredUser.FullName,
                 Email = unregisteredUser.EmailAddress,
                 UserName = unregisteredUser.EmailAddress,
+                DeliveryEmailAddress = unregisteredUser.EmailAddress,
+                PhoneNumber = unregisteredUser.PhoneNumber,
+                DeliveryPhoneNumber = unregisteredUser.PhoneNumber,
                 StreetName = unregisteredUser.StreetName,
                 HouseNumber = unregisteredUser.HouseNumber,
                 ZipCode = unregisteredUser.ZipCode,

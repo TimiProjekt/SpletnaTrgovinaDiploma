@@ -189,8 +189,9 @@ namespace SpletnaTrgovinaDiploma.Controllers
             {
                 var userInfoViewModel = new UserInfoViewModel
                 {
-                    EmailAddress = user.Email,
-                    PhoneNumber = user.PhoneNumber,
+                    FullName = user.FullName,
+                    EmailAddress = user.DeliveryEmailAddress,
+                    PhoneNumber = user.DeliveryPhoneNumber,
                     StreetName = user.StreetName,
                     HouseNumber = user.HouseNumber,
                     City = user.City,
