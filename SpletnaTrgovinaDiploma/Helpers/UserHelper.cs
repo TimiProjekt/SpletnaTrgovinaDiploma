@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 using SpletnaTrgovinaDiploma.Data.Static;
 using SpletnaTrgovinaDiploma.Data.ViewModels;
 using SpletnaTrgovinaDiploma.Models;
@@ -91,6 +92,15 @@ namespace SpletnaTrgovinaDiploma.Helpers
             };
 
             return await Register(newUser, UNREGISTERED_PASSWORD);
+        }
+
+        public ApplicationUser GetApplicationUser(ClaimsPrincipal userPrincipal)
+        {
+            var userEmailAddress = userPrincipal.FindFirstValue(ClaimTypes.Email);
+            if (userEmailAddress != null)
+                return userManager.FindByEmailAsync(userEmailAddress).Result;
+
+            return null;
         }
     }
 }

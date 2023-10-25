@@ -34,12 +34,11 @@ namespace SpletnaTrgovinaDiploma.Data.ViewModels
         [Display(Name = "Country")]
         [Required(ErrorMessage = "Country is required")]
         [Range(1, int.MaxValue, ErrorMessage = "You must select a country")]
-        public int? CountryId { get; set; }
+        public int CountryId { get; set; }
         public Country Country { get; set; }
 
         public bool HasAddress => !string.IsNullOrEmpty(StreetName) && !string.IsNullOrEmpty(HouseNumber) &&
-                                  !string.IsNullOrEmpty(City) && !string.IsNullOrEmpty(ZipCode) &&
-                                  CountryId.HasValue;
+                                  !string.IsNullOrEmpty(City) && !string.IsNullOrEmpty(ZipCode);
 
         public string GetFullAddress =>
             HasAddress ? $"{StreetName} {HouseNumber}, {ZipCode} {City}, {Country?.Name}" : "No address";

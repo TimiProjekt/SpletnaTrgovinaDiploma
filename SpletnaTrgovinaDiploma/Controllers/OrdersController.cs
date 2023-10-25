@@ -40,7 +40,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var userRole = User.FindFirstValue(ClaimTypes.Role);
-            
+
             var orders = await ordersService.GetOrdersByUserIdAndRoleAsync(userId, userRole);
             SetPageDetails("Orders", "Orders");
             return View(orders);
@@ -55,13 +55,13 @@ namespace SpletnaTrgovinaDiploma.Controllers
             if (!string.IsNullOrEmpty(searchString))
             {
                 var upperCaseSearchString = searchString.ToUpper();
-                var filteredOrders = allOrders.Where(n => n.Id.ToString().Contains(upperCaseSearchString) || n.Email.Contains(upperCaseSearchString));
+                var filteredOrders = allOrders.Where(n => n.Id.ToString().Contains(upperCaseSearchString) || n.DeliveryEmailAddress.Contains(upperCaseSearchString));
 
                 SetPageDetails("Search result", $"Search result for \"{searchString}\"");
                 return View("Index", filteredOrders);
             }
 
-            SetPageDetails("Orders","Orders");
+            SetPageDetails("Orders", "Orders");
             return View("Index", allOrders);
         }
 
@@ -159,79 +159,67 @@ namespace SpletnaTrgovinaDiploma.Controllers
                     return RedirectToAction(nameof(ShippingAndPayment));
             }
 
-            var deliveryInfoViewModel = new DeliveryInfoViewModel() { IsRegistered = true };
+            var loginViewModel = new LoginViewModel();
 
             LoadCountriesDropdownData();
 
-            return View(deliveryInfoViewModel);
+            return View(loginViewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeliveryInfo(DeliveryInfoViewModel deliveryInfoViewModel)
+        public async Task<IActionResult> DeliveryInfo(LoginViewModel loginViewModel)
         {
             LoadCountriesDropdownData();
             if (!ModelState.IsValid)
-                return View(deliveryInfoViewModel);
+                return View(loginViewModel);
 
-            if (deliveryInfoViewModel.IsRegistered)
-            {
-                var loginResult = await userHelper.Login(deliveryInfoViewModel.RegisteredUser);
-                if (loginResult.Succeeded)
-                    return RedirectToAction(nameof(ShippingAndPayment));
-
-                TempData["Error"] = "Wrong credentials. Please, try again!";
-                return View(deliveryInfoViewModel);
-            }
-            else
-            {
-                var registerResult = await userHelper.Register(deliveryInfoViewModel.UnregisteredUser);
-                if (registerResult.Succeeded)
-                    return RedirectToAction(nameof(ShippingAndPayment));
-
-                if (!registerResult.Succeeded)
-                {
-                    var error = registerResult.Errors.FirstOrDefault();
-                    var errorMessage = error?.Description ?? "Unknown error.";
-
-                    TempData["Error"] = errorMessage;
-                    return View(deliveryInfoViewModel);
-                }
-
+            var loginResult = await userHelper.Login(loginViewModel);
+            if (loginResult.Succeeded)
                 return RedirectToAction(nameof(ShippingAndPayment));
-            }
+
+            TempData["Error"] = "Wrong credentials. Please, try again!";
+            return View(loginViewModel);
         }
 
         public IActionResult ShippingAndPayment()
         {
+            LoadCountriesDropdownData();
             var items = shoppingCart.GetShoppingCartItems();
             shoppingCart.ShoppingCartItems = items;
 
-            var userEmailAddress = User.FindFirstValue(ClaimTypes.Email);
-            var user = userManager.FindByEmailAsync(userEmailAddress).Result;
+            var userInfoViewModel = new UserInfoViewModel();
+            var user = userHelper.GetApplicationUser(User);
+            if (user != null)
+            {
+                userInfoViewModel = new UserInfoViewModel()
+                {
+                    EmailAddress = user.DeliveryEmailAddress,
+                    FullName = user.FullName,
+                    PhoneNumber = user.PhoneNumber,
+                    StreetName = user.StreetName,
+                    HouseNumber = user.HouseNumber,
+                    City = user.City,
+                    ZipCode = user.ZipCode,
+                    CountryId = user.CountryId
+                };
+            }
 
-            var country = context.Countries.SingleOrDefault(c => c.Id == user.CountryId);
             var response = new ShippingAndPaymentViewModel()
             {
                 ShoppingCart = shoppingCart,
                 ShoppingCartTotal = shoppingCart.GetShoppingCartTotal(),
-                StreetName = user.StreetName,
-                HouseNumber = user.HouseNumber,
-                City = user.City,
-                ZipCode = user.ZipCode,
-                CountryName = country?.Name,
-                HasAddress = user.HasAddress
+                UserInfoViewModel = userInfoViewModel
             };
 
             return View(response);
         }
 
-        public async Task<IActionResult> CompleteOrder()
+        public async Task<IActionResult> CompleteOrder(ShippingAndPaymentViewModel shippingAndPaymentViewModel)
         {
             var items = shoppingCart.GetShoppingCartItems();
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var userEmailAddress = User.FindFirstValue(ClaimTypes.Email);
+            var userId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            await ordersService.StoreOrderAsync(items, userId, userEmailAddress);
+            await ordersService.StoreOrderAsync(shippingAndPaymentViewModel.UserInfoViewModel, items, userId);
             await shoppingCart.ClearShoppingCartAsync();
 
             return View("OrderCompleted");

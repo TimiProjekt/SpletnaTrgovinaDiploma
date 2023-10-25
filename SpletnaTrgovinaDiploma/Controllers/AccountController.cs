@@ -140,6 +140,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 var user = await userManager.FindByNameAsync(userInfoViewModel.EmailAddress);
                 user.FullName = userInfoViewModel.FullName;
                 user.PhoneNumber = userInfoViewModel.PhoneNumber;
+                user.DeliveryPhoneNumber = userInfoViewModel.PhoneNumber;
                 user.StreetName = userInfoViewModel.StreetName;
                 user.HouseNumber = userInfoViewModel.HouseNumber;
                 user.City = userInfoViewModel.City;

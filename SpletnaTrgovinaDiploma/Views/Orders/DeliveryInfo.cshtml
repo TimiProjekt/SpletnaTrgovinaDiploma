@@ -1,20 +1,8 @@
 ﻿@using SpletnaTrgovinaDiploma.Data.ViewModels
-@model DeliveryInfoViewModel
+@model LoginViewModel
 @{
-    ViewData["Title"] = "Delivery Information";
+    ViewData["Title"] = "Login or unregistered";
 }
-
-<div class="text-center pt-5">
-    <div class="btn-group">
-        <a class="btn btn-outline-primary" id="btn-show-unregistered" href="#" onclick="showUnregistered()">
-            Unregistered
-        </a>
-
-        <a class="btn btn-success" id="btn-show-login" href="#" onclick="showLogin()">
-            Login
-        </a>
-    </div>
-</div>
 
 @if (TempData["Error"] != null)
 {
@@ -23,115 +11,29 @@
     </div>
 }
 
-<div class="table" id="unregistered-table" style="@(Model.IsRegistered ? "display:none" : "display:block")">
-    <div class="row">
-        <div class="col-md-8 ml-2 offset-md-1">
-            <form asp-action="DeliveryInfo">
-                <input name="IsRegistered" type="hidden" value="False" />
-                <div class="form-group">
-                    <label asp-for="UnregisteredUser.FullName" class="control-label"></label>
-                    <input asp-for="UnregisteredUser.FullName" class="form-control" />
-                    <span asp-validation-for="UnregisteredUser.FullName" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="UnregisteredUser.EmailAddress" class="control-label"></label>
-                    <input asp-for="UnregisteredUser.EmailAddress" class="form-control" />
-                    <span asp-validation-for="UnregisteredUser.EmailAddress" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="UnregisteredUser.PhoneNumber" class="control-label"></label>
-                    <input asp-for="UnregisteredUser.PhoneNumber" class="form-control" />
-                    <span asp-validation-for="UnregisteredUser.PhoneNumber" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="UnregisteredUser.StreetName" class="control-label"></label>
-                    <input asp-for="UnregisteredUser.StreetName" class="form-control" />
-                    <span asp-validation-for="UnregisteredUser.StreetName" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="UnregisteredUser.HouseNumber" class="control-label"></label>
-                    <input asp-for="UnregisteredUser.HouseNumber" class="form-control" />
-                    <span asp-validation-for="UnregisteredUser.HouseNumber" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="UnregisteredUser.ZipCode" class="control-label"></label>
-                    <input asp-for="UnregisteredUser.ZipCode" class="form-control" />
-                    <span asp-validation-for="UnregisteredUser.ZipCode" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="UnregisteredUser.City" class="control-label"></label>
-                    <input asp-for="UnregisteredUser.City" class="form-control" />
-                    <span asp-validation-for="UnregisteredUser.City" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="UnregisteredUser.CountryId"></label>
-                    <select asp-for="UnregisteredUser.CountryId" class="form-control" asp-items="ViewBag.Countries"></select>
-                    <span asp-validation-for="UnregisteredUser.CountryId" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <input class="btn btn-outline-success float-right" type="submit" value="Next" />
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<div class="table" id="login-table" style="@(Model.IsRegistered ? "display:block" : "display:none")">
+<div class="table">
     <div class="row">
         <div class="col-md-8 ml-2 offset-md-1">
             <form asp-action="DeliveryInfo">
                 <input name="IsRegistered" type="hidden" value="True" />
                 <div class="form-group">
-                    <label asp-for="RegisteredUser.EmailAddress" class="control-label"></label>
-                    <input asp-for="RegisteredUser.EmailAddress" class="form-control" />
-                    <span asp-validation-for="RegisteredUser.EmailAddress" class="text-danger"></span>
+                    <label asp-for="EmailAddress" class="control-label"></label>
+                    <input asp-for="EmailAddress" class="form-control" />
+                    <span asp-validation-for="EmailAddress" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="RegisteredUser.Password" class="control-label"></label>
-                    <input asp-for="RegisteredUser.Password" class="form-control" />
-                    <span asp-validation-for="RegisteredUser.Password" class="text-danger"></span>
+                    <label asp-for="Password" class="control-label"></label>
+                    <input asp-for="Password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
 
                 <div class="form-group">
                     <input class="btn btn-outline-success float-right" type="submit" value="Login" />
+                    <a class="btn btn-info" asp-controller="Orders" asp-action="ShippingAndPayment">
+                        Continue without account
+                    </a>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
-@section Scripts{
-
-    <script type="text/javascript">
-        function showUnregistered() {
-
-            var unregisteredTable = document.getElementById('unregistered-table');
-            var loginTable = document.getElementById('login-table');
-            var btnUnregistered = document.getElementById('btn-show-unregistered');
-            var btnLogin = document.getElementById('btn-show-login');
-            unregisteredTable.style.display = 'block';
-            loginTable.style.display = 'none';
-            btnUnregistered.classList.add('btn-primary');
-            btnUnregistered.classList.remove('btn-outline-primary');
-            btnLogin.classList.remove('btn-success');
-            btnLogin.classList.add('btn-outline-success');
-        }
-
-        function showLogin() {
-            var unregisteredTable = document.getElementById('unregistered-table');
-            var loginTable = document.getElementById('login-table');
-            var btnUnregistered = document.getElementById('btn-show-unregistered');
-            var btnLogin = document.getElementById('btn-show-login');
-            unregisteredTable.style.display = 'none';
-            loginTable.style.display = 'block';
-            btnUnregistered.classList.remove('btn-primary');
-            btnUnregistered.classList.add('btn-outline-primary');
-            btnLogin.classList.add('btn-success');
-            btnLogin.classList.remove('btn-outline-success');
-        }
-    </script>
-}
-
-
-

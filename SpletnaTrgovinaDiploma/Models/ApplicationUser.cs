@@ -23,13 +23,12 @@ namespace SpletnaTrgovinaDiploma.Models
         public string City { get; set; }
 
         [ForeignKey(nameof(Country))]
-        public int? CountryId { get; set; }
+        public int CountryId { get; set; }
         [IgnoreDataMember]
         public Country Country { get; set; }
 
         public bool HasAddress => !string.IsNullOrEmpty(StreetName) && !string.IsNullOrEmpty(HouseNumber) &&
-                                  !string.IsNullOrEmpty(City) && !string.IsNullOrEmpty(ZipCode) &&
-                                  CountryId.HasValue;
+                                  !string.IsNullOrEmpty(City) && !string.IsNullOrEmpty(ZipCode);
 
         public string GetFullAddress =>
             HasAddress ? $"{StreetName} {HouseNumber}, {ZipCode} {City}, {Country?.Name}" : "No address";

@@ -3,6 +3,7 @@ using SpletnaTrgovinaDiploma.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SpletnaTrgovinaDiploma.Data.ViewModels;
 
 namespace SpletnaTrgovinaDiploma.Data.Services
 {
@@ -29,13 +30,21 @@ namespace SpletnaTrgovinaDiploma.Data.Services
             return orders;
         }
 
-        public async Task StoreOrderAsync(List<ShoppingCartItem> items, string userId, string userEmailAddress)
+        public async Task StoreOrderAsync(UserInfoViewModel userInfoViewModel, List<ShoppingCartItem> items, string userId)
         {
             var order = new Order()
             {
                 UserId = userId,
-                Email = userEmailAddress
+                DeliveryEmailAddress = userInfoViewModel.EmailAddress,
+                FullName = userInfoViewModel.FullName,
+                DeliveryPhoneNumber = userInfoViewModel.PhoneNumber,
+                StreetName = userInfoViewModel.StreetName,
+                HouseNumber = userInfoViewModel.HouseNumber,
+                City = userInfoViewModel.City,
+                ZipCode = userInfoViewModel.ZipCode,
+                Country = context.Countries.Single(c => c.Id == userInfoViewModel.CountryId),
             };
+
             await context.Orders.AddAsync(order);
             await context.SaveChangesAsync();
 
