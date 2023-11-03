@@ -23,6 +23,10 @@ namespace SpletnaTrgovinaDiploma.Models
 
         public string City { get; set; }
 
+        public int ShippingOption { get; set; }
+
+        public int PaymentOption { get; set; }
+
         [ForeignKey(nameof(Country))]
         public int CountryId { get; set; }
         [IgnoreDataMember]

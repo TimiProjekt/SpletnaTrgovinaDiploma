@@ -30,19 +30,32 @@ namespace SpletnaTrgovinaDiploma.Data.Services
             return orders;
         }
 
-        public async Task StoreOrderAsync(UserInfoViewModel userInfoViewModel, List<ShoppingCartItem> items, string userId)
+        public Order GetOrderByIdAndRole(int orderId, string userRole)
+        {
+            if (userRole != "Admin")
+                return null;
+
+            var orders = context.Orders
+                .SingleOrDefault(o => o.Id == orderId);
+
+            return orders;
+        }
+
+        public async Task StoreOrderAsync(ShippingAndPaymentViewModel shippingAndPaymentViewModel, List<ShoppingCartItem> items, string userId)
         {
             var order = new Order()
             {
                 UserId = userId,
-                DeliveryEmailAddress = userInfoViewModel.EmailAddress,
-                FullName = userInfoViewModel.FullName,
-                DeliveryPhoneNumber = userInfoViewModel.PhoneNumber,
-                StreetName = userInfoViewModel.StreetName,
-                HouseNumber = userInfoViewModel.HouseNumber,
-                City = userInfoViewModel.City,
-                ZipCode = userInfoViewModel.ZipCode,
-                Country = context.Countries.Single(c => c.Id == userInfoViewModel.CountryId),
+                DeliveryEmailAddress = shippingAndPaymentViewModel.EmailAddress,
+                FullName = shippingAndPaymentViewModel.FullName,
+                DeliveryPhoneNumber = shippingAndPaymentViewModel.PhoneNumber,
+                StreetName = shippingAndPaymentViewModel.StreetName,
+                HouseNumber = shippingAndPaymentViewModel.HouseNumber,
+                City = shippingAndPaymentViewModel.City,
+                ZipCode = shippingAndPaymentViewModel.ZipCode,
+                ShippingOption = (int)shippingAndPaymentViewModel.ShippingOption,
+                PaymentOption = (int)shippingAndPaymentViewModel.PaymentOption,
+                Country = context.Countries.Single(c => c.Id == shippingAndPaymentViewModel.CountryId),
             };
 
             await context.Orders.AddAsync(order);

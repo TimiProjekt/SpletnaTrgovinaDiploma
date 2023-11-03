@@ -1,156 +1,176 @@
 ﻿@using SpletnaTrgovinaDiploma.Data.ViewModels
 @model ShippingAndPaymentViewModel
 
-<form asp-action="CompleteOrder">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <h2>Shipping and payment options</h2>
-            <p> Izkoristite dostavo v več kot 450 GLS paketomatov za samo 1.99$ </p>
-            <p> Ali pa vam naročilo dostavimo na dom že od 2.99$ </p>
-            <fieldset>
-                <legend class="pt-3"><b>Select a shipping option</b></legend>
-                <div>
-                    <input type="radio" id="PriorityHomeShipping" name="Shipping" value="PriorityHomeShipping" checked />
-                    <label for="PriorityHomeShipping">Priority home shipping</label>
+<div class="row">
+    <div>
+        <p>
+            <h4 class="ml-5">Update your current settings</h4>
+        </p>
+
+        <form asp-action="ShippingAndPayment">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @Html.HiddenFor(v => v.ShoppingCart)
+            @Html.HiddenFor(v => v.ShoppingCartTotal)
+
+            <div class="row">
+                <div class="col-md-8 offset-md-2">
+                    <h2>Shipping and payment options</h2>
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <p> Izkoristite dostavo v več kot 450 GLS paketomatov za samo 1.99$ </p>
+                    <p> Ali pa vam naročilo dostavimo na dom že od 2.99$ </p>
+
+                    <fieldset>
+                        <div class="form-group">
+                            <legend class="pt-3"><b>Select a shipping option</b></legend>
+                            <label>
+                                @Html.RadioButtonFor(v => v.ShippingOption, ShippingOption.PriorityHomeShipping)
+                                Priority Home Shipping
+                            </label>
+                            <br />
+
+                            <label>
+                                @Html.RadioButtonFor(v => v.ShippingOption, ShippingOption.StandardHomeShipping)
+                                Standard Home Shipping
+                            </label>
+                            <br />
+
+                            <label>
+                                @Html.RadioButtonFor(v => v.ShippingOption, ShippingOption.Paketomat)
+                                Paketomat
+                            </label>
+                        </div>
+
+                        <div>
+                            <div class="form-group">
+                                <label asp-for="FullName" class="control-label"></label>
+                                <input asp-for="FullName" class="form-control" />
+                                <span asp-validation-for="FullName" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="EmailAddress" class="control-label"></label>
+                                <input asp-for="EmailAddress" class="form-control" />
+                                <span asp-validation-for="EmailAddress" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="PhoneNumber" class="control-label"></label>
+                                <input asp-for="PhoneNumber" class="form-control" />
+                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="StreetName" class="control-label"></label>
+                                <input asp-for="StreetName" class="form-control" />
+                                <span asp-validation-for="StreetName" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="HouseNumber" class="control-label"></label>
+                                <input asp-for="HouseNumber" class="form-control" />
+                                <span asp-validation-for="HouseNumber" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="ZipCode" class="control-label"></label>
+                                <input asp-for="ZipCode" class="form-control" />
+                                <span asp-validation-for="ZipCode" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="City" class="control-label"></label>
+                                <input asp-for="City" class="form-control" />
+                                <span asp-validation-for="City" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="CountryId"></label>
+                                <select asp-for="CountryId" class="form-control" asp-items="ViewBag.Countries"></select>
+                                <span asp-validation-for="CountryId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <legend class="pt-3"><b>Select a payment option</b></legend>
+
+                            <label>
+                                @Html.RadioButtonFor(v => v.PaymentOption, PaymentOption.CreditCard)
+                                Visa/Mastercard online payment
+                            </label>
+                            <br />
+
+                            <label>
+                                @Html.RadioButtonFor(v => v.PaymentOption, PaymentOption.Paypal)
+                                Paypal
+                            </label>
+                            <br />
+
+                            <label>
+                                @Html.RadioButtonFor(v => v.PaymentOption, PaymentOption.Cash)
+                                Payment after arrival
+
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    <div class="pt-3">
+                        @if (Model.ShoppingCart.TotalAmountOfItems == 1)
+                        {
+                            <b>1 Item in cart</b>
+                        }
+                        else
+                        {
+                            <b>@Model.ShoppingCart.TotalAmountOfItems Items in cart</b>
+                        }
+                        <br />
+                        <a class="text-primary" id="btn-show-summary" href="#" onclick="toggleSummary()"><u>Show summary</u></a>
+                        <b class="float-right" style="font-size: 1.2em">Total: @Model.ShoppingCartTotal.ToString("c")</b>
+                    </div>
+
+                    <table class="table" id="items-table" style="display: none">
+                        <thead>
+                            <tr>
+                                <th>Item summary</th>
+                                <th class="text-center">Amount</th>
+                                <th>Price</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.ShoppingCart.ShoppingCartItems)
+                            {
+                                <tr>
+                                    <td class="align-middle">
+                                        <a asp-controller="Items" asp-action="Details" asp-route-id="@item.Item.Id">
+                                            @item.Item.Name
+                                        </a>
+                                    </td>
+                                    <td class="align-middle text-center">@(item.Amount)</td>
+                                    <td class="align-middle">@item.Item.Price.ToString("c")</td>
+                                    <td class="align-middle text-right">@((item.Amount * item.Item.Price).ToString("c"))</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="2"></td>
+                                <td><b>Total:</b></td>
+                                <td class="text-right">
+                                    <b>
+                                        @Model.ShoppingCartTotal.ToString("c")
+                                    </b>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                    <div class="text-right pt-3">
+                        <input class="btn btn-success float-right" type="submit" value="Confirm order" />
+                    </div>
+                    <p class="pt-5">S tem je povezana obveznost plačila podjetju in strinjanje s splošnimi pogoji poslovanja.</p>
+                    <p>
+                        Z oddajo spletnega naročila se strinjam z izbiro načina plačila in s pogoji poslovanja.
+                        Prejeta plačila potrošniku vrnemo na TRR, razen, če potrošnik izrecno zahteva vračilo na drugo plačilno sredstvo.
+                        Potrošnik zaradi vračil ne nosi stroškov.
+                    </p>
                 </div>
-
-                <div>
-                    <input type="radio" id="StandardHomeShipping" name="Shipping" value="StandardHomeShipping" checked />
-                    <label for="StandardHomeShipping">Standard home shipping</label>
-                </div>
-
-                <div>
-                    <input type="radio" id="Paketomat" name="Shipping" value="Paketomat" />
-                    <label for="Paketomat">Prevzem v paketomatu</label>
-                </div>
-
-                <div>
-                    <div class="form-group">
-                        <label asp-for="UserInfoViewModel.FullName" class="control-label"></label>
-                        <input asp-for="UserInfoViewModel.FullName" class="form-control" />
-                        <span asp-validation-for="UserInfoViewModel.FullName" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="UserInfoViewModel.EmailAddress" class="control-label"></label>
-                        <input asp-for="UserInfoViewModel.EmailAddress" class="form-control" />
-                        <span asp-validation-for="UserInfoViewModel.EmailAddress" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="UserInfoViewModel.PhoneNumber" class="control-label"></label>
-                        <input asp-for="UserInfoViewModel.PhoneNumber" class="form-control" />
-                        <span asp-validation-for="UserInfoViewModel.PhoneNumber" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="UserInfoViewModel.StreetName" class="control-label"></label>
-                        <input asp-for="UserInfoViewModel.StreetName" class="form-control" />
-                        <span asp-validation-for="UserInfoViewModel.StreetName" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="UserInfoViewModel.HouseNumber" class="control-label"></label>
-                        <input asp-for="UserInfoViewModel.HouseNumber" class="form-control" />
-                        <span asp-validation-for="UserInfoViewModel.HouseNumber" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="UserInfoViewModel.ZipCode" class="control-label"></label>
-                        <input asp-for="UserInfoViewModel.ZipCode" class="form-control" />
-                        <span asp-validation-for="UserInfoViewModel.ZipCode" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="UserInfoViewModel.City" class="control-label"></label>
-                        <input asp-for="UserInfoViewModel.City" class="form-control" />
-                        <span asp-validation-for="UserInfoViewModel.City" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="UserInfoViewModel.CountryId"></label>
-                        <select asp-for="UserInfoViewModel.CountryId" class="form-control" asp-items="ViewBag.Countries"></select>
-                        <span asp-validation-for="UserInfoViewModel.CountryId" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <input class="btn btn-outline-success float-right" type="submit" value="Next" />
-                    </div>
-                </div>
-
-                <legend class="pt-3"><b>Select a payment option</b></legend>
-                <div>
-                    <input type="radio" id="CreditCard" name="Payment" value="CreditCard" checked />
-                    <label for="CreditCard">Visa/Mastercard online payment</label>
-                </div>
-
-                <div>
-                    <input type="radio" id="Paypal" name="Payment" value="Paypal" checked />
-                    <label for="Paypal">Paypal</label>
-                </div>
-
-                <div>
-                    <input type="radio" id="Cash" name="Payment" value="Cash" />
-                    <label for="Cash">Payment after arrival</label>
-                </div>
-            </fieldset>
-
-            <div class="pt-3">
-                @if (Model.ShoppingCart.TotalAmountOfItems == 1)
-                {
-                    <b>1 Item in cart</b>
-                }
-                else
-                {
-                    <b>@Model.ShoppingCart.TotalAmountOfItems Items in cart</b>
-                }
-                <br />
-                <a class="text-primary" id="btn-show-summary" href="#" onclick="toggleSummary()"><u>Show summary</u></a>
-                <b class="float-right" style="font-size:1.2em">Total: @Model.ShoppingCartTotal.ToString("c")</b>
             </div>
-
-            <table class="table" id="items-table" style="display:none">
-                <thead>
-                    <tr>
-                        <th>Item summary</th>
-                        <th class="text-center">Amount</th>
-                        <th>Price</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.ShoppingCart.ShoppingCartItems)
-                    {
-                        <tr>
-                            <td class="align-middle">
-                                <a asp-controller="Items" asp-action="Details" asp-route-id="@item.Item.Id">
-                                    @item.Item.Name
-                                </a>
-                            </td>
-                            <td class="align-middle text-center">@(item.Amount)</td>
-                            <td class="align-middle">@item.Item.Price.ToString("c")</td>
-                            <td class="align-middle text-right">@((item.Amount*item.Item.Price).ToString("c"))</td>
-                        </tr>
-                    }
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="2"></td>
-                        <td><b>Total:</b></td>
-                        <td class="text-right">
-                            <b>
-                                @Model.ShoppingCartTotal.ToString("c")
-                            </b>
-                        </td>
-                    </tr>
-                </tfoot>
-            </table>
-
-            <div class="text-right pt-3">
-                <input class="btn btn-success float-right" type="submit" value="Confirm order" />
-            </div>
-            <p class="pt-5">S tem je povezana obveznost plačila podjetju in strinjanje s splošnimi pogoji poslovanja.</p>
-            <p>
-                Z oddajo spletnega naročila se strinjam z izbiro načina plačila in s pogoji poslovanja.
-                Prejeta plačila potrošniku vrnemo na TRR, razen, če potrošnik izrecno zahteva vračilo na drugo plačilno sredstvo.
-                Potrošnik zaradi vračil ne nosi stroškov.
-            </p>
-        </div>
+        </form>
     </div>
-</form>
+</div>
 
 @section Scripts{
 
@@ -159,8 +179,8 @@
         var table = document.getElementById('items-table')
         var btn = document.getElementById('btn-show-summary')
         if (btn.innerText === 'Show summary') {
-            btn.innerText = 'Hide summary'
-            table.style.display = 'table'
+            btn.innerText = 'Hide summary';
+            table.style.display = 'table';
         }
         else {
             btn.innerText = 'Show summary'
@@ -168,4 +188,4 @@
         }
     }
 </script>
-}
+    }

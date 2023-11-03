@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 
@@ -6,10 +7,13 @@ namespace SpletnaTrgovinaDiploma.Models
 {
     public class ApplicationUser : IdentityUser, IDeliveryInfo
     {
+        [Display(Name = "Email address")]
         public string EmailAddress => UserName;
 
+        [Display(Name = "Full name")]
         public string FullName { get; set; }
 
+        [Display(Name = "Email address")]
         public string DeliveryEmailAddress { get; set; }
 
         public string DeliveryPhoneNumber { get; set; }

@@ -23,20 +23,22 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model)
+                @foreach (var user in Model)
                 {
                     <tr>
                         <td class="align-middle">
-                            @Html.DisplayFor(modelItem => item.FullName)
+                            <a asp-controller="Account" asp-action="GetUserInfo" asp-all-route-data="@(new Dictionary<string, string> {{"userId", user.Id}})">
+                                @Html.DisplayFor(modelItem => user.FullName)
+                            </a>
                         </td>
                         <td class="align-middle">
-                            @Html.DisplayFor(modelItem => item.EmailAddress)
+                            @Html.DisplayFor(modelItem => user.EmailAddress)
                         </td>
                         <td class="align-middle">
-                            @Html.DisplayFor(modelItem => item.Email)
+                            @Html.DisplayFor(modelItem => user.Email)
                         </td>
                         <td class="align-middle">
-                            @Html.DisplayFor(modelItem => item.GetFullAddress)
+                            @Html.DisplayFor(modelItem => user.GetFullAddress)
                         </td>
                     </tr>
                 }

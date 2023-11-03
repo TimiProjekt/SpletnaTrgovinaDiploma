@@ -7,7 +7,10 @@ namespace SpletnaTrgovinaDiploma.Data.Services
 {
     public interface IOrdersService
     {
-        Task StoreOrderAsync(UserInfoViewModel userInfoViewModel, List<ShoppingCartItem> items, string userId);
+        Task StoreOrderAsync(ShippingAndPaymentViewModel shippingAndPaymentViewModel, List<ShoppingCartItem> items, string userId);
+
         Task<List<Order>> GetOrdersByUserIdAndRoleAsync(string userId, string userRole);
+
+        Order GetOrderByIdAndRole(int orderId, string userRole);
     }
 }

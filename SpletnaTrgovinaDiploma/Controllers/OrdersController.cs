@@ -7,7 +7,6 @@ using SpletnaTrgovinaDiploma.Data.ViewModels;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using SpletnaTrgovinaDiploma.Data;
 using SpletnaTrgovinaDiploma.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SpletnaTrgovinaDiploma.Helpers;
@@ -21,17 +20,15 @@ namespace SpletnaTrgovinaDiploma.Controllers
         private readonly IOrdersService ordersService;
         private readonly ShoppingCart shoppingCart;
         private readonly UserManager<ApplicationUser> userManager;
-        private readonly AppDbContext context;
         private readonly UserHelper userHelper;
 
-        public OrdersController(ICountryService countryService, IItemsService itemsService, IOrdersService ordersService, ShoppingCart shoppingCart, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, AppDbContext context)
+        public OrdersController(ICountryService countryService, IItemsService itemsService, IOrdersService ordersService, ShoppingCart shoppingCart, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
             this.countryService = countryService;
             this.itemsService = itemsService;
             this.ordersService = ordersService;
             this.shoppingCart = shoppingCart;
             this.userManager = userManager;
-            this.context = context;
 
             userHelper = new UserHelper(userManager, signInManager);
         }
@@ -54,8 +51,9 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                var upperCaseSearchString = searchString.ToUpper();
-                var filteredOrders = allOrders.Where(n => n.Id.ToString().Contains(upperCaseSearchString) || n.DeliveryEmailAddress.Contains(upperCaseSearchString));
+                bool ContainsCaseInsensitiveString(string source, string contains) => source?.ToUpper().Contains(contains.ToUpper()) ?? false;
+
+                var filteredOrders = allOrders.Where(n => ContainsCaseInsensitiveString(n.Id.ToString(), searchString) || ContainsCaseInsensitiveString(n.DeliveryEmailAddress, searchString));
 
                 SetPageDetails("Search result", $"Search result for \"{searchString}\"");
                 return View("Index", filteredOrders);
@@ -81,6 +79,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             if (order == null)
                 return RedirectToAction("Index", "Items");
 
+            LoadCountriesDropdownData();
             return View(order);
         }
 
@@ -181,46 +180,53 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return View(loginViewModel);
         }
 
-        public IActionResult ShippingAndPayment()
+        ShoppingCart GetShoppingCartWithItems()
         {
-            LoadCountriesDropdownData();
             var items = shoppingCart.GetShoppingCartItems();
             shoppingCart.ShoppingCartItems = items;
 
-            var userInfoViewModel = new UserInfoViewModel();
-            var user = userHelper.GetApplicationUser(User);
-            if (user != null)
-            {
-                userInfoViewModel = new UserInfoViewModel()
-                {
-                    EmailAddress = user.DeliveryEmailAddress,
-                    FullName = user.FullName,
-                    PhoneNumber = user.PhoneNumber,
-                    StreetName = user.StreetName,
-                    HouseNumber = user.HouseNumber,
-                    City = user.City,
-                    ZipCode = user.ZipCode,
-                    CountryId = user.CountryId
-                };
-            }
+            return shoppingCart;
+        }
 
+        public IActionResult ShippingAndPayment()
+        {
+            LoadCountriesDropdownData();
+            var myShoppingCart = GetShoppingCartWithItems();
+
+            var user = userHelper.GetApplicationUser(User);
             var response = new ShippingAndPaymentViewModel()
             {
-                ShoppingCart = shoppingCart,
-                ShoppingCartTotal = shoppingCart.GetShoppingCartTotal(),
-                UserInfoViewModel = userInfoViewModel
+                ShoppingCart = myShoppingCart,
+                ShoppingCartTotal = myShoppingCart.GetShoppingCartTotal(),
+                EmailAddress = user?.DeliveryEmailAddress ?? "",
+                FullName = user?.FullName ?? "",
+                PhoneNumber = user?.PhoneNumber ?? "",
+                StreetName = user?.StreetName ?? "",
+                HouseNumber = user?.HouseNumber ?? "",
+                City = user?.City ?? "",
+                ZipCode = user?.ZipCode ?? "",
+                CountryId = user?.CountryId ?? 1
             };
 
             return View(response);
         }
 
-        public async Task<IActionResult> CompleteOrder(ShippingAndPaymentViewModel shippingAndPaymentViewModel)
+        [HttpPost]
+        public async Task<IActionResult> ShippingAndPayment(ShippingAndPaymentViewModel shippingAndPaymentViewModel)
         {
-            var items = shoppingCart.GetShoppingCartItems();
+            LoadCountriesDropdownData();
+            var myShoppingCart = GetShoppingCartWithItems();
+            shippingAndPaymentViewModel.ShoppingCart = myShoppingCart;
+            shippingAndPaymentViewModel.ShoppingCartTotal = myShoppingCart.GetShoppingCartTotal();
+
+            if (!ModelState.IsValid)
+                return View(shippingAndPaymentViewModel);
+
+            var items = myShoppingCart.GetShoppingCartItems();
             var userId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            await ordersService.StoreOrderAsync(shippingAndPaymentViewModel.UserInfoViewModel, items, userId);
-            await shoppingCart.ClearShoppingCartAsync();
+            await ordersService.StoreOrderAsync(shippingAndPaymentViewModel, items, userId);
+            await myShoppingCart.ClearShoppingCartAsync();
 
             return View("OrderCompleted");
         }

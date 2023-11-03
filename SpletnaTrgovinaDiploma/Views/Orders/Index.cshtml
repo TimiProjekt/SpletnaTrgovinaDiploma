@@ -53,9 +53,18 @@
                         @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
                         {
                             <td class="align-middle">
-                                <a asp-controller="Account" asp-action="GetUserInfo" asp-all-route-data="@(new Dictionary<string, string> { {"userId", order.UserId} })">
-                                    @order.User.FullName
-                                </a>
+                                @if (order.User != null)
+                                {
+                                    <a asp-controller="Account" asp-action="GetUserInfo" asp-all-route-data="@(new Dictionary<string, string> {{"userId", order.UserId}})">
+                                        @(order.FullName)
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Account" asp-action="GetUnregisteredUserInfo" asp-all-route-data="@(new Dictionary<string, string> {{"orderId", order.Id.ToString()}})">
+                                        @(order.FullName)
+                                    </a>
+                                }
                             </td>
                         }
                     </tr>

@@ -6,6 +6,7 @@ using SpletnaTrgovinaDiploma.Data.Static;
 using SpletnaTrgovinaDiploma.Data.ViewModels;
 using SpletnaTrgovinaDiploma.Models;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -17,17 +18,19 @@ namespace SpletnaTrgovinaDiploma.Controllers
     public class AccountController : Controller
     {
         private readonly ICountryService countryService;
+        private readonly IOrdersService ordersService;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly AppDbContext context;
         private readonly UserHelper userHelper;
 
-        public AccountController(ICountryService countryService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, AppDbContext context)
+        public AccountController(ICountryService countryService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, AppDbContext context, IOrdersService ordersService)
         {
             this.countryService = countryService;
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.context = context;
+            this.ordersService = ordersService;
 
             userHelper = new UserHelper(userManager, signInManager);
         }
@@ -181,6 +184,21 @@ namespace SpletnaTrgovinaDiploma.Controllers
             ViewBag.Countries = new SelectList(itemDropdownsData.Countries, "Id", "Name");
         }
 
+        UserInfoViewModel CreateInfoViewModel(IDeliveryInfo deliveryInfo)
+        {
+            return new UserInfoViewModel
+            {
+                FullName = deliveryInfo.FullName,
+                EmailAddress = deliveryInfo.DeliveryEmailAddress,
+                PhoneNumber = deliveryInfo.DeliveryPhoneNumber,
+                StreetName = deliveryInfo.StreetName,
+                HouseNumber = deliveryInfo.HouseNumber,
+                City = deliveryInfo.City,
+                ZipCode = deliveryInfo.ZipCode,
+                CountryId = deliveryInfo.CountryId
+            };
+        }
+
         [Authorize(Roles = UserRoles.Admin)]
         public IActionResult GetUserInfo(string userId)
         {
@@ -188,17 +206,26 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
             if (user != null)
             {
-                var userInfoViewModel = new UserInfoViewModel
-                {
-                    FullName = user.FullName,
-                    EmailAddress = user.DeliveryEmailAddress,
-                    PhoneNumber = user.DeliveryPhoneNumber,
-                    StreetName = user.StreetName,
-                    HouseNumber = user.HouseNumber,
-                    City = user.City,
-                    ZipCode = user.ZipCode,
-                    CountryId = user.CountryId
-                };
+                var userInfoViewModel = CreateInfoViewModel(user);
+
+                LoadCountriesDropdownData();
+                return View(userInfoViewModel);
+            }
+
+            TempData["Error"] = "Cannot fetch user info";
+
+            return View(new UserInfoViewModel());
+        }
+
+        [Authorize(Roles = UserRoles.Admin)]
+        public IActionResult GetUnregisteredUserInfo(int orderId)
+        {
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+            var order = ordersService.GetOrderByIdAndRole(orderId, userRole);
+
+            if (order != null)
+            {
+                var userInfoViewModel = CreateInfoViewModel(order);
 
                 LoadCountriesDropdownData();
                 return View(userInfoViewModel);
