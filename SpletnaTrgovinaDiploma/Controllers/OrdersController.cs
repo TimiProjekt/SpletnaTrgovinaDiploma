@@ -194,10 +194,12 @@ namespace SpletnaTrgovinaDiploma.Controllers
             var myShoppingCart = GetShoppingCartWithItems();
 
             var user = userHelper.GetApplicationUser(User);
+            var shoppingCartTotal = myShoppingCart.GetShoppingCartTotal();
             var response = new ShippingAndPaymentViewModel()
             {
                 ShoppingCart = myShoppingCart,
-                ShoppingCartTotal = myShoppingCart.GetShoppingCartTotal(),
+                ShoppingCartTotal = shoppingCartTotal,
+                ShoppingCartTotalWithoutVat = shoppingCartTotal * 100 / 122,
                 EmailAddress = user?.DeliveryEmailAddress ?? "",
                 FullName = user?.FullName ?? "",
                 PhoneNumber = user?.PhoneNumber ?? "",

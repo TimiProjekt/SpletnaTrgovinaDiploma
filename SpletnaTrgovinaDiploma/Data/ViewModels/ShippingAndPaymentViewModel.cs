@@ -8,6 +8,8 @@ namespace SpletnaTrgovinaDiploma.Data.ViewModels
 
         public decimal ShoppingCartTotal { get; set; }
 
+        public decimal ShoppingCartTotalWithoutVat { get; set; }
+
         public ShippingOption ShippingOption { get; set; }
 
         public PaymentOption PaymentOption { get; set; }

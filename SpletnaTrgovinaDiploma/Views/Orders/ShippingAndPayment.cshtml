@@ -11,6 +11,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             @Html.HiddenFor(v => v.ShoppingCart)
             @Html.HiddenFor(v => v.ShoppingCartTotal)
+            @Html.HiddenFor(v => v.ShoppingCartTotalWithoutVat)
 
             <div class="row">
                 <div class="col-md-8 offset-md-2">
@@ -117,7 +118,10 @@
                         }
                         <br />
                         <a class="text-primary" id="btn-show-summary" href="#" onclick="toggleSummary()"><u>Show summary</u></a>
-                        <b class="float-right" style="font-size: 1.2em">Total: @Model.ShoppingCartTotal.ToString("c")</b>
+                        <div class="float-right">
+                            <b class="float-right" style="font-size: 1.2em">Total: @Model.ShoppingCartTotal.ToString("c")</b> <br />
+                            <div class="d-inline-block">Ex. VAT (22%): @Model.ShoppingCartTotalWithoutVat.ToString("c")</div>
+                        </div>
                     </div>
 
                     <table class="table" id="items-table" style="display: none">
@@ -157,7 +161,7 @@
                         </tfoot>
                     </table>
 
-                    <div class="text-right pt-3">
+                    <div class="text-right pt-5">
                         <input class="btn btn-success float-right" type="submit" value="Confirm order" />
                     </div>
                     <p class="pt-5">S tem je povezana obveznost plačila podjetju in strinjanje s splošnimi pogoji poslovanja.</p>
