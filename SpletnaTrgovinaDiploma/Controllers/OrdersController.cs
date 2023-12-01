@@ -228,9 +228,32 @@ namespace SpletnaTrgovinaDiploma.Controllers
             var userId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
 
             await ordersService.StoreOrderAsync(shippingAndPaymentViewModel, items, userId);
+
+            SendConfirmationEmail(myShoppingCart, shippingAndPaymentViewModel);
+
             await myShoppingCart.ClearShoppingCartAsync();
 
             return View("OrderCompleted");
+        }
+
+        static void SendConfirmationEmail(ShoppingCart myShoppingCart, ShippingAndPaymentViewModel viewModel)
+        {
+            var messageHtml = $"Hello {viewModel.FullName}! <br/>";
+            messageHtml += "The order which includes the following items: <br/> <ul>";
+
+            foreach (var item in myShoppingCart.ShoppingCartItems)
+                messageHtml += $"<li> {item.Item.Name} {item.Item.Price} x ({item.Amount} kom) = {item.Item.Price * item.Amount}</li>";
+
+            messageHtml += "</ul> has been completed and will be shipped out shortly. <br/>";
+            messageHtml += $"Total price: {myShoppingCart.GetShoppingCartTotal()}  <br/>";
+            messageHtml += $"Delivery method: {viewModel.ShippingOption}  <br/>";
+            messageHtml += $"Delivery address: {viewModel.GetFullAddress}  <br/>";
+            messageHtml += $"Payment method: {viewModel.PaymentOption}  <br/>";
+
+            EmailProvider.SendEmail(
+                viewModel.EmailAddress,
+                "Your order is completed.",
+                messageHtml);
         }
 
         void LoadCountriesDropdownData()
