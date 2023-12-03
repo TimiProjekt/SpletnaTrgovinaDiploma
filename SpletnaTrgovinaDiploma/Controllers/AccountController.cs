@@ -98,7 +98,22 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 return View(registerViewModel);
             }
 
+            SendConfirmationEmail(registerViewModel);
+
             return View("RegisterCompleted");
+        }
+
+
+        static void SendConfirmationEmail(RegisterViewModel viewModel)
+        {
+            var messageHtml = $"Hello {viewModel.FullName}! <br/>";
+            messageHtml += "You have successfully registered at Gaming svet <br/> ";
+            messageHtml += "You can now <a href='https://fireparts.azurewebsites.net/'> login! </a>";
+
+            EmailProvider.SendEmail(
+                viewModel.EmailAddress,
+                "Your order is completed.",
+                messageHtml);
         }
 
         [Authorize]
