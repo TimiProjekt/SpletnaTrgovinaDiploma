@@ -34,6 +34,7 @@ namespace SpletnaTrgovinaDiploma
             services.AddScoped<ICountryService, CountryService>();
             services.AddScoped<IItemsService, ItemsService>();
             services.AddScoped<IOrdersService, OrdersService>();
+            services.AddScoped<INewsletterEmailService, NewsletterEmailService>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped(ShoppingCart.GetShoppingCart);

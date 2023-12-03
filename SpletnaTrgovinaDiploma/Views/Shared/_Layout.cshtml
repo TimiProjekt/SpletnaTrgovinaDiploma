@@ -1,4 +1,5 @@
 ﻿@using SpletnaTrgovinaDiploma.Helpers
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,7 +28,7 @@
                                     aria-expanded="false">
                                 Categories
                             </button>
-                            
+
                             <div class="pl-2 mt-auto mb-auto" style="word-break: keep-all; white-space: nowrap">
                                 @ActiveLink.GetCurrentCategoryName(Url.Action())
                             </div>
@@ -81,11 +82,18 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="border-top footer text-muted text-center" style="bottom: auto">
+        Subscribe to our newsletter! <br />
+        <form asp-controller="Account" asp-action="SubscribeToNewsletter">
+            <input class="w-auto" name="email" type="text" />
+            <button type="submit" title="Subscribe" class="btn-primary">Subscribe</button>
+        </form>
+
         <div class="container">
             &copy; 2022 - SpletnaTrgovinaDiploma
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

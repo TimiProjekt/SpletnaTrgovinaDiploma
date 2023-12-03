@@ -17,20 +17,28 @@ namespace SpletnaTrgovinaDiploma.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly ICountryService countryService;
-        private readonly IOrdersService ordersService;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly AppDbContext context;
         private readonly UserHelper userHelper;
+        private readonly ICountryService countryService;
+        private readonly IOrdersService ordersService;
+        private readonly INewsletterEmailService newsletterEmailService;
 
-        public AccountController(ICountryService countryService, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, AppDbContext context, IOrdersService ordersService)
+        public AccountController(
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            AppDbContext context,
+            ICountryService countryService,
+            IOrdersService ordersService,
+            INewsletterEmailService newsletterEmailService)
         {
-            this.countryService = countryService;
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.context = context;
+            this.countryService = countryService;
             this.ordersService = ordersService;
+            this.newsletterEmailService = newsletterEmailService;
 
             userHelper = new UserHelper(userManager, signInManager);
         }
@@ -114,6 +122,14 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 viewModel.EmailAddress,
                 "Your order is completed.",
                 messageHtml);
+        }
+
+        [HttpPost]
+        public IActionResult SubscribeToNewsletter(string email)
+        {
+            newsletterEmailService.AddToMailingList(email);
+
+            return RedirectToAction("Index", "Items");
         }
 
         [Authorize]
