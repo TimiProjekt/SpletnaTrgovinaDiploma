@@ -93,6 +93,18 @@ namespace SpletnaTrgovinaDiploma.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
         {
+            void SendConfirmationEmail()
+            {
+                var messageHtml = $"Hello {registerViewModel.FullName}! <br/>";
+                messageHtml += "You have successfully registered at Gaming svet <br/> ";
+                messageHtml += "You can now <a href='https://fireparts.azurewebsites.net/'> login! </a>";
+
+                EmailProvider.SendEmail(
+                    registerViewModel.EmailAddress,
+                    "Your registration is completed",
+                    messageHtml);
+            }
+
             if (!ModelState.IsValid)
                 return View(registerViewModel);
 
@@ -106,28 +118,29 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 return View(registerViewModel);
             }
 
-            SendConfirmationEmail(registerViewModel);
+            SendConfirmationEmail();
 
             return View("RegisterCompleted");
         }
 
 
-        static void SendConfirmationEmail(RegisterViewModel viewModel)
-        {
-            var messageHtml = $"Hello {viewModel.FullName}! <br/>";
-            messageHtml += "You have successfully registered at Gaming svet <br/> ";
-            messageHtml += "You can now <a href='https://fireparts.azurewebsites.net/'> login! </a>";
-
-            EmailProvider.SendEmail(
-                viewModel.EmailAddress,
-                "Your registration is completed.",
-                messageHtml);
-        }
-
         [HttpPost]
         public IActionResult SubscribeToNewsletter(string email)
         {
+            void SendConfirmationEmail()
+            {
+                var messageHtml = $"Hello {email}! <br/>";
+                messageHtml += "You have successfully subscribed to our newsletter at Gaming svet <br/> ";
+
+                EmailProvider.SendEmail(
+                    email,
+                    "Your newsletter subscription",
+                    messageHtml);
+            }
+
             newsletterEmailService.AddToMailingList(email);
+
+            SendConfirmationEmail();
 
             return RedirectToAction("Index", "Items");
         }
