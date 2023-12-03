@@ -120,7 +120,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
             EmailProvider.SendEmail(
                 viewModel.EmailAddress,
-                "Your order is completed.",
+                "Your registration is completed.",
                 messageHtml);
         }
 
