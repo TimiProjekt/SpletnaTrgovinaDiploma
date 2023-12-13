@@ -33,7 +33,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         public async Task<IActionResult> Index()
         {
             var allItems = await service.GetAllAsync(n => n.BrandsItems);
-            SetPageDetails("Home page", "Home page of Fire Computer Parts");
+            SetPageDetails("Home page", "Home page of Gaming svet");
             return View(allItems);
         }
 
@@ -59,7 +59,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 return View("Index", filteredResult);
             }
 
-            SetPageDetails("Home page", "Home page of Fire Computer Parts");
+            SetPageDetails("Home page", "Home page of Gaming svet");
             return View("Index", allItems);
         }
 

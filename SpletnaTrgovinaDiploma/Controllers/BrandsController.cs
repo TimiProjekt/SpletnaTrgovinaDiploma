@@ -39,7 +39,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 return View("EditIndex", filteredResult);
             }
 
-            SetPageDetails("Home page", "Home page of Fire Computer Parts");
+            SetPageDetails("Home page", "Home page of Gaming svet");
             return View("EditIndex", allBrands);
         }
 
