@@ -8,6 +8,7 @@ using SpletnaTrgovinaDiploma.Models;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SpletnaTrgovinaDiploma.Data.Services;
@@ -88,6 +89,95 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return View(loginViewModel);
         }
 
+        public IActionResult ForgotPassword() => View(new ResetPasswordViewModel());
+
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(ResetPasswordViewModel resetPasswordViewModel)
+        {
+            var email = resetPasswordViewModel.EmailAddress;
+            if (string.IsNullOrEmpty(email))
+            {
+                TempData["Error"] = "Email address should not be empty.";
+                return View(resetPasswordViewModel);
+            }
+
+            var user = await userManager.FindByNameAsync(email);
+            if (user == null)
+            {
+                TempData["Error"] = "Email does not exist.";
+                return View(resetPasswordViewModel);
+            }
+
+            var token = await userManager.GeneratePasswordResetTokenAsync(user);
+            var callbackUrl = $"https://gamingsvet.azurewebsites.net/Account/ResetPassword?email={email}&token={HttpUtility.UrlEncode(token)}";
+
+            EmailProvider.SendEmail(
+                email,
+                "Reset password link",
+                $"Dear {user.FullName}, <br />" +
+                "You requested to reset your password." +
+                $"If you requested this then follow this <a href=\"{callbackUrl}\"> link </a> to reset your password." +
+                "If you did not request this, then we suggest that you immediately change your password."
+            );
+
+            return View(
+                "Success",
+                new SuccessViewModel(
+                    $"An e-mail has been sent to {email}.",
+                    "Please follow the link in the e-mail to reset your password."));
+        }
+
+        public async Task<IActionResult> ResetPassword(string email, string token)
+        {
+            if (email == null || token == null)
+                return View("NotFound");
+
+            var user = await userManager.FindByNameAsync(email);
+
+            if (user == null)
+                return View("NotFound");
+
+            var registerViewModel = new ResetPasswordViewModel
+            {
+                EmailAddress = email,
+                Token = HttpUtility.UrlDecode(token)
+            };
+
+            return View(registerViewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel resetPasswordViewModel)
+        {
+            if (resetPasswordViewModel.Password != resetPasswordViewModel.ConfirmPassword)
+            {
+                TempData["Error"] = "Passwords do not match!";
+                return View(resetPasswordViewModel);
+            }
+
+            var user = await userManager.FindByNameAsync(resetPasswordViewModel.EmailAddress);
+
+            if (user == null)
+            {
+                TempData["Error"] = "Internal error, please try again. If it persists, contact your administrator.";
+                return View(resetPasswordViewModel);
+            }
+
+            var result = await userManager.ResetPasswordAsync(user, resetPasswordViewModel.Token, resetPasswordViewModel.Password);
+
+            if (!result.Succeeded)
+            {
+                TempData["Error"] = "Error: " + result.Errors.First().Description;
+                return View(resetPasswordViewModel);
+            }
+
+            return View(
+                "Success",
+                new SuccessViewModel(
+                    "Password reset success.",
+                    "You can now login."));
+        }
+
         public IActionResult Register() => View(new RegisterViewModel());
 
         [HttpPost]
@@ -131,6 +221,9 @@ namespace SpletnaTrgovinaDiploma.Controllers
             {
                 var messageHtml = $"Hello {email}! <br/>";
                 messageHtml += "You have successfully subscribed to our newsletter at Gaming svet <br/> ";
+
+                // when subscribing create a cancellation token which is then used to generate unsubscribe link in all e-mails
+                // add link to unsubscribe with token & email
 
                 EmailProvider.SendEmail(
                     email,

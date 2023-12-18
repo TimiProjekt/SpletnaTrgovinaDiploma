@@ -40,7 +40,9 @@ namespace SpletnaTrgovinaDiploma
             services.AddScoped(ShoppingCart.GetShoppingCart);
 
             //Authentication and authorization
-            services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>();
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<AppDbContext>()
+                .AddDefaultTokenProviders();
             services.AddMemoryCache();
             services.AddSession();
             services.AddAuthentication(options =>

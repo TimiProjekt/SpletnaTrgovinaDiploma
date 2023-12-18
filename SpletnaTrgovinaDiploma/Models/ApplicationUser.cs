@@ -27,7 +27,7 @@ namespace SpletnaTrgovinaDiploma.Models
         public string City { get; set; }
 
         [ForeignKey(nameof(Country))]
-        public int CountryId { get; set; }
+        public int? CountryId { get; set; }
         [IgnoreDataMember]
         public Country Country { get; set; }
 

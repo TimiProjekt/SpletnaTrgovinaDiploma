@@ -233,7 +233,12 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
             await myShoppingCart.ClearShoppingCartAsync();
 
-            return View("OrderCompleted");
+            return View(
+                "Success",
+                new SuccessViewModel(
+                    "Order completed successfully.",
+                    "You can check all your orders in the Orders section of your profile.",
+                    "Thank you!"));
         }
 
         static void SendConfirmationEmail(ShoppingCart myShoppingCart, ShippingAndPaymentViewModel viewModel)

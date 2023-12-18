@@ -28,7 +28,7 @@ namespace SpletnaTrgovinaDiploma.Models
         public int PaymentOption { get; set; }
 
         [ForeignKey(nameof(Country))]
-        public int CountryId { get; set; }
+        public int? CountryId { get; set; }
         [IgnoreDataMember]
         public Country Country { get; set; }
 

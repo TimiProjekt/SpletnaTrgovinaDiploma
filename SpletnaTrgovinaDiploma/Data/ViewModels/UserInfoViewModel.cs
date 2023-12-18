@@ -36,7 +36,7 @@ namespace SpletnaTrgovinaDiploma.Data.ViewModels
         [Display(Name = "Country")]
         [Required(ErrorMessage = "Country is required")]
         [Range(1, int.MaxValue, ErrorMessage = "You must select a country")]
-        public int CountryId { get; set; }
+        public int? CountryId { get; set; }
         public Country Country { get; set; }
 
         public bool HasAddress => !string.IsNullOrEmpty(StreetName) && !string.IsNullOrEmpty(HouseNumber) &&
