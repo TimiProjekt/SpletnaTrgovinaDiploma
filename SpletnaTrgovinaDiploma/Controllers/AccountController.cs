@@ -110,7 +110,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
             var token = await userManager.GeneratePasswordResetTokenAsync(user);
             var callbackUrl = $"https://gamingsvet.azurewebsites.net/Account/ResetPassword?email={email}&token={HttpUtility.UrlEncode(token)}";
-
+            
             EmailProvider.SendEmail(
                 email,
                 "Reset password link",
@@ -213,7 +213,6 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return View("RegisterCompleted");
         }
 
-
         [HttpPost]
         public IActionResult SubscribeToNewsletter(string email)
         {
@@ -222,9 +221,6 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 var messageHtml = $"Hello {email}! <br/>";
                 messageHtml += "You have successfully subscribed to our newsletter at Gaming svet <br/> ";
 
-                // when subscribing create a cancellation token which is then used to generate unsubscribe link in all e-mails
-                // add link to unsubscribe with token & email
-
                 EmailProvider.SendEmail(
                     email,
                     "Your newsletter subscription",
@@ -232,6 +228,26 @@ namespace SpletnaTrgovinaDiploma.Controllers
             }
 
             newsletterEmailService.AddToMailingList(email);
+
+            SendConfirmationEmail();
+
+            return RedirectToAction("Index", "Items");
+        }
+
+        public IActionResult UnsubscribeFromNewsletter(string email)
+        {
+            void SendConfirmationEmail()
+            {
+                var messageHtml = $"Hello {email}! <br/>";
+                messageHtml += "You have successfully unsubscribed from our newsletter at Gaming svet <br/> ";
+
+                EmailProvider.SendEmail(
+                    email,
+                    "Your newsletter subscription",
+                    messageHtml);
+            }
+
+            newsletterEmailService.RemoveFromMailingList(email);
 
             SendConfirmationEmail();
 

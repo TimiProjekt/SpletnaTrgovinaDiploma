@@ -30,6 +30,17 @@ namespace SpletnaTrgovinaDiploma.Data.Services
             await context.SaveChangesAsync();
         }
 
+        public async Task RemoveFromMailingList(string emailAddress)
+        {
+            // If it doesn't exist, don't remove it. Future: Give feedback that it's not subscribed
+            var newsletterEmail = context.NewsletterMailingList.Single(e => e.Email == emailAddress);
+            if (newsletterEmail == null)
+                return;
+
+            context.NewsletterMailingList.Remove(newsletterEmail);
+            await context.SaveChangesAsync();
+        }
+
         public IEnumerable<NewsletterEmail> GetAllEmailAddressesFromMailingList()
         {
             return context.NewsletterMailingList.Select(c => c);

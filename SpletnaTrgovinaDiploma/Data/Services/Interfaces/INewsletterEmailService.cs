@@ -9,6 +9,8 @@ namespace SpletnaTrgovinaDiploma.Data.Services
     {
         Task AddToMailingList(string emailAddress);
 
+        Task RemoveFromMailingList(string emailAddress);
+
         IEnumerable<NewsletterEmail> GetAllEmailAddressesFromMailingList();
     }
 }
