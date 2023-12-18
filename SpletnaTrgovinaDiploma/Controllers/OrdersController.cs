@@ -235,7 +235,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
             return View(
                 "Success",
-                new SuccessViewModel(
+                new EmailViewModel(
                     "Order completed successfully.",
                     "You can check all your orders in the Orders section of your profile.",
                     "Thank you!"));

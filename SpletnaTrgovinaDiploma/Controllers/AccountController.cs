@@ -110,7 +110,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
             var token = await userManager.GeneratePasswordResetTokenAsync(user);
             var callbackUrl = $"https://gamingsvet.azurewebsites.net/Account/ResetPassword?email={email}&token={HttpUtility.UrlEncode(token)}";
-            
+
             EmailProvider.SendEmail(
                 email,
                 "Reset password link",
@@ -122,7 +122,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
             return View(
                 "Success",
-                new SuccessViewModel(
+                new EmailViewModel(
                     $"An e-mail has been sent to {email}.",
                     "Please follow the link in the e-mail to reset your password."));
         }
@@ -173,7 +173,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
             return View(
                 "Success",
-                new SuccessViewModel(
+                new EmailViewModel(
                     "Password reset success.",
                     "You can now login."));
         }
@@ -231,7 +231,11 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
             SendConfirmationEmail();
 
-            return RedirectToAction("Index", "Items");
+            return View(
+                "Success",
+                new EmailViewModel(
+                    "Successfully registered for the newsletter.",
+                    ""));
         }
 
         public IActionResult UnsubscribeFromNewsletter(string email)
@@ -252,6 +256,32 @@ namespace SpletnaTrgovinaDiploma.Controllers
             SendConfirmationEmail();
 
             return RedirectToAction("Index", "Items");
+        }
+
+        [Authorize(Roles = UserRoles.Admin)]
+        public IActionResult SubscriberEmail() => View(new EmailViewModel("", ""));
+
+        [HttpPost]
+        [Authorize(Roles = UserRoles.Admin)]
+        public IActionResult SubscriberEmail(EmailViewModel emailViewModel)
+        {
+            var allEmailAddresses = newsletterEmailService.GetAllEmailAddressesFromMailingList();
+
+            var emailSent = 0;
+            foreach (var newsletterEmail in allEmailAddresses.TakeLast(5))
+            {
+                EmailProvider.SendEmail(
+                    newsletterEmail.Email,
+                    emailViewModel.Header,
+                    emailViewModel.Body);
+                emailSent++;
+            }
+
+            return View(
+                "Success",
+                new EmailViewModel(
+                    $"Emails successfully sent to all {emailSent} subscribers.",
+                    ""));
         }
 
         [Authorize]
