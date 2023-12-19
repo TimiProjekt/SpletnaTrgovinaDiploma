@@ -15,11 +15,11 @@ namespace SpletnaTrgovinaDiploma.Data.Services
             this.context = context;
         }
 
-        public async Task AddToMailingList(string emailAddress)
+        public async Task<bool> AddToMailingList(string emailAddress)
         {
             // If it already exists, don't add it again. Future: Give feedback that it's already registered
             if (context.NewsletterMailingList.Any(newsletterEmail => newsletterEmail.Email == emailAddress))
-                return;
+                return false;
 
             var newItem = new NewsletterEmail()
             {
@@ -28,17 +28,19 @@ namespace SpletnaTrgovinaDiploma.Data.Services
 
             await context.NewsletterMailingList.AddAsync(newItem);
             await context.SaveChangesAsync();
+            return true;
         }
 
-        public async Task RemoveFromMailingList(string emailAddress)
+        public async Task<bool> RemoveFromMailingList(string emailAddress)
         {
             // If it doesn't exist, don't remove it. Future: Give feedback that it's not subscribed
             var newsletterEmail = context.NewsletterMailingList.Single(e => e.Email == emailAddress);
             if (newsletterEmail == null)
-                return;
+                return false;
 
             context.NewsletterMailingList.Remove(newsletterEmail);
             await context.SaveChangesAsync();
+            return true;
         }
 
         public IEnumerable<NewsletterEmail> GetAllEmailAddressesFromMailingList()

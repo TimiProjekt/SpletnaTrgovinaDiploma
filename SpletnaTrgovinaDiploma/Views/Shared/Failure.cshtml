@@ -1,0 +1,10 @@
+﻿@model SpletnaTrgovinaDiploma.Data.ViewModels.EmailViewModel
+
+<div class="row">
+    <div class="col-md-6 offset-md-3 alert alert-danger text-center">
+        <h2>@Model.Header</h2>
+        <p>@Model.Body</p>
+        <hr/>
+        <p>@(Model.Footer ?? "")</p>
+    </div>
+</div>

@@ -215,7 +215,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         }
 
         [HttpPost]
-        public IActionResult SubscribeToNewsletter(string email)
+        public async Task<IActionResult> SubscribeToNewsletter(string email)
         {
             void SendConfirmationEmail()
             {
@@ -228,18 +228,15 @@ namespace SpletnaTrgovinaDiploma.Controllers
                     messageHtml);
             }
 
-            newsletterEmailService.AddToMailingList(email);
+            var result = await newsletterEmailService.AddToMailingList(email);
+            if (!result)
+                return View("Failure", new EmailViewModel("Email already subscribed to newsletter.", ""));
 
             SendConfirmationEmail();
-
-            return View(
-                "Success",
-                new EmailViewModel(
-                    "Successfully registered for the newsletter.",
-                    ""));
+            return View("Success", new EmailViewModel("Successfully registered for the newsletter.", ""));
         }
 
-        public IActionResult UnsubscribeFromNewsletter(string email)
+        public async Task<IActionResult> UnsubscribeFromNewsletter(string email)
         {
             void SendConfirmationEmail()
             {
@@ -252,11 +249,12 @@ namespace SpletnaTrgovinaDiploma.Controllers
                     messageHtml);
             }
 
-            newsletterEmailService.RemoveFromMailingList(email);
+            var result = await newsletterEmailService.RemoveFromMailingList(email);
+            if (!result)
+                return View("Failure", new EmailViewModel("Email not subscribed to our newsletter.", ""));
 
             SendConfirmationEmail();
-
-            return RedirectToAction("Index", "Items");
+            return View("Success", new EmailViewModel("Successfully registered for the newsletter.", ""));
         }
 
         [Authorize(Roles = UserRoles.Admin)]
@@ -278,11 +276,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 emailSent++;
             }
 
-            return View(
-                "Success",
-                new EmailViewModel(
-                    $"Emails successfully sent to all {emailSent} subscribers.",
-                    ""));
+            return View("Success", new EmailViewModel($"Emails successfully sent to all {emailSent} subscribers.", ""));
         }
 
         [Authorize]
