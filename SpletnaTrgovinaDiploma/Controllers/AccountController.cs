@@ -254,7 +254,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 return View("Failure", new EmailViewModel("Email not subscribed to our newsletter.", ""));
 
             SendConfirmationEmail();
-            return View("Success", new EmailViewModel("Successfully registered for the newsletter.", ""));
+            return View("Success", new EmailViewModel("Successfully unsubscribed from the newsletter.", ""));
         }
 
         [Authorize(Roles = UserRoles.Admin)]
