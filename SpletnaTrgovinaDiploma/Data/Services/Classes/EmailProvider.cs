@@ -10,7 +10,7 @@ namespace SpletnaTrgovinaDiploma.Data.Services
         private static readonly string Sender = new ConfigurationBuilder().AddJsonFile("appSettings.json").Build().GetSection("AppSettings")["EmailSender"];
         private static readonly string Password = new ConfigurationBuilder().AddJsonFile("appSettings.json").Build().GetSection("AppSettings")["EmailPassword"];
 
-        private const string SmtpAddress = "smtp-relay.sendinblue.com";
+        private const string SmtpAddress = "smtp-relay.brevo.com";
         private const int PortNumber = 587;
         private const bool EnableSsl = true;
 
