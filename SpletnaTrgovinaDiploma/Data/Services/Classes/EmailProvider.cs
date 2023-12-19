@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Mail;
 using Microsoft.Extensions.Configuration;
+using SpletnaTrgovinaDiploma.Data.Services.Classes;
 
 namespace SpletnaTrgovinaDiploma.Data.Services
 {
@@ -13,12 +14,10 @@ namespace SpletnaTrgovinaDiploma.Data.Services
         private const int PortNumber = 587;
         private const bool EnableSsl = true;
 
-        private const string UnsubscribeUrl =
-            "https://gamingsvet.azurewebsites.net/Account/UnsubscribeFromNewsletter?email=";
-
         public static void SendEmail(string receiver, string subject, string message)
         {
-            var unsubscribeLink = $" <br/> <br/> <a href=\"{UnsubscribeUrl}{receiver}\"> Unsubscribe </a> ";
+            var unsubscribeUrl = $"{ConfigurationService.PublishedUrl}/Account/UnsubscribeFromNewsletter?email=";
+            var unsubscribeLink = $" <br/> <br/> <a href=\"{unsubscribeUrl}{receiver}\"> Unsubscribe </a> ";
 
             using (var mail = new MailMessage())
             {

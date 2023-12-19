@@ -171,7 +171,7 @@ CREATE TABLE [dbo].[AspNetUsers](
 	[HouseNumber] [nvarchar](max) NULL,
 	[ZipCode] [nvarchar](max) NULL,
 	[City] [nvarchar](max) NULL,
-	[CountryId] [int] NOT NULL,
+	[CountryId] [int] NULL,
 	[UserName] [nvarchar](256) NULL,
 	[NormalizedUserName] [nvarchar](256) NULL,
 	[Email] [nvarchar](256) NULL,
@@ -306,7 +306,7 @@ CREATE TABLE [dbo].[Orders](
 	[City] [nvarchar](max) NULL,
 	[ShippingOption] [int] NOT NULL,
 	[PaymentOption] [int] NOT NULL,
-	[CountryId] [int] NOT NULL,
+	[CountryId] [int] NULL,
 	[UserId] [nvarchar](450) NULL,
  CONSTRAINT [PK_Orders] PRIMARY KEY CLUSTERED 
 (

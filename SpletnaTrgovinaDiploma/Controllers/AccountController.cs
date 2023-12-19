@@ -12,6 +12,7 @@ using System.Web;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SpletnaTrgovinaDiploma.Data.Services;
+using SpletnaTrgovinaDiploma.Data.Services.Classes;
 using SpletnaTrgovinaDiploma.Helpers;
 
 namespace SpletnaTrgovinaDiploma.Controllers
@@ -109,7 +110,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             }
 
             var token = await userManager.GeneratePasswordResetTokenAsync(user);
-            var callbackUrl = $"https://gamingsvet.azurewebsites.net/Account/ResetPassword?email={email}&token={HttpUtility.UrlEncode(token)}";
+            var callbackUrl = $"{ConfigurationService.PublishedUrl}/Account/ResetPassword?email={email}&token={HttpUtility.UrlEncode(token)}";
 
             EmailProvider.SendEmail(
                 email,
@@ -187,7 +188,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             {
                 var messageHtml = $"Hello {registerViewModel.FullName}! <br/>";
                 messageHtml += "You have successfully registered at Gaming svet <br/> ";
-                messageHtml += "You can now <a href='https://fireparts.azurewebsites.net/'> login! </a>";
+                messageHtml += $"You can now <a href='{ConfigurationService.PublishedUrl}'> login! </a>";
 
                 EmailProvider.SendEmail(
                     registerViewModel.EmailAddress,
