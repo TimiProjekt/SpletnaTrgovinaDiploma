@@ -36,6 +36,21 @@
                 <div class="col-md-8">
                     <div class="card-body">
                         <p class="card-text" style="white-space: pre-wrap;">@Model.Description</p>
+
+                        @if (Model.Descriptions != null)
+                        {
+                            <p class="card-text" style="white-space: pre-wrap;">
+                                <ul>
+                                    @foreach (var itemDescription in Model.Descriptions)
+                                    {
+                                        <li>
+                                            <b>@itemDescription.Name: </b> @itemDescription.Description
+                                        </li>
+                                    }
+                                </ul>
+                            </p>
+                        }
+
                         <p class="card-text"><b>Name: </b>@Model.Name</p>
                         <p class="card-text"><b>Price: </b>@Model.Price €</p>
                         <p class="card-text">

@@ -14,6 +14,7 @@ namespace SpletnaTrgovinaDiploma.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public string ShortDescription { get; set; }
+        public List<ItemDescription> Descriptions { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }
