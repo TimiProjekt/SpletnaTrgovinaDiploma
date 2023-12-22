@@ -6,6 +6,8 @@ using SpletnaTrgovinaDiploma.Data.Static;
 using SpletnaTrgovinaDiploma.Models;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml;
+using SpletnaTrgovinaDiploma.Data.ViewModels;
 
 namespace SpletnaTrgovinaDiploma.Controllers
 {
@@ -53,7 +55,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             {
                 var upperCaseSearchString = searchString.ToUpper();
                 var filteredResult = allItems
-                    .Where(n => n.Name.ToUpper().Contains(upperCaseSearchString) || n.Description.ToUpper().Contains(upperCaseSearchString));
+                    .Where(n => n.Name?.ToUpper().Contains(upperCaseSearchString) ?? n.Description?.ToUpper().Contains(upperCaseSearchString) ?? false);
 
                 SetPageDetails("Search result", $"Search result for \"{searchString}\"");
                 return View("Index", filteredResult);
@@ -71,7 +73,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             {
                 var upperCaseSearchString = searchString.ToUpper();
                 var filteredResult = allItems
-                    .Where(n => n.Name.ToUpper().Contains(upperCaseSearchString) || n.Description.ToUpper().Contains(upperCaseSearchString));
+                    .Where(n => n.Name?.ToUpper().Contains(upperCaseSearchString) ?? n.Description?.ToUpper().Contains(upperCaseSearchString) ?? false);
 
                 SetPageDetails("Search result", $"Search result for \"{searchString}\"");
                 return View("EditIndex", filteredResult);
@@ -115,7 +117,6 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        //Get: Items/Edit/1
         public async Task<IActionResult> Edit(int id)
         {
             var itemDetails = await service.GetItemByIdAsync(id);
@@ -145,7 +146,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(int id, NewItemViewModel item)
         {
-            if (id != item.Id) 
+            if (id != item.Id)
                 return View("NotFound");
 
             if (!ModelState.IsValid)
@@ -188,6 +189,71 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
             await service.DeleteAsync(id);
             return RedirectToAction(nameof(EditIndex));
+        }
+
+        public IActionResult Import() => View(new ImportXmlModel());
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> Import(ImportXmlModel importXmlModel)
+        {
+            if (!ModelState.IsValid)
+                return View(importXmlModel);
+
+            IActionResult AddXmlFormatErrorAndReturnView(ImportXmlModel importXmlModel)
+            {
+                ModelState.AddModelError(nameof(importXmlModel.File), "XML is not in the expected format.");
+                return View(importXmlModel);
+            }
+
+            // do import
+            var amountOfImportedItems = 0;
+            var doc = new XmlDocument();
+
+            doc.Load(importXmlModel.File.OpenReadStream());
+            if (doc.DocumentElement == null)
+                return AddXmlFormatErrorAndReturnView(importXmlModel);
+
+            var productCatalog = doc.DocumentElement.SelectSingleNode("/ProductCatalog");
+            if (productCatalog == null)
+                return AddXmlFormatErrorAndReturnView(importXmlModel);
+
+            foreach (XmlNode product in productCatalog.ChildNodes)
+            {
+                if (product != null)
+                {
+                    var newItem = new NewItemViewModel();
+
+                    foreach (XmlNode productAttribute in product.ChildNodes)
+                    {
+                        //if (productAttribute.Name == "Vendor")
+                        // Vendor => BrandItem; If Brand does not exist, create new one
+
+                        if (productAttribute.Name == "ProductType")
+                            newItem.ShortDescription = productAttribute.InnerText;
+                        if (productAttribute.Name == "ProductDescription")
+                            newItem.Name = productAttribute.InnerText;
+                        if (productAttribute.Name == "Image")
+                            newItem.ImageUrl = productAttribute.InnerText;
+                        //if (productAttribute.Name == "AttrList")
+                        //Descriptions foreach
+                    }
+
+                    await service.AddNewItemAsync(newItem);
+                }
+            }
+
+            // Vendor => BrandItem; If Brand does not exist, create new one
+            // ProductType => ShortDescription
+            // ProductDescription => Name
+            // Image => ImageUrl
+            // AttrList => Descriptions
+
+
+            // Insert all at the same time
+
+            return View("Success", new EmailViewModel($"Successfully imported {amountOfImportedItems} items.", ""));
         }
     }
 }

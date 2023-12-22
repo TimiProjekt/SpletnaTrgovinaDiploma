@@ -6,6 +6,11 @@ namespace SpletnaTrgovinaDiploma.Models
 {
     public class NewItemViewModel
     {
+        public NewItemViewModel()
+        {
+            BrandIds = new List<int>();
+        }
+
         public int Id { get; set; }
 
         [Display(Name = "Item name")]
