@@ -18,9 +18,23 @@ namespace SpletnaTrgovinaDiploma.Data
                 am.ItemId
             });
 
-            modelBuilder.Entity<BrandItem>().HasOne(m => m.Item).WithMany(am => am.BrandsItems).HasForeignKey(m => m.ItemId);
-            modelBuilder.Entity<BrandItem>().HasOne(m => m.Brand).WithMany(am => am.BrandsItems).HasForeignKey(m => m.BrandId);
+            modelBuilder
+                .Entity<BrandItem>()
+                .HasOne(m => m.Item)
+                .WithMany(am => am.BrandsItems)
+                .HasForeignKey(m => m.ItemId);
 
+            modelBuilder
+                .Entity<BrandItem>()
+                .HasOne(m => m.Brand)
+                .WithMany(am => am.BrandsItems)
+                .HasForeignKey(m => m.BrandId);
+
+            modelBuilder
+                .Entity<ItemDescription>()
+                .HasOne(m => m.Item)
+                .WithMany(am => am.Descriptions)
+                .HasForeignKey(m => m.ItemId);
 
             base.OnModelCreating(modelBuilder);
         }

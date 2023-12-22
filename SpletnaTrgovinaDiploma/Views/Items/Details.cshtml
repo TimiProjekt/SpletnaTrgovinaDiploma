@@ -39,16 +39,14 @@
 
                         @if (Model.Descriptions != null)
                         {
-                            <p class="card-text" style="white-space: pre-wrap;">
-                                <ul>
-                                    @foreach (var itemDescription in Model.Descriptions)
-                                    {
-                                        <li>
-                                            <b>@itemDescription.Name: </b> @itemDescription.Description
-                                        </li>
-                                    }
-                                </ul>
-                            </p>
+                            <ul>
+                                @foreach (var itemDescription in Model.Descriptions)
+                                {
+                                    <li>
+                                        <b>@itemDescription.Name: </b> @itemDescription.Description
+                                    </li>
+                                }
+                            </ul>
                         }
 
                         <p class="card-text"><b>Name: </b>@Model.Name</p>
