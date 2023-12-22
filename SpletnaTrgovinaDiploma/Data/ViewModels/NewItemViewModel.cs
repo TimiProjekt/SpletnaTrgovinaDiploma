@@ -9,6 +9,7 @@ namespace SpletnaTrgovinaDiploma.Models
         public NewItemViewModel()
         {
             BrandIds = new List<int>();
+            ItemDescriptions = new List<ItemDescription>();
         }
 
         public int Id { get; set; }
@@ -41,5 +42,9 @@ namespace SpletnaTrgovinaDiploma.Models
         [Display(Name = "Select brand(s)")]
         [Required(ErrorMessage = "Item brand(s) is required")]
         public List<int> BrandIds { get; set; }
+
+        // [Display(Name = "Select brand(s)")]
+        // [Required(ErrorMessage = "Item brand(s) is required")]
+        public List<ItemDescription> ItemDescriptions { get; set; }
     }
 }

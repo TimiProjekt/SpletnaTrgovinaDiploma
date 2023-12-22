@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using SpletnaTrgovinaDiploma.Data.Base;
 using SpletnaTrgovinaDiploma.Models;
 using System.Linq;
@@ -24,7 +25,8 @@ namespace SpletnaTrgovinaDiploma.Data.Services
                 ShortDescription = data.ShortDescription,
                 Price = data.Price,
                 ImageUrl = data.ImageUrl,
-                ItemCategory = data.ItemCategory
+                ItemCategory = data.ItemCategory,
+                Descriptions = data.ItemDescriptions
             };
             await context.Items.AddAsync(newItem);
             await context.SaveChangesAsync();
@@ -39,6 +41,44 @@ namespace SpletnaTrgovinaDiploma.Data.Services
                 };
                 await context.BrandsItems.AddAsync(newBrandItem);
             }
+            await context.SaveChangesAsync();
+        }
+
+
+        public async Task AddNewItemsAsync(List<NewItemViewModel> data)
+        {
+            var newItems = new List<Item>();
+            var newItemDescriptions = new List<ItemDescription>();
+
+            foreach (var newItemViewModel in data)
+            {
+                var newItem = new Item()
+                {
+                    Name = newItemViewModel.Name,
+                    Description = newItemViewModel.Description,
+                    ShortDescription = newItemViewModel.ShortDescription,
+                    Price = newItemViewModel.Price,
+                    ImageUrl = newItemViewModel.ImageUrl,
+                    ItemCategory = newItemViewModel.ItemCategory,
+                    Descriptions = newItemViewModel.ItemDescriptions
+                };
+                newItems.Add(newItem);
+
+                foreach (var itemDescription in newItem.Descriptions)
+                {
+                    var newItemDescription = new ItemDescription()
+                    {
+                        ItemId = newItem.Id,
+                        Name = itemDescription.Name,
+                        Description = itemDescription.Description,
+                    };
+
+                    newItemDescriptions.Add(newItemDescription);
+                }
+            }
+
+            await context.ItemDescriptions.AddRangeAsync(newItemDescriptions);
+            await context.Items.AddRangeAsync(newItems);
             await context.SaveChangesAsync();
         }
 

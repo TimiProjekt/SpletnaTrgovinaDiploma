@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SpletnaTrgovinaDiploma.Data.Services;
@@ -208,7 +209,6 @@ namespace SpletnaTrgovinaDiploma.Controllers
             }
 
             // do import
-            var amountOfImportedItems = 0;
             var doc = new XmlDocument();
 
             doc.Load(importXmlModel.File.OpenReadStream());
@@ -219,6 +219,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             if (productCatalog == null)
                 return AddXmlFormatErrorAndReturnView(importXmlModel);
 
+            var newItems = new List<NewItemViewModel>();
             foreach (XmlNode product in productCatalog.ChildNodes)
             {
                 if (product != null)
@@ -231,29 +232,26 @@ namespace SpletnaTrgovinaDiploma.Controllers
                         // Vendor => BrandItem; If Brand does not exist, create new one
 
                         if (productAttribute.Name == "ProductType")
+                        {
                             newItem.ShortDescription = productAttribute.InnerText;
+                            newItem.Description = productAttribute.InnerText;
+                        }
                         if (productAttribute.Name == "ProductDescription")
                             newItem.Name = productAttribute.InnerText;
+
                         if (productAttribute.Name == "Image")
                             newItem.ImageUrl = productAttribute.InnerText;
                         //if (productAttribute.Name == "AttrList")
                         //Descriptions foreach
                     }
 
-                    await service.AddNewItemAsync(newItem);
+                    newItems.Add(newItem);
                 }
             }
 
-            // Vendor => BrandItem; If Brand does not exist, create new one
-            // ProductType => ShortDescription
-            // ProductDescription => Name
-            // Image => ImageUrl
-            // AttrList => Descriptions
+            await service.AddNewItemsAsync(newItems);
 
-
-            // Insert all at the same time
-
-            return View("Success", new EmailViewModel($"Successfully imported {amountOfImportedItems} items.", ""));
+            return View("Success", new EmailViewModel($"Successfully imported {newItems.Count} items.", ""));
         }
     }
 }

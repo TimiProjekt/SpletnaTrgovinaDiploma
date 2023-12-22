@@ -44,6 +44,7 @@ namespace SpletnaTrgovinaDiploma.Data
         public DbSet<Item> Items { get; set; }
         public DbSet<BrandItem> BrandsItems { get; set; }
         public DbSet<NewsletterEmail> NewsletterMailingList { get; set; }
+        public DbSet<ItemDescription> ItemDescriptions { get; set; }
 
 
         //Orders related tables
