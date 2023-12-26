@@ -134,6 +134,8 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 ImageUrl = itemDetails.ImageUrl,
                 ItemCategory = itemDetails.ItemCategory,
                 BrandIds = itemDetails.BrandsItems.Select(n => n.BrandId).ToList(),
+                ProductCode = itemDetails.ProductCode,
+                Availability = itemDetails.Availability
             };
 
 
@@ -160,7 +162,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             }
 
             await service.UpdateItemAsync(item);
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         void SetPageDetails(string title, string description)

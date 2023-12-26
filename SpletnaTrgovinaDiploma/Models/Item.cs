@@ -20,6 +20,9 @@ namespace SpletnaTrgovinaDiploma.Models
         public string ImageUrl { get; set; }
         public ItemCategory ItemCategory { get; set; }
 
+        public string ProductCode { get; set; }
+        public int? Availability { get; set; }
+
         //Relationships
         public List<BrandItem> BrandsItems { get; set; }
         public List<ItemDescription> Descriptions { get; set; }

@@ -94,7 +94,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 return View(brand);
             
             await service.UpdateAsync(id, brand);
-            return RedirectToAction(nameof(EditIndex));
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         //Get: Brands/Delete/1

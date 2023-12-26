@@ -39,6 +39,7 @@
 
                         @if (Model.Descriptions != null)
                         {
+                            <h5>Product specification</h5>
                             <ul>
                                 @foreach (var itemDescription in Model.Descriptions)
                                 {
@@ -50,6 +51,8 @@
                         }
 
                         <p class="card-text"><b>Name: </b>@Model.Name</p>
+                        <p class="card-text"><b>Product code: </b>@Model.ProductCode</p>
+                        <p class="card-text"><b>In stock: </b>@(Model.Availability ?? 0)</p>
                         <p class="card-text"><b>Price: </b>@Model.Price €</p>
                         <p class="card-text">
                             <b>Category: </b>

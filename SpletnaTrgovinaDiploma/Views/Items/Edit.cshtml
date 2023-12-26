@@ -30,12 +30,22 @@
                                 <span asp-validation-for="Price" class="text-danger"></span>
                             </div>
                             <div class="form-group">
+                                <label asp-for="ProductCode"></label>
+                                <input asp-for="ProductCode" class="form-control" />
+                                <span asp-validation-for="ProductCode" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
                                 <label asp-for="ImageUrl"></label>
                                 <input asp-for="ImageUrl" class="form-control" />
                                 <span asp-validation-for="ImageUrl" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="Availability"></label>
+                                @Html.TextBoxFor(model => model.Availability, "{0:0}")
+                                <span asp-validation-for="Availability" class="text-danger"></span>
+                            </div>
                             <div class="form-group">
                                 <label asp-for="ItemCategory"></label>
                                 <select asp-for="ItemCategory" class="form-control" asp-items="Html.GetEnumSelectList<ItemCategory>()"><</select>

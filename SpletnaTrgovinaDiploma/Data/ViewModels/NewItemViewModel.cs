@@ -38,6 +38,12 @@ namespace SpletnaTrgovinaDiploma.Models
         [Required(ErrorMessage = "Item category is required")]
         public ItemCategory ItemCategory { get; set; }
 
+        [Display(Name = "Product code")]
+        public string ProductCode { get; set; }
+
+        [Display(Name = "Availability")]
+        public int? Availability { get; set; }
+
         //Relationships
         [Display(Name = "Select brand(s)")]
         [Required(ErrorMessage = "Item brand(s) is required")]

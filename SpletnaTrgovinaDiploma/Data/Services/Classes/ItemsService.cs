@@ -60,7 +60,9 @@ namespace SpletnaTrgovinaDiploma.Data.Services
                     Price = newItemViewModel.Price,
                     ImageUrl = newItemViewModel.ImageUrl,
                     ItemCategory = newItemViewModel.ItemCategory,
-                    Descriptions = newItemViewModel.ItemDescriptions
+                    Descriptions = newItemViewModel.ItemDescriptions,
+                    ProductCode = newItemViewModel.ProductCode,
+                    Availability = newItemViewModel.Availability,
                 };
                 newItems.Add(newItem);
 
@@ -105,6 +107,8 @@ namespace SpletnaTrgovinaDiploma.Data.Services
                 dbItem.Price = data.Price;
                 dbItem.ImageUrl = data.ImageUrl;
                 dbItem.ItemCategory = data.ItemCategory;
+                dbItem.ProductCode = data.ProductCode;
+                dbItem.Availability = data.Availability;
                 await context.SaveChangesAsync();
             }
 
