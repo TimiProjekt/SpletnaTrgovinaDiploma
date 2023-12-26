@@ -65,7 +65,10 @@ namespace SpletnaTrgovinaDiploma.Helpers
 
         NewItemViewModel TryReadingAttributesFrom(XmlNode dataNode)
         {
-            var newItem = new NewItemViewModel();
+            var newItem = new NewItemViewModel()
+            {
+                ItemDescriptions = new List<ItemDescription>()
+            };
 
             foreach (XmlNode productAttribute in dataNode.ChildNodes)
             {
@@ -93,6 +96,8 @@ namespace SpletnaTrgovinaDiploma.Helpers
 
             if (productAttribute.Name == "Vendor")
                 newItem.BrandNames.Add(productAttribute.InnerText);
+
+            TryImportingAttributeList(newItem, productAttribute);
         }
 
         static void TryImportingAttributeList(NewItemViewModel newItem, XmlNode productAttribute)
@@ -103,8 +108,8 @@ namespace SpletnaTrgovinaDiploma.Helpers
                 {
                     var itemDescription = new ItemDescription()
                     {
-                        Name = attribute.Name,
-                        Description = attribute.Value ?? ""
+                        Name = attribute.Attributes?[0].InnerText ?? "",
+                        Description = attribute.Attributes?[1].InnerText ?? ""
                     };
 
                     newItem.ItemDescriptions.Add(itemDescription);

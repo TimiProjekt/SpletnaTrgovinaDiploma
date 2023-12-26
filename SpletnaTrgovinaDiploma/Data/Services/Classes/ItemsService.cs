@@ -39,7 +39,6 @@ namespace SpletnaTrgovinaDiploma.Data.Services
         public async Task AddNewItemsAsync(List<NewItemViewModel> data)
         {
             var newItems = new List<Item>();
-            var newItemDescriptions = new List<ItemDescription>();
             var allBrands = context.Brands.ToList();
 
             foreach (var newItemViewModel in data)
@@ -57,24 +56,25 @@ namespace SpletnaTrgovinaDiploma.Data.Services
                     Descriptions = newItemViewModel.ItemDescriptions,
                     BrandsItems = new List<BrandItem>()
                 };
-                newItems.Add(newItem);
 
-                foreach (var itemDescription in newItem.Descriptions)
+                var newItemDescriptions = new List<ItemDescription>();
+                foreach (var itemDescription in newItemViewModel.ItemDescriptions)
                 {
                     var newItemDescription = new ItemDescription()
                     {
-                        ItemId = newItem.Id,
+                        Item = newItem,
                         Name = itemDescription.Name,
                         Description = itemDescription.Description,
                     };
 
                     newItemDescriptions.Add(newItemDescription);
                 }
+                newItem.Descriptions.AddRange(newItemDescriptions);
 
                 AssignBrandIdsFromBrandNames(newItem, newItemViewModel, allBrands);
+                newItems.Add(newItem);
             }
 
-            context.ItemDescriptions.AddRange(newItemDescriptions);
             context.Items.AddRange(newItems);
             await context.SaveChangesAsync();
         }
@@ -105,7 +105,22 @@ namespace SpletnaTrgovinaDiploma.Data.Services
                 dbItem.ItemCategory = data.ItemCategory ?? ItemCategory.Unknown;
                 dbItem.Descriptions = data.ItemDescriptions;
                 dbItem.ProductCode = data.ProductCode;
-                dbItem.Availability = data.Availability;
+                dbItem.Availability = data.Availability; 
+                dbItem.Descriptions = data.ItemDescriptions.Count > 0 ? new List<ItemDescription>() : dbItem.Descriptions;
+
+                // find or create attribute
+                foreach (var itemDescription in data.ItemDescriptions)
+                {
+                    var findItemDescription = dbItem.Descriptions.SingleOrDefault(d => d.Name == itemDescription.Name) ?? itemDescription;
+
+                    if (findItemDescription == null)
+                    {
+                        itemDescription.Item = dbItem;
+                        dbItem.Descriptions.Add(itemDescription);
+                    }
+                    else
+                        findItemDescription.Description = itemDescription.Description;
+                }
                 await context.SaveChangesAsync();
             }
 
@@ -141,6 +156,18 @@ namespace SpletnaTrgovinaDiploma.Data.Services
                     dbItem.ItemCategory = item.ItemCategory ?? dbItem.ItemCategory;
                     dbItem.ProductCode = item.ProductCode ?? dbItem.ProductCode;
                     dbItem.Availability = item.Availability ?? dbItem.Availability;
+                    dbItem.Descriptions = item.ItemDescriptions.Count > 0 ? new List<ItemDescription>() : dbItem.Descriptions;
+
+                    // find or create attribute
+                    foreach (var itemDescription in item.ItemDescriptions)
+                    {
+                        var findItemDescription = dbItem.Descriptions.SingleOrDefault(d => d.Name == itemDescription.Name) ?? itemDescription;
+
+                        if (findItemDescription == null)
+                            dbItem.Descriptions.Add(itemDescription);
+                        else
+                            findItemDescription.Description = itemDescription.Description;
+                    }
                 }
 
                 AssignBrandIdsFromBrandNames(dbItem, item, allBrands);
@@ -172,6 +199,7 @@ namespace SpletnaTrgovinaDiploma.Data.Services
 
                     findBrand = brand;
                 }
+
                 if (newItem.BrandsItems.All(item => item.Brand.Name != brandName))
                 {
                     var newBrandItem = new BrandItem()
