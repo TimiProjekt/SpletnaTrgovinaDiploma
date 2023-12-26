@@ -11,5 +11,6 @@ namespace SpletnaTrgovinaDiploma.Data.Services
         Task AddNewItemAsync(NewItemViewModel data);
         Task AddNewItemsAsync(List<NewItemViewModel> data);
         Task UpdateItemAsync(NewItemViewModel data);
+        Task<int> UpdateItemsNonNullValuesAsync(List<NewItemViewModel> data);
     }
 }

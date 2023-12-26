@@ -7,7 +7,7 @@
 <div class="row">
     <div class="col-md-8 offset-md-2">
         <p>
-            <h4>Create a new item</h4>
+            <h4>Import items from XML</h4>
         </p>
 
         <div class="row">
@@ -20,6 +20,14 @@
                             <label class="col-form-label">Select File</label>
                             <input asp-for="File" class="form-control" />
                             <span asp-validation-for="File" class="text-danger"></span>
+                        </div>
+                        <div class="col-12">
+                            <input asp-for="IsUpdateExisting" />
+                            <label class="col-form-label">Update existing?</label>
+                            <span asp-validation-for="IsUpdateExisting" class="text-danger"></span>
+                            <br />
+                            If you don't check the checkbox, then items will be inserted. If duplicate product code already exists, that specific item will not be inserted.
+                            If you check the checkbox, then items will be updated based on the matching product code. If not match, that row of data is ignored
                         </div>
                     </div>
 

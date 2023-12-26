@@ -9,6 +9,7 @@ namespace SpletnaTrgovinaDiploma.Models
         public NewItemViewModel()
         {
             BrandIds = new List<int>();
+            BrandNames = new List<string>();
             ItemDescriptions = new List<ItemDescription>();
         }
 
@@ -28,7 +29,7 @@ namespace SpletnaTrgovinaDiploma.Models
 
         [Display(Name = "Price in €")]
         [Required(ErrorMessage = "Price is required")]
-        public decimal Price { get; set; }
+        public decimal? Price { get; set; }
 
         [Display(Name = "Item image URL")]
         [Required(ErrorMessage = "Item image URL is required")]
@@ -36,7 +37,7 @@ namespace SpletnaTrgovinaDiploma.Models
 
         [Display(Name = "Select a category")]
         [Required(ErrorMessage = "Item category is required")]
-        public ItemCategory ItemCategory { get; set; }
+        public ItemCategory? ItemCategory { get; set; }
 
         [Display(Name = "Product code")]
         public string ProductCode { get; set; }
@@ -47,7 +48,10 @@ namespace SpletnaTrgovinaDiploma.Models
         //Relationships
         [Display(Name = "Select brand(s)")]
         [Required(ErrorMessage = "Item brand(s) is required")]
-        public List<int> BrandIds { get; set; }
+        public List<int> BrandIds { get; set; }       
+        
+        //Relationships
+        public List<string> BrandNames { get; set; }
 
         // [Display(Name = "Select brand(s)")]
         // [Required(ErrorMessage = "Item brand(s) is required")]

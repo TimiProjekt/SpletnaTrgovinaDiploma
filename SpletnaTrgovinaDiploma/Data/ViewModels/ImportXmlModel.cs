@@ -7,5 +7,8 @@ namespace SpletnaTrgovinaDiploma.Data.ViewModels
     {
         [Required(ErrorMessage = "Please select file")]
         public IFormFile File { get; set; }
+
+        [Display(Name = "Import new or update existing")]
+        public bool IsUpdateExisting { get; set; }
     }
 }

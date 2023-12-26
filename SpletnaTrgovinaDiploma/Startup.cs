@@ -85,9 +85,6 @@ namespace SpletnaTrgovinaDiploma
                     name: "default",
                     pattern: "{controller=Items}/{action=Index}/{id?}");
             });
-
-            //Seed database
-            AppDbInitializer.SeedAsync(app).Wait();
         }
     }
 }

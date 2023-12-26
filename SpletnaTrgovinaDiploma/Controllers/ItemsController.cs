@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SpletnaTrgovinaDiploma.Data.Services;
@@ -9,25 +8,29 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 using SpletnaTrgovinaDiploma.Data.ViewModels;
+using SpletnaTrgovinaDiploma.Helpers;
 
 namespace SpletnaTrgovinaDiploma.Controllers
 {
     [Authorize(Roles = UserRoles.Admin)]
     public class ItemsController : Controller
     {
-        private readonly IItemsService service;
+        private readonly IItemsService itemsService;
         private readonly IBrandsService brandService;
+        private readonly XmlImportUtil xmlImportUtil;
 
-        public ItemsController(IItemsService service, IBrandsService brandService)
+        public ItemsController(IItemsService itemsService, IBrandsService brandService)
         {
-            this.service = service;
+            this.itemsService = itemsService;
             this.brandService = brandService;
+
+            xmlImportUtil = new XmlImportUtil(itemsService);
         }
 
         [AllowAnonymous]
         public async Task<IActionResult> GetByBrand(int id)
         {
-            var allItems = await service.GetAllAsync(n => n.BrandsItems);
+            var allItems = await itemsService.GetAllAsync(n => n.BrandsItems);
             var filteredItems = allItems.Where(item => item.BrandsItems.Any(bi => bi.BrandId == id));
             return View(filteredItems);
         }
@@ -35,14 +38,14 @@ namespace SpletnaTrgovinaDiploma.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            var allItems = await service.GetAllAsync(n => n.BrandsItems);
+            var allItems = await itemsService.GetAllAsync(n => n.BrandsItems);
             SetPageDetails("Home page", "Home page of Gaming svet");
             return View(allItems);
         }
 
         public async Task<IActionResult> EditIndex()
         {
-            var data = await service.GetAllAsync();
+            var data = await itemsService.GetAllAsync();
             var orderedData = data.OrderBy(item => item.Name);
             return View(orderedData);
         }
@@ -50,7 +53,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Filter(string searchString)
         {
-            var allItems = await service.GetAllAsync(n => n.BrandsItems);
+            var allItems = await itemsService.GetAllAsync(n => n.BrandsItems);
 
             if (!string.IsNullOrEmpty(searchString))
             {
@@ -68,7 +71,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
         public async Task<IActionResult> FilterAdmin(string searchString)
         {
-            var allItems = await service.GetAllAsync(n => n.BrandsItems);
+            var allItems = await itemsService.GetAllAsync(n => n.BrandsItems);
 
             if (!string.IsNullOrEmpty(searchString))
             {
@@ -88,7 +91,11 @@ namespace SpletnaTrgovinaDiploma.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Details(int id)
         {
-            var itemDetail = await service.GetItemByIdAsync(id);
+            var itemDetail = await itemsService.GetItemByIdAsync(id);
+
+            if (itemDetail == null)
+                return View("NotFound");
+
             return View(itemDetail);
         }
 
@@ -114,13 +121,13 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 return View(item);
             }
 
-            await service.AddNewItemAsync(item);
+            await itemsService.AddNewItemAsync(item);
             return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Edit(int id)
         {
-            var itemDetails = await service.GetItemByIdAsync(id);
+            var itemDetails = await itemsService.GetItemByIdAsync(id);
             if (itemDetails == null)
                 return View("NotFound");
 
@@ -161,7 +168,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 return View(item);
             }
 
-            await service.UpdateItemAsync(item);
+            await itemsService.UpdateItemAsync(item);
             return RedirectToAction(nameof(Details), new { id });
         }
 
@@ -174,7 +181,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         //Get: Items/Delete/1
         public async Task<IActionResult> Delete(int id)
         {
-            var itemDetails = await service.GetByIdAsync(id);
+            var itemDetails = await itemsService.GetByIdAsync(id);
 
             if (itemDetails == null)
                 return View("NotFound");
@@ -185,18 +192,16 @@ namespace SpletnaTrgovinaDiploma.Controllers
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var itemDetails = await service.GetByIdAsync(id);
+            var itemDetails = await itemsService.GetByIdAsync(id);
 
             if (itemDetails == null)
                 return View("NotFound");
 
-            await service.DeleteAsync(id);
+            await itemsService.DeleteAsync(id);
             return RedirectToAction(nameof(EditIndex));
         }
 
         public IActionResult Import() => View(new ImportXmlModel());
-
-
 
         [HttpPost]
         public async Task<IActionResult> Import(ImportXmlModel importXmlModel)
@@ -204,56 +209,19 @@ namespace SpletnaTrgovinaDiploma.Controllers
             if (!ModelState.IsValid)
                 return View(importXmlModel);
 
-            IActionResult AddXmlFormatErrorAndReturnView(ImportXmlModel importXmlModel)
+            var doc = new XmlDocument();
+
+            doc.Load(importXmlModel.File.OpenReadStream());
+            if (doc.DocumentElement == null)
             {
                 ModelState.AddModelError(nameof(importXmlModel.File), "XML is not in the expected format.");
                 return View(importXmlModel);
             }
 
-            // do import
-            var doc = new XmlDocument();
+            var amountOfItems = await xmlImportUtil.TryImportItemDetails(doc, importXmlModel.IsUpdateExisting);
+            amountOfItems += await xmlImportUtil.TryImportAvailability(doc, importXmlModel.IsUpdateExisting);
 
-            doc.Load(importXmlModel.File.OpenReadStream());
-            if (doc.DocumentElement == null)
-                return AddXmlFormatErrorAndReturnView(importXmlModel);
-
-            var productCatalog = doc.DocumentElement.SelectSingleNode("/ProductCatalog");
-            if (productCatalog == null)
-                return AddXmlFormatErrorAndReturnView(importXmlModel);
-
-            var newItems = new List<NewItemViewModel>();
-            foreach (XmlNode product in productCatalog.ChildNodes)
-            {
-                if (product != null)
-                {
-                    var newItem = new NewItemViewModel();
-
-                    foreach (XmlNode productAttribute in product.ChildNodes)
-                    {
-                        //if (productAttribute.Name == "Vendor")
-                        // Vendor => BrandItem; If Brand does not exist, create new one
-
-                        if (productAttribute.Name == "ProductType")
-                        {
-                            newItem.ShortDescription = productAttribute.InnerText;
-                            newItem.Description = productAttribute.InnerText;
-                        }
-                        if (productAttribute.Name == "ProductDescription")
-                            newItem.Name = productAttribute.InnerText;
-
-                        if (productAttribute.Name == "Image")
-                            newItem.ImageUrl = productAttribute.InnerText;
-                        //if (productAttribute.Name == "AttrList")
-                        //Descriptions foreach
-                    }
-
-                    newItems.Add(newItem);
-                }
-            }
-
-            await service.AddNewItemsAsync(newItems);
-
-            return View("Success", new EmailViewModel($"Successfully imported {newItems.Count} items.", ""));
+            return View("Success", new EmailViewModel($"Successfully {(importXmlModel.IsUpdateExisting ? "updated" : "imported")} {amountOfItems} items.", ""));
         }
     }
 }

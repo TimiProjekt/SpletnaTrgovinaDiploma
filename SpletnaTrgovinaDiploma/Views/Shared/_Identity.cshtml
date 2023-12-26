@@ -26,25 +26,7 @@ else
                 <a class="dropdown-item" asp-controller="Account" asp-action="Settings">
                     <i class="bi bi-wrench"></i> Settings
                 </a>
-                @if (User.IsInRole("Admin"))
-                {
-                <li>
-                    <a class="dropdown-item" asp-controller="Account" asp-action="Users">
-                        <i class="bi bi-people"></i> Users
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item" asp-controller="Account" asp-action="SubscriberEmail">
-                        <i class="bi bi-people"></i> Subscribers
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item" asp-controller="Items" asp-action="Import">
-                        <i class="bi bi-people"></i> Import XML
-                    </a>
-                </li>
-                }
-            <a class="dropdown-item" asp-controller="Account" asp-action="Logout">
+                <a class="dropdown-item" asp-controller="Account" asp-action="Logout">
                 <i class="bi bi-box-arrow-in-right"></i> Log out
             </a>
             </li>
