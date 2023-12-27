@@ -8,9 +8,9 @@ namespace SpletnaTrgovinaDiploma.Data.Services
     public interface IItemsService : IEntityBaseRepository<Item>
     {
         Task<Item> GetItemByIdAsync(int id);
-        Task AddNewItemAsync(NewItemViewModel data);
-        Task AddNewItemsAsync(List<NewItemViewModel> data);
-        Task UpdateItemAsync(NewItemViewModel data);
-        Task<int> UpdateItemsNonNullValuesAsync(List<NewItemViewModel> data);
+        Task AddNewItemAsync(NewItemViewModel dataItem);
+        Task AddNewItemsAsync(List<NewItemViewModel> dataList);
+        Task UpdateItemAsync(NewItemViewModel dataItem);
+        Task<int> UpdateItemsNonNullValuesAsync(List<NewItemViewModel> dataList);
     }
 }

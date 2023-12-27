@@ -11,68 +11,60 @@ namespace SpletnaTrgovinaDiploma.Data.Services
     {
         private readonly AppDbContext context;
 
+        List<Item> GetAllItems() =>
+            context.Items
+                .Include(am => am.Descriptions)
+                .Include(am => am.BrandsItems)
+                .ToList();
+
         public ItemsService(AppDbContext context) : base(context)
         {
             this.context = context;
         }
 
-        public async Task AddNewItemAsync(NewItemViewModel data)
+        public async Task AddNewItemAsync(NewItemViewModel dataItem)
         {
-            var newItem = new Item()
+            var dbItem = new Item()
             {
-                Name = data.Name,
-                Description = data.Description,
-                ShortDescription = data.ShortDescription,
-                Price = data.Price ?? 0,
-                ImageUrl = data.ImageUrl,
-                ItemCategory = data.ItemCategory ?? ItemCategory.Unknown,
-                Descriptions = data.ItemDescriptions,
+                Name = dataItem.Name,
+                Description = dataItem.Description,
+                ShortDescription = dataItem.ShortDescription,
+                Price = dataItem.Price ?? 0,
+                ImageUrl = dataItem.ImageUrl,
+                ItemCategory = dataItem.ItemCategory ?? ItemCategory.Unknown,
+                Descriptions = dataItem.ItemDescriptions,
                 BrandsItems = new List<BrandItem>()
             };
+            
+            AssignBrandIdsFromBrandNames(dbItem, dataItem, context.Brands.ToList());
 
-            AssignBrandIdsFromBrandNames(newItem, data, context.Brands.ToList());
-            context.Items.Add(newItem);
-
+            context.Items.Add(dbItem);
             await context.SaveChangesAsync();
         }
 
-        public async Task AddNewItemsAsync(List<NewItemViewModel> data)
+        public async Task AddNewItemsAsync(List<NewItemViewModel> dataList)
         {
             var newItems = new List<Item>();
             var allBrands = context.Brands.ToList();
 
-            foreach (var newItemViewModel in data)
+            foreach (var dataItem in dataList)
             {
-                var newItem = new Item()
+                var dbItem = new Item()
                 {
-                    Name = newItemViewModel.Name,
-                    Description = newItemViewModel.Description,
-                    ShortDescription = newItemViewModel.ShortDescription,
-                    Price = newItemViewModel.Price ?? 0,
-                    ImageUrl = newItemViewModel.ImageUrl,
-                    ItemCategory = newItemViewModel.ItemCategory ?? ItemCategory.Unknown,
-                    ProductCode = newItemViewModel.ProductCode,
-                    Availability = newItemViewModel.Availability,
-                    Descriptions = newItemViewModel.ItemDescriptions,
+                    Name = dataItem.Name,
+                    Description = dataItem.Description,
+                    ShortDescription = dataItem.ShortDescription,
+                    Price = dataItem.Price ?? 0,
+                    ImageUrl = dataItem.ImageUrl,
+                    ItemCategory = dataItem.ItemCategory ?? ItemCategory.Unknown,
+                    ProductCode = dataItem.ProductCode,
+                    Availability = dataItem.Availability,
+                    Descriptions = dataItem.ItemDescriptions,
                     BrandsItems = new List<BrandItem>()
                 };
-
-                var newItemDescriptions = new List<ItemDescription>();
-                foreach (var itemDescription in newItemViewModel.ItemDescriptions)
-                {
-                    var newItemDescription = new ItemDescription()
-                    {
-                        Item = newItem,
-                        Name = itemDescription.Name,
-                        Description = itemDescription.Description,
-                    };
-
-                    newItemDescriptions.Add(newItemDescription);
-                }
-                newItem.Descriptions.AddRange(newItemDescriptions);
-
-                AssignBrandIdsFromBrandNames(newItem, newItemViewModel, allBrands);
-                newItems.Add(newItem);
+                
+                AssignBrandIdsFromBrandNames(dbItem, dataItem, allBrands);
+                newItems.Add(dbItem);
             }
 
             context.Items.AddRange(newItems);
@@ -91,86 +83,56 @@ namespace SpletnaTrgovinaDiploma.Data.Services
             return itemDetails;
         }
 
-        public async Task UpdateItemAsync(NewItemViewModel data)
+        public async Task UpdateItemAsync(NewItemViewModel dataItem)
         {
-            var dbItem = await context.Items.FirstOrDefaultAsync(n => n.Id == data.Id);
+            var dbItem = GetAllItems()
+                .FirstOrDefault(n => n.Id == dataItem.Id);
 
             if (dbItem != null)
             {
-                dbItem.Name = data.Name;
-                dbItem.Description = data.Description;
-                dbItem.ShortDescription = data.ShortDescription;
-                dbItem.Price = data.Price ?? 0;
-                dbItem.ImageUrl = data.ImageUrl;
-                dbItem.ItemCategory = data.ItemCategory ?? ItemCategory.Unknown;
-                dbItem.Descriptions = data.ItemDescriptions;
-                dbItem.ProductCode = data.ProductCode;
-                dbItem.Availability = data.Availability; 
-                dbItem.Descriptions = data.ItemDescriptions.Count > 0 ? new List<ItemDescription>() : dbItem.Descriptions;
+                dbItem.Name = dataItem.Name;
+                dbItem.Description = dataItem.Description;
+                dbItem.ShortDescription = dataItem.ShortDescription;
+                dbItem.Price = dataItem.Price ?? 0;
+                dbItem.ImageUrl = dataItem.ImageUrl;
+                dbItem.ItemCategory = dataItem.ItemCategory ?? ItemCategory.Unknown;
+                dbItem.ProductCode = dataItem.ProductCode;
+                dbItem.Availability = dataItem.Availability;
 
-                // find or create attribute
-                foreach (var itemDescription in data.ItemDescriptions)
-                {
-                    var findItemDescription = dbItem.Descriptions.SingleOrDefault(d => d.Name == itemDescription.Name) ?? itemDescription;
-
-                    if (findItemDescription == null)
-                    {
-                        itemDescription.Item = dbItem;
-                        dbItem.Descriptions.Add(itemDescription);
-                    }
-                    else
-                        findItemDescription.Description = itemDescription.Description;
-                }
-                await context.SaveChangesAsync();
+                FindOrCreateItemDescriptions(dbItem, dataItem.ItemDescriptions);
+                AssignBrandIdsFromBrandNames(dbItem, dataItem, context.Brands.ToList());
             }
 
-            //Remove existing items
-            var existingBrandsDb = context.BrandsItems.Where(n => n.ItemId == data.Id).ToList();
-            context.BrandsItems.RemoveRange(existingBrandsDb);
-            await context.SaveChangesAsync();
-
-            AssignBrandIdsFromBrandNames(dbItem, data, context.Brands.ToList());
             await context.SaveChangesAsync();
         }
 
-        public async Task<int> UpdateItemsNonNullValuesAsync(List<NewItemViewModel> data)
+        public async Task<int> UpdateItemsNonNullValuesAsync(List<NewItemViewModel> dataList)
         {
             var amountOfUpdatedItems = 0;
-            var allItems = context.Items.ToList();
+            var allItems = GetAllItems();
             var allBrands = context.Brands.ToList();
 
-            foreach (var item in data)
+            foreach (var dataItem in dataList)
             {
-                var dbItem = allItems.FirstOrDefault(n => n.ProductCode == item.ProductCode);
+                var dbItem = allItems.FirstOrDefault(n => n.ProductCode == dataItem.ProductCode);
 
-                if (!string.IsNullOrEmpty(item.ProductCode) && dbItem != null)
+                if (!string.IsNullOrEmpty(dataItem.ProductCode) && dbItem != null)
                 {
+                    //only if item found, it could be update, otherwise ignore
                     amountOfUpdatedItems++;
 
-                    //only if item found, it could be update, otherwise create a new one
-                    dbItem.Name = item.Name ?? dbItem.Name;
-                    dbItem.Description = item.Description ?? dbItem.Description;
-                    dbItem.ShortDescription = item.ShortDescription ?? dbItem.ShortDescription;
-                    dbItem.Price = item.Price ?? dbItem.Price;
-                    dbItem.ImageUrl = item.ImageUrl ?? dbItem.ImageUrl;
-                    dbItem.ItemCategory = item.ItemCategory ?? dbItem.ItemCategory;
-                    dbItem.ProductCode = item.ProductCode ?? dbItem.ProductCode;
-                    dbItem.Availability = item.Availability ?? dbItem.Availability;
-                    dbItem.Descriptions = item.ItemDescriptions.Count > 0 ? new List<ItemDescription>() : dbItem.Descriptions;
+                    dbItem.Name = dataItem.Name ?? dbItem.Name;
+                    dbItem.Description = dataItem.Description ?? dbItem.Description;
+                    dbItem.ShortDescription = dataItem.ShortDescription ?? dbItem.ShortDescription;
+                    dbItem.Price = dataItem.Price ?? dbItem.Price;
+                    dbItem.ImageUrl = dataItem.ImageUrl ?? dbItem.ImageUrl;
+                    dbItem.ItemCategory = dataItem.ItemCategory ?? dbItem.ItemCategory;
+                    dbItem.ProductCode = dataItem.ProductCode ?? dbItem.ProductCode;
+                    dbItem.Availability = dataItem.Availability ?? dbItem.Availability;
 
-                    // find or create attribute
-                    foreach (var itemDescription in item.ItemDescriptions)
-                    {
-                        var findItemDescription = dbItem.Descriptions.SingleOrDefault(d => d.Name == itemDescription.Name) ?? itemDescription;
-
-                        if (findItemDescription == null)
-                            dbItem.Descriptions.Add(itemDescription);
-                        else
-                            findItemDescription.Description = itemDescription.Description;
-                    }
+                    FindOrCreateItemDescriptions(dbItem, dataItem.ItemDescriptions);
+                    AssignBrandIdsFromBrandNames(dbItem, dataItem, allBrands);
                 }
-
-                AssignBrandIdsFromBrandNames(dbItem, item, allBrands);
             }
 
             await context.SaveChangesAsync();
@@ -178,8 +140,28 @@ namespace SpletnaTrgovinaDiploma.Data.Services
             return amountOfUpdatedItems;
         }
 
-        void AssignBrandIdsFromBrandNames(Item newItem, NewItemViewModel newItemViewModel, List<Brand> allBrands)
+        void FindOrCreateItemDescriptions(Item item, List<ItemDescription> itemDescriptions, bool deleteOld = false)
         {
+            if (deleteOld)
+                item.Descriptions.Clear();
+
+            // find or create attribute
+            foreach (var itemDescription in itemDescriptions)
+            {
+                var findItemDescription = item.Descriptions.FirstOrDefault(d => d.Name == itemDescription.Name);
+
+                if (findItemDescription == null)
+                    item.Descriptions.Add(itemDescription);
+                else
+                    findItemDescription.Description = itemDescription.Description;
+            }
+        }
+
+        void AssignBrandIdsFromBrandNames(Item item, NewItemViewModel newItemViewModel, List<Brand> allBrands, bool deleteOld = true)
+        {
+            if (deleteOld)
+                item.BrandsItems.Clear();
+
             // New Brands that do not exist yet
             foreach (var brandName in newItemViewModel.BrandNames)
             {
@@ -200,28 +182,28 @@ namespace SpletnaTrgovinaDiploma.Data.Services
                     findBrand = brand;
                 }
 
-                if (newItem.BrandsItems.All(item => item.Brand.Name != brandName))
+                if (item.BrandsItems.All(i => i.Brand.Name != brandName))
                 {
                     var newBrandItem = new BrandItem()
                     {
-                        Item = newItem,
+                        Item = item,
                         Brand = findBrand
                     };
 
-                    newItem.BrandsItems.Add(newBrandItem);
+                    item.BrandsItems.Add(newBrandItem);
                 }
             }
 
             foreach (var brandId in newItemViewModel.BrandIds)
             {
-                if (newItem.BrandsItems.All(item => item.BrandId != brandId))
+                if (item.BrandsItems.All(i => i.BrandId != brandId))
                 {
                     var newBrandItem = new BrandItem()
                     {
-                        Item = newItem,
+                        Item = item,
                         BrandId = brandId
                     };
-                    newItem.BrandsItems.Add(newBrandItem);
+                    item.BrandsItems.Add(newBrandItem);
                 }
             }
 
