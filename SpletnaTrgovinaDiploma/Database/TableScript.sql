@@ -282,7 +282,7 @@ CREATE TABLE [dbo].[Orders](
 	[HouseNumber] [nvarchar](max) NULL,
 	[ZipCode] [nvarchar](max) NULL,
 	[City] [nvarchar](max) NULL,
-	[Shippinption] [int] NOT NULL,
+	[ShippingOption] [int] NOT NULL,
 	[PaymentOption] [int] NOT NULL,
 	[CountryId] [int] NULL,
 	[UserId] [nvarchar](450) NULL,
