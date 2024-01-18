@@ -200,7 +200,9 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 ShoppingCart = myShoppingCart,
                 ShoppingCartTotal = shoppingCartTotal,
                 ShoppingCartTotalWithoutVat = shoppingCartTotal * 100 / 122,
-                EmailAddress = user?.DeliveryEmailAddress ?? "",
+                EmailAddress = !string.IsNullOrEmpty(user?.DeliveryEmailAddress) 
+                    ? user.DeliveryEmailAddress 
+                    : user?.Email ?? "",
                 FullName = user?.FullName ?? "",
                 PhoneNumber = user?.PhoneNumber ?? "",
                 StreetName = user?.StreetName ?? "",
