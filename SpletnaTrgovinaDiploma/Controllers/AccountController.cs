@@ -227,6 +227,10 @@ namespace SpletnaTrgovinaDiploma.Controllers
                     "Your newsletter subscription",
                     messageHtml);
             }
+            
+            var emailValidationSuccess = EmailProvider.IsValidEmail(email);
+            if (!emailValidationSuccess)
+                return View("Failure", new EmailViewModel("Entered e-mail is invalid.", ""));
 
             var result = await newsletterEmailService.AddToMailingList(email);
             if (!result)
@@ -248,6 +252,10 @@ namespace SpletnaTrgovinaDiploma.Controllers
                     "Your newsletter subscription",
                     messageHtml);
             }
+
+            var emailValidationSuccess = EmailProvider.IsValidEmail(email);
+            if (!emailValidationSuccess)
+                return View("Failure", new EmailViewModel("Entered e-mail is invalid.", ""));
 
             var result = await newsletterEmailService.RemoveFromMailingList(email);
             if (!result)
@@ -380,38 +388,34 @@ namespace SpletnaTrgovinaDiploma.Controllers
         [Authorize(Roles = UserRoles.Admin)]
         public IActionResult GetUserInfo(string userId)
         {
+            LoadCountriesDropdownData();
+
             var user = userManager.FindByIdAsync(userId).Result;
-
-            if (user != null)
+            if (user == null)
             {
-                var userInfoViewModel = CreateInfoViewModel(user);
-
-                LoadCountriesDropdownData();
-                return View(userInfoViewModel);
+                TempData["Error"] = "Cannot fetch user info";
+                return View(new UserInfoViewModel());
             }
 
-            TempData["Error"] = "Cannot fetch user info";
-
-            return View(new UserInfoViewModel());
+            var userInfoViewModel = CreateInfoViewModel(user);
+            return View(userInfoViewModel);
         }
 
         [Authorize(Roles = UserRoles.Admin)]
         public IActionResult GetUnregisteredUserInfo(int orderId)
         {
+            LoadCountriesDropdownData();
             var userRole = User.FindFirstValue(ClaimTypes.Role);
+
             var order = ordersService.GetOrderByIdAndRole(orderId, userRole);
-
-            if (order != null)
+            if (order == null)
             {
-                var userInfoViewModel = CreateInfoViewModel(order);
-
-                LoadCountriesDropdownData();
-                return View(userInfoViewModel);
+                TempData["Error"] = "Cannot fetch user info";
+                return View(new UserInfoViewModel());
             }
 
-            TempData["Error"] = "Cannot fetch user info";
-
-            return View(new UserInfoViewModel());
+            var userInfoViewModel = CreateInfoViewModel(order);
+            return View(userInfoViewModel);
         }
 
         void SetPageDetails(string title, string description)

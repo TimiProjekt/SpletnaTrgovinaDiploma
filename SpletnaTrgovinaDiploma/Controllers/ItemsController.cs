@@ -145,9 +145,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 Availability = itemDetails.Availability
             };
 
-
             var itemDropdownsData = await brandService.GetDropdownValuesAsync();
-
             ViewBag.Brands = new SelectList(itemDropdownsData.Brands, "Id", "Name");
 
             return View(response);

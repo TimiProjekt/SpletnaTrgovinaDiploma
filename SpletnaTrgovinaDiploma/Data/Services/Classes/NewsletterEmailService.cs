@@ -34,7 +34,7 @@ namespace SpletnaTrgovinaDiploma.Data.Services
         public async Task<bool> RemoveFromMailingList(string emailAddress)
         {
             // If it doesn't exist, don't remove it. Future: Give feedback that it's not subscribed
-            var newsletterEmail = context.NewsletterMailingList.Single(e => e.Email == emailAddress);
+            var newsletterEmail = context.NewsletterMailingList.SingleOrDefault(e => e.Email == emailAddress);
             if (newsletterEmail == null)
                 return false;
 

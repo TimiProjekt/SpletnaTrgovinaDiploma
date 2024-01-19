@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Mail;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
 using SpletnaTrgovinaDiploma.Data.Services.Classes;
 
@@ -34,6 +35,13 @@ namespace SpletnaTrgovinaDiploma.Data.Services
                     smtp.Send(mail);
                 }
             }
+        }
+
+        public static bool IsValidEmail(string email)
+        {
+            const string regex = @"^[^@\s]+@[^@\s]+\.(com|net|org|gov)$";
+
+            return Regex.IsMatch(email, regex, RegexOptions.IgnoreCase);
         }
     }
 }
