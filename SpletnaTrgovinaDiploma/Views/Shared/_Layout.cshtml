@@ -65,8 +65,8 @@
 
                     </ul>
 
-                    <form class="form-inline my-2 my-lg-0" asp-controller="Items" asp-action="Filter" style="padding-right: 10px;">
-                        <input name="searchString" type="text" class="form-control" placeholder="Search for an item...">
+                    <form class="form-inline my-2 my-lg-0" asp-controller="Items" asp-action="Index" style="padding-right: 10px;">
+                        <input name="searchString" value="@ViewBag.CurrentFilter" type="text" class="form-control" placeholder="Search for an item...">
                         <button class="btn btn-outline-info my-2 my-sm-0 ml-2" type="submit"><i class="bi bi-search"></i></button>
                     </form>
 

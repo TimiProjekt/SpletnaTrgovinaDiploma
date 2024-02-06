@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SpletnaTrgovinaDiploma.Data.Services;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using SpletnaTrgovinaDiploma.Data.ViewModels;
 using SpletnaTrgovinaDiploma.Helpers;
+using X.PagedList;
 
 namespace SpletnaTrgovinaDiploma.Controllers
 {
@@ -35,14 +37,6 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return View(filteredItems);
         }
 
-        [AllowAnonymous]
-        public async Task<IActionResult> Index()
-        {
-            var allItems = await itemsService.GetAllAsync(n => n.BrandsItems);
-            SetPageDetails("Home page", "Home page of Gaming svet");
-            return View(allItems);
-        }
-
         public async Task<IActionResult> EditIndex()
         {
             var data = await itemsService.GetAllAsync();
@@ -51,25 +45,36 @@ namespace SpletnaTrgovinaDiploma.Controllers
         }
 
         [AllowAnonymous]
-        public async Task<IActionResult> Filter(string searchString)
+        public async Task<IActionResult> Index(string currentFilter, string searchString, int page = 1)
         {
-            var allItems = await itemsService.GetAllAsync(n => n.BrandsItems);
+            const int itemsPerPage = 12;
+
+            if (searchString != null)
+                page = 1;
+            else
+                searchString = currentFilter;
+
+            ViewBag.CurrentFilter = searchString;
+            var allItems = await itemsService
+                .GetAllAsync(n => n.BrandsItems);
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                var upperCaseSearchString = searchString.ToUpper();
-                var filteredResult = allItems
-                    .Where(n => n.Name?.ToUpper().Contains(upperCaseSearchString) ?? n.Description?.ToUpper().Contains(upperCaseSearchString) ?? false);
+                var filteredItems = allItems
+                    .Where(i => (i.Name?.Contains(searchString, StringComparison.InvariantCultureIgnoreCase) ?? false)
+                                || (i.Description?.Contains(searchString, StringComparison.InvariantCultureIgnoreCase) ?? false)
+                                || (i.ShortDescription?.Contains(searchString, StringComparison.InvariantCultureIgnoreCase) ?? false)
+                                || (i.ProductCode?.Contains(searchString, StringComparison.InvariantCultureIgnoreCase) ?? false));
 
                 SetPageDetails("Search result", $"Search result for \"{searchString}\"");
-                return View("Index", filteredResult);
+                return View("Index", filteredItems.ToPagedList(page, itemsPerPage));
             }
 
             SetPageDetails("Home page", "Home page of Gaming svet");
-            return View("Index", allItems);
+            return View("Index", allItems.ToPagedList(page, itemsPerPage));
         }
 
-        public async Task<IActionResult> FilterAdmin(string searchString)
+        public async Task<IActionResult> IndexAdmin(string searchString)
         {
             var allItems = await itemsService.GetAllAsync(n => n.BrandsItems);
 

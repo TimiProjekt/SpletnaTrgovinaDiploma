@@ -1,5 +1,5 @@
-﻿@using SpletnaTrgovinaDiploma.Helpers
-@model IEnumerable<Item>
+﻿@using X.PagedList.Mvc.Core;
+@model X.PagedList.IPagedList<Item>
 
 <div class="row">
     @foreach (var item in Model)
@@ -28,7 +28,7 @@
                             <img class="mr-2 ml-4 pt-5 pb-5" style="max-width: 75%; max-height: 300px;" src="@item.ImageUrl" alt="@item.Name">
                         </a>
                     </div>
-                    <div class="col-md-6 height-text" >
+                    <div class="col-md-6 height-text">
                         <div class="card-body">
                             <p class="card-text" style="white-space: pre-wrap;">@item.ShortDescription</p>
                             <p class="card-text"><b>Name: </b>@item.Name</p>
@@ -39,7 +39,7 @@
                     <div class="col-md-12">
                         <div class="card-footer" style="height: 100%; display: flex; justify-content: space-between; align-items: center;">
                             <a class="btn btn-outline-primary float-right m-2" asp-controller="Items" asp-action="Details" asp-route-id="@item.Id">
-                                <i class="bi bi-eye-fill"></i> 
+                                <i class="bi bi-eye-fill"></i>
                                 Show Details
                             </a>
                             <a class="btn btn-success text-white m-2" asp-controller="Orders" asp-action="AddItemToShoppingCart" asp-route-id="@item.Id">
@@ -52,4 +52,11 @@
             </div>
         </div>
     }
+    <br />
+    <div class="text-center w-100">
+        Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+        <br />
+        @Html.PagedListPager(Model, page => Url.Action("Index", "Items", new { page, currentFilter = ViewBag.CurrentFilter }))
+    </div>
+
 </div>
