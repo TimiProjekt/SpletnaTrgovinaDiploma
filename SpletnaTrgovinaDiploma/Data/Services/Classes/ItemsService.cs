@@ -11,11 +11,10 @@ namespace SpletnaTrgovinaDiploma.Data.Services
     {
         private readonly AppDbContext context;
 
-        List<Item> GetAllItems() =>
+        IEnumerable<Item> GetAllItems() =>
             context.Items
                 .Include(am => am.Descriptions)
-                .Include(am => am.BrandsItems)
-                .ToList();
+                .Include(am => am.BrandsItems);
 
         public ItemsService(AppDbContext context) : base(context)
         {

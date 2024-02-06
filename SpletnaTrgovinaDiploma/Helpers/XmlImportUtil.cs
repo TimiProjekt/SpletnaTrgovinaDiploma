@@ -52,7 +52,7 @@ namespace SpletnaTrgovinaDiploma.Helpers
             if (isUpdateExisting)
                 return await itemsService.UpdateItemsNonNullValuesAsync(newItems);
 
-            var allItems = await itemsService.GetAllAsync();
+            var allItems = itemsService.GetAll();
             var nonExistentNewItems = newItems
                 .Where(item => allItems.All(i => i.ProductCode != item.ProductCode))
                 .ToList();

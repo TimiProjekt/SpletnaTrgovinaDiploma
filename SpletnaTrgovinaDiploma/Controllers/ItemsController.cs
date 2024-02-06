@@ -30,16 +30,16 @@ namespace SpletnaTrgovinaDiploma.Controllers
         }
 
         [AllowAnonymous]
-        public async Task<IActionResult> GetByBrand(int id)
+        public IActionResult GetByBrand(int id)
         {
-            var allItems = await itemsService.GetAllAsync(n => n.BrandsItems);
+            var allItems = itemsService.GetAll(n => n.BrandsItems);
             var filteredItems = allItems.Where(item => item.BrandsItems.Any(bi => bi.BrandId == id));
             return View(filteredItems);
         }
 
-        public async Task<IActionResult> EditIndex()
+        public IActionResult EditIndex()
         {
-            var data = await itemsService.GetAllAsync();
+            var data = itemsService.GetAll();
             var orderedData = data.OrderBy(item => item.Name);
             return View(orderedData);
         }
@@ -55,16 +55,13 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 searchString = currentFilter;
 
             ViewBag.CurrentFilter = searchString;
-            var allItems = await itemsService
-                .GetAllAsync(n => n.BrandsItems);
+            var allItems = itemsService
+                .GetAll(n => n.BrandsItems);
 
             if (!string.IsNullOrEmpty(searchString))
             {
                 var filteredItems = allItems
-                    .Where(i => (i.Name?.Contains(searchString, StringComparison.InvariantCultureIgnoreCase) ?? false)
-                                || (i.Description?.Contains(searchString, StringComparison.InvariantCultureIgnoreCase) ?? false)
-                                || (i.ShortDescription?.Contains(searchString, StringComparison.InvariantCultureIgnoreCase) ?? false)
-                                || (i.ProductCode?.Contains(searchString, StringComparison.InvariantCultureIgnoreCase) ?? false));
+                    .Where(i => ContainsSearchString(i, searchString));
 
                 SetPageDetails("Search result", $"Search result for \"{searchString}\"");
                 return View("Index", filteredItems.ToPagedList(page, itemsPerPage));
@@ -74,15 +71,21 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return View("Index", allItems.ToPagedList(page, itemsPerPage));
         }
 
-        public async Task<IActionResult> IndexAdmin(string searchString)
+        static bool ContainsSearchString(Item item, string searchString)
+            => !string.IsNullOrEmpty(item.Name) && item.Name.Contains(searchString, StringComparison.InvariantCultureIgnoreCase)
+                || !string.IsNullOrEmpty(item.Description) && item.Description.Contains(searchString, StringComparison.InvariantCultureIgnoreCase)
+                || !string.IsNullOrEmpty(item.ShortDescription) && item.ShortDescription.Contains(searchString, StringComparison.InvariantCultureIgnoreCase)
+                || !string.IsNullOrEmpty(item.ProductCode) && item.ProductCode.Contains(searchString, StringComparison.InvariantCultureIgnoreCase);
+
+        public IActionResult IndexAdmin(string searchString)
         {
-            var allItems = await itemsService.GetAllAsync(n => n.BrandsItems);
+            var allItems = itemsService.GetAll(n => n.BrandsItems);
 
             if (!string.IsNullOrEmpty(searchString))
             {
                 var upperCaseSearchString = searchString.ToUpper();
                 var filteredResult = allItems
-                    .Where(n => n.Name?.ToUpper().Contains(upperCaseSearchString) ?? n.Description?.ToUpper().Contains(upperCaseSearchString) ?? false);
+                    .Where(i => ContainsSearchString(i, searchString));
 
                 SetPageDetails("Search result", $"Search result for \"{searchString}\"");
                 return View("EditIndex", filteredResult);

@@ -18,16 +18,16 @@ namespace SpletnaTrgovinaDiploma.Controllers
             this.service = service;
         }
 
-        public async Task<IActionResult> EditIndex()
+        public IActionResult EditIndex()
         {
-            var data = await service.GetAllAsync();
+            var data = service.GetAll();
             var orderedData = data.OrderBy(brand => brand.Name);
             return View(orderedData);
         }
 
-        public async Task<IActionResult> Filter(string searchString)
+        public IActionResult Filter(string searchString)
         {
-            var allBrands = await service.GetAllAsync(n => n.BrandsItems);
+            var allBrands = service.GetAll(n => n.BrandsItems);
 
             if (!string.IsNullOrEmpty(searchString))
             {

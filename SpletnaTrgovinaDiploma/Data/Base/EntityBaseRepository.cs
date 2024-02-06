@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -31,13 +30,13 @@ namespace SpletnaTrgovinaDiploma.Data.Base
             await context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync() => await context.Set<T>().ToListAsync();
+        public IQueryable<T> GetAll() => context.Set<T>();
 
-        public async Task<IEnumerable<T>> GetAllAsync(params Expression<Func<T, object>>[] includeProperties)
+        public IQueryable<T> GetAll(params Expression<Func<T, object>>[] includeProperties)
         {
-            IQueryable<T> query = context.Set<T>();
+            var query = GetAll();
             query = includeProperties.Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
-            return await query.ToListAsync();
+            return query;
         }
 
         public async Task<T> GetByIdAsync(int id) => await context.Set<T>().FirstOrDefaultAsync(n => n.Id == id);
