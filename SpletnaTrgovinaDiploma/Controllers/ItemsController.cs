@@ -37,15 +37,32 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return View(filteredItems);
         }
 
-        public IActionResult EditIndex()
+        [AllowAnonymous]
+        public IActionResult Index(string currentFilter, string searchString, int page = 1)
         {
-            var data = itemsService.GetAll();
-            var orderedData = data.OrderBy(item => item.Name);
-            return View(orderedData);
+            if (!string.IsNullOrEmpty(searchString))
+                SetPageDetails("Search result", $"Search result for \"{searchString}\"");
+            else
+                SetPageDetails("Home page", "Home page of Gaming svet");
+
+            var filteredItems = GetFilteredItems(currentFilter, searchString, page);
+
+            return View(filteredItems);
         }
 
-        [AllowAnonymous]
-        public async Task<IActionResult> Index(string currentFilter, string searchString, int page = 1)
+        public IActionResult EditIndex(string currentFilter, string searchString, int page = 1)
+        {
+            if (!string.IsNullOrEmpty(searchString))
+                SetPageDetails("Search result", $"Search result for \"{searchString}\"");
+            else
+                SetPageDetails("All items", "Search result");
+
+            var filteredItems = GetFilteredItems(currentFilter, searchString, page);
+
+            return View(filteredItems);
+        }
+
+        IPagedList<Item> GetFilteredItems(string currentFilter, string searchString, int page)
         {
             const int itemsPerPage = 12;
 
@@ -61,38 +78,17 @@ namespace SpletnaTrgovinaDiploma.Controllers
             if (!string.IsNullOrEmpty(searchString))
             {
                 var filteredItems = allItems
-                    .Where(i => ContainsSearchString(i, searchString));
+                    .Where(i => i.Name.Contains(searchString)
+                                    || i.Description.Contains(searchString)
+                                    || i.ShortDescription.Contains(searchString)
+                                    || i.ProductCode.Contains(searchString));
 
                 SetPageDetails("Search result", $"Search result for \"{searchString}\"");
-                return View("Index", filteredItems.ToPagedList(page, itemsPerPage));
+                return filteredItems.ToPagedList(page, itemsPerPage);
             }
 
             SetPageDetails("Home page", "Home page of Gaming svet");
-            return View("Index", allItems.ToPagedList(page, itemsPerPage));
-        }
-
-        static bool ContainsSearchString(Item item, string searchString)
-            => !string.IsNullOrEmpty(item.Name) && item.Name.Contains(searchString, StringComparison.InvariantCultureIgnoreCase)
-                || !string.IsNullOrEmpty(item.Description) && item.Description.Contains(searchString, StringComparison.InvariantCultureIgnoreCase)
-                || !string.IsNullOrEmpty(item.ShortDescription) && item.ShortDescription.Contains(searchString, StringComparison.InvariantCultureIgnoreCase)
-                || !string.IsNullOrEmpty(item.ProductCode) && item.ProductCode.Contains(searchString, StringComparison.InvariantCultureIgnoreCase);
-
-        public IActionResult IndexAdmin(string searchString)
-        {
-            var allItems = itemsService.GetAll(n => n.BrandsItems);
-
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                var upperCaseSearchString = searchString.ToUpper();
-                var filteredResult = allItems
-                    .Where(i => ContainsSearchString(i, searchString));
-
-                SetPageDetails("Search result", $"Search result for \"{searchString}\"");
-                return View("EditIndex", filteredResult);
-            }
-
-            SetPageDetails("Items", "Search result");
-            return View("EditIndex", allItems);
+            return allItems.ToPagedList(page, itemsPerPage);
         }
 
         //GET: Items/Details/1(ItemId)

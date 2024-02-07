@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SpletnaTrgovinaDiploma.Data.Services;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace SpletnaTrgovinaDiploma.Controllers
 {

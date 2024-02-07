@@ -60,7 +60,6 @@ namespace SpletnaTrgovinaDiploma.Helpers
             await itemsService.AddNewItemsAsync(nonExistentNewItems);
 
             return nonExistentNewItems.Count;
-
         }
 
         NewItemViewModel TryReadingAttributesFrom(XmlNode dataNode)

@@ -52,11 +52,6 @@
             </div>
         </div>
     }
-    <br />
-    <div class="text-center w-100">
-        Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
-        <br />
-        @Html.PagedListPager(Model, page => Url.Action("Index", "Items", new { page, currentFilter = ViewBag.CurrentFilter }))
-    </div>
 
+    @await Html.PartialAsync("Components/PagingComponent", Model)
 </div>
