@@ -35,10 +35,22 @@ namespace SpletnaTrgovinaDiploma.Data.Services
             if (userRole != "Admin")
                 return null;
 
-            var orders = context.Orders
+            var order = context.Orders
                 .SingleOrDefault(o => o.Id == orderId);
 
-            return orders;
+            return order;
+        }
+
+        public async Task UpdateOrderStatus(int orderId, OrderStatus status)
+        {
+            var order = context.Orders
+                .SingleOrDefault(o => o.Id == orderId);
+
+            if (order == null)
+                return;
+
+            order.Status = status;
+            await context.SaveChangesAsync();
         }
 
         public async Task StoreOrderAsync(ShippingAndPaymentViewModel shippingAndPaymentViewModel, List<ShoppingCartItem> items, string userId)
@@ -53,8 +65,8 @@ namespace SpletnaTrgovinaDiploma.Data.Services
                 HouseNumber = shippingAndPaymentViewModel.HouseNumber,
                 City = shippingAndPaymentViewModel.City,
                 ZipCode = shippingAndPaymentViewModel.ZipCode,
-                ShippingOption = (int)shippingAndPaymentViewModel.ShippingOption,
-                PaymentOption = (int)shippingAndPaymentViewModel.PaymentOption,
+                ShippingOption = shippingAndPaymentViewModel.ShippingOption,
+                PaymentOption = shippingAndPaymentViewModel.PaymentOption,
                 Country = context.Countries.Single(c => c.Id == shippingAndPaymentViewModel.CountryId),
             };
 

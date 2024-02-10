@@ -1,4 +1,6 @@
-﻿@model Order
+﻿@using SpletnaTrgovinaDiploma.Data.ViewModels
+@using SpletnaTrgovinaDiploma.Helpers
+@model Order
 
 @{
     ViewData["Title"] = "Specific order";
@@ -9,6 +11,11 @@
         <p>
             <h4>Order with order Id @Model.Id</h4>
         </p>
+
+        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+        {
+            <a asp-controller="Orders" asp-action="EditStatus" asp-route-id="@Model.Id">Edit status of the order</a>
+        }
 
         <div class="form-group">
             <b>Full name:</b>
@@ -69,7 +76,7 @@
                 @Model.City
             </u>
         </div>
-        
+
         <div class="form-group">
             <b>City:</b>
             <u class="m-3">
@@ -80,14 +87,33 @@
         <div class="form-group">
             <b>Shipping option:</b>
             <u class="m-3">
-                @Model.ShippingOption - @(Model.ShippingOption == 0 ? "Priority Home Shipping" : Model.ShippingOption == 1 ? "Standard Home Shipping" : "Paketomat" )
+                @Model.ShippingOption - @(Model.ShippingOption switch
+                {
+                ShippingOption.PriorityHomeShipping => "Priority Home Shipping",
+                ShippingOption.StandardHomeShipping => "Standard Home Shipping",
+                ShippingOption.Paketomat => "Paketomat",
+                _ => throw new NotSupportedException()
+                })
             </u>
         </div>
 
         <div class="form-group">
             <b>Payment option:</b>
             <u class="m-3">
-                @Model.PaymentOption - @(Model.PaymentOption == 0 ? "Visa/Mastercard online payment" : Model.PaymentOption == 1 ? "Paypal" : "Payment after arrival" )
+                @Model.PaymentOption - @(Model.PaymentOption switch
+                {
+                PaymentOption.CreditCard => "Visa/Mastercard online payment",
+                PaymentOption.FundsTransfer => "Funds transfer",
+                PaymentOption.Cash=> "Payment after arrival",
+                _ => throw new NotSupportedException()
+                })
+            </u>
+        </div>
+
+        <div class="form-group">
+            <b>Order status:</b>
+            <u class="m-3">
+                @Model.Status.GetOrderStatusText()
             </u>
         </div>
 

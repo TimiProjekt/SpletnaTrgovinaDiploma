@@ -200,8 +200,8 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 ShoppingCart = myShoppingCart,
                 ShoppingCartTotal = shoppingCartTotal,
                 ShoppingCartTotalWithoutVat = shoppingCartTotal * 100 / 122,
-                EmailAddress = !string.IsNullOrEmpty(user?.DeliveryEmailAddress) 
-                    ? user.DeliveryEmailAddress 
+                EmailAddress = !string.IsNullOrEmpty(user?.DeliveryEmailAddress)
+                    ? user.DeliveryEmailAddress
                     : user?.Email ?? "",
                 FullName = user?.FullName ?? "",
                 PhoneNumber = user?.PhoneNumber ?? "",
@@ -227,7 +227,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 return View(shippingAndPaymentViewModel);
 
             var items = myShoppingCart.GetShoppingCartItems();
-            var userId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             await ordersService.StoreOrderAsync(shippingAndPaymentViewModel, items, userId);
 
@@ -241,6 +241,55 @@ namespace SpletnaTrgovinaDiploma.Controllers
                     "Order completed successfully.",
                     "You can check all your orders in the Orders section of your profile.",
                     "Thank you!"));
+        }
+
+        public async Task<IActionResult> EditStatus(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+
+            if (userRole != "Admin")
+                return View("NotFound");
+
+            var orders = await ordersService.GetOrdersByUserIdAndRoleAsync(userId, userRole);
+            var order = orders.SingleOrDefault(o => o.Id == id);
+            if (order == null)
+                return RedirectToAction("Index", "Orders");
+
+            var orderStatus = new OrderStatusViewModel()
+            {
+                OrderId = id,
+                CurrentStatus = order.Status
+            };
+
+            ViewBag.Statuses = order.Status.GetDropdownValues(order.PaymentOption);
+
+            return View(orderStatus);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditStatus(int id, OrderStatusViewModel orderStatus)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+
+            if (userRole != "Admin")
+                return View("NotFound");
+
+            var orders = await ordersService.GetOrdersByUserIdAndRoleAsync(userId, userRole);
+            var order = orders.SingleOrDefault(o => o.Id == id);
+            if (order == null)
+                return RedirectToAction("Index", "Orders");
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Statuses = order.Status.GetDropdownValues(order.PaymentOption);
+
+                return View(orderStatus);
+            }
+
+            await ordersService.UpdateOrderStatus(id, orderStatus.NewStatus);
+            return RedirectToAction(nameof(GetById), new { id });
         }
 
         static void SendConfirmationEmail(ShoppingCart myShoppingCart, ShippingAndPaymentViewModel viewModel)

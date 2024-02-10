@@ -1,0 +1,2 @@
+﻿ALTER TABLE [dbo].[Orders]
+ADD [Status] INT NOT NULL DEFAULT 0;

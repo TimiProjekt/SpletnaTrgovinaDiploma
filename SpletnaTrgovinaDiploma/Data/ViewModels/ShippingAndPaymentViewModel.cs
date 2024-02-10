@@ -25,7 +25,7 @@ namespace SpletnaTrgovinaDiploma.Data.ViewModels
     public enum PaymentOption
     {
         CreditCard,
-        Paypal,
+        FundsTransfer,
         Cash
     }
 }

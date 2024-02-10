@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
+using SpletnaTrgovinaDiploma.Data.ViewModels;
 
 namespace SpletnaTrgovinaDiploma.Models
 {
@@ -23,9 +24,11 @@ namespace SpletnaTrgovinaDiploma.Models
 
         public string City { get; set; }
 
-        public int ShippingOption { get; set; }
+        public ShippingOption ShippingOption { get; set; }
 
-        public int PaymentOption { get; set; }
+        public PaymentOption PaymentOption { get; set; }
+
+        public OrderStatus Status { get; set; }
 
         [ForeignKey(nameof(Country))]
         public int? CountryId { get; set; }
@@ -43,7 +46,5 @@ namespace SpletnaTrgovinaDiploma.Models
         public ApplicationUser User { get; set; }
 
         public List<OrderItem> OrderItems { get; set; }
-
-
     }
 }

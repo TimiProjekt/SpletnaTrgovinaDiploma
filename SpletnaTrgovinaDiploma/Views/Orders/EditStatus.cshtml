@@ -1,0 +1,49 @@
+﻿@using SpletnaTrgovinaDiploma.Helpers
+@model OrderStatusViewModel
+
+@{
+    ViewData["Title"] = $"Update item with order id {Model.OrderId}";
+}
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <p>
+            <h4>@ViewData["Title"]</h4>
+        </p>
+
+        <div class="row">
+            <div class="col-md-8 ml-2">
+
+                <form asp-action="EditStatus">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <label asp-for="CurrentStatus"></label>:
+                                <br/>
+                                <b>
+                                    @Model.CurrentStatus.GetOrderStatusText()
+                                </b>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="NewStatus"></label>
+                                <select asp-for="NewStatus" class="form-control" asp-items="@ViewBag.Statuses"><</select>
+                                <span asp-validation-for="NewStatus" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="submit" value="Update status" class="btn btn-outline-success float-right" />
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>

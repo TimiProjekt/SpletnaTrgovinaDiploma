@@ -12,5 +12,7 @@ namespace SpletnaTrgovinaDiploma.Data.Services
         Task<List<Order>> GetOrdersByUserIdAndRoleAsync(string userId, string userRole);
 
         Order GetOrderByIdAndRole(int orderId, string userRole);
+
+        Task UpdateOrderStatus(int orderId, OrderStatus status);
     }
 }
