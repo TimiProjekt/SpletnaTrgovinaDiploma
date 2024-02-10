@@ -12,6 +12,6 @@ namespace SpletnaTrgovinaDiploma.Models
 
         [Display(Name = "New order status")]
         [Required(ErrorMessage = "New order status is required")]
-        public OrderStatus NewStatus { get; set; }
+        public OrderStatus? NewStatus { get; set; }
     }
 }

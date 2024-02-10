@@ -288,7 +288,9 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 return View(orderStatus);
             }
 
-            await ordersService.UpdateOrderStatus(id, orderStatus.NewStatus);
+            if (orderStatus.NewStatus.HasValue)
+                await ordersService.UpdateOrderStatus(id, orderStatus.NewStatus.Value);
+
             return RedirectToAction(nameof(GetById), new { id });
         }
 
