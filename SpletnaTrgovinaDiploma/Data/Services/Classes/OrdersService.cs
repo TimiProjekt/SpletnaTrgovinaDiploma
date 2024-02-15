@@ -22,6 +22,7 @@ namespace SpletnaTrgovinaDiploma.Data.Services
                 .Include(n => n.OrderItems)
                 .ThenInclude(n => n.Item)
                 .Include(n => n.User)
+                .Include(n => n.StatusChangedLog)
                 .ToListAsync();
 
             if (userRole != "Admin")
@@ -41,7 +42,7 @@ namespace SpletnaTrgovinaDiploma.Data.Services
             return order;
         }
 
-        public async Task UpdateOrderStatus(int orderId, OrderStatus status)
+        public async Task UpdateOrderStatus(int orderId, OrderStatus oldStatus, OrderStatus newStatus, string comment, string userId)
         {
             var order = context.Orders
                 .SingleOrDefault(o => o.Id == orderId);
@@ -49,8 +50,19 @@ namespace SpletnaTrgovinaDiploma.Data.Services
             if (order == null)
                 return;
 
-            order.Status = status;
+            order.Status = newStatus;
+
+            InsertOrderStatusChangedLog(orderId, oldStatus, newStatus, comment, userId);
+
+            //add to log
             await context.SaveChangesAsync();
+        }
+
+        void InsertOrderStatusChangedLog(int orderId, OrderStatus oldStatus, OrderStatus newStatus, string comment, string userId)
+        {
+            var newLog = new OrderStatusChangedLog(orderId, oldStatus, newStatus, comment, userId);
+
+            context.OrderStatusChangedLog.Add(newLog);
         }
 
         public async Task StoreOrderAsync(ShippingAndPaymentViewModel shippingAndPaymentViewModel, List<ShoppingCartItem> items, string userId)
@@ -69,7 +81,6 @@ namespace SpletnaTrgovinaDiploma.Data.Services
                 PaymentOption = shippingAndPaymentViewModel.PaymentOption,
                 Country = context.Countries.Single(c => c.Id == shippingAndPaymentViewModel.CountryId),
             };
-
             await context.Orders.AddAsync(order);
             await context.SaveChangesAsync();
 
@@ -84,6 +95,8 @@ namespace SpletnaTrgovinaDiploma.Data.Services
                 };
                 await context.OrderItems.AddAsync(orderItem);
             }
+
+            InsertOrderStatusChangedLog(order.Id, OrderStatus.Processing, OrderStatus.Processing, "Initial order placed", userId);
             await context.SaveChangesAsync();
         }
     }

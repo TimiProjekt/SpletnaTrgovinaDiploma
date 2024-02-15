@@ -8,10 +8,14 @@ namespace SpletnaTrgovinaDiploma.Models
         public int OrderId { get; set; }
 
         [Display(Name = "Current order status")]
-        public OrderStatus CurrentStatus { get; set; }
+        public OrderStatus? CurrentStatus { get; set; }
 
         [Display(Name = "New order status")]
         [Required(ErrorMessage = "New order status is required")]
         public OrderStatus? NewStatus { get; set; }
+
+        [Display(Name = "Comment")]
+        [Required(ErrorMessage = "Comment is required")]
+        public string Comment { get; set; }
     }
 }

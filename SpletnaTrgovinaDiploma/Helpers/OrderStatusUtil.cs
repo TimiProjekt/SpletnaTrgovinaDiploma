@@ -8,6 +8,13 @@ namespace SpletnaTrgovinaDiploma.Helpers
 {
     public static class OrderStatusUtil
     {
+        public static string GetOrderStatusText(this OrderStatus? orderStatus)
+        {
+            if (orderStatus == null) return string.Empty;
+
+            return orderStatus.Value.GetOrderStatusText();
+        }
+
         public static string GetOrderStatusText(this OrderStatus orderStatus)
         {
             var text = orderStatus switch
@@ -17,7 +24,7 @@ namespace SpletnaTrgovinaDiploma.Helpers
                 OrderStatus.Paid => "Paid",
                 OrderStatus.ReadyForPickupOrSent => "Sent",
                 OrderStatus.Finished => "Finished",
-                OrderStatus.Cancelled => "Cancelled",
+                OrderStatus.Canceled => "Canceled",
                 _ => throw new NotSupportedException()
             };
 
@@ -53,8 +60,8 @@ namespace SpletnaTrgovinaDiploma.Helpers
             if (orderStatus == OrderStatus.ReadyForPickupOrSent)
                 yield return OrderStatus.Finished.GetSelectListItem();
 
-            if (orderStatus != OrderStatus.Finished && orderStatus != OrderStatus.Cancelled)
-                yield return OrderStatus.Cancelled.GetSelectListItem();
+            if (orderStatus != OrderStatus.Finished && orderStatus != OrderStatus.Canceled)
+                yield return OrderStatus.Canceled.GetSelectListItem();
         }
 
         static IEnumerable<SelectListItem> GetFundsTransferStatuses(this OrderStatus orderStatus)
@@ -71,8 +78,8 @@ namespace SpletnaTrgovinaDiploma.Helpers
             if (orderStatus == OrderStatus.ReadyForPickupOrSent)
                 yield return OrderStatus.Finished.GetSelectListItem();
 
-            if (orderStatus != OrderStatus.Finished && orderStatus != OrderStatus.Cancelled)
-                yield return OrderStatus.Cancelled.GetSelectListItem();
+            if (orderStatus != OrderStatus.Finished && orderStatus != OrderStatus.Canceled)
+                yield return OrderStatus.Canceled.GetSelectListItem();
         }
 
         static IEnumerable<SelectListItem> GetCashStatuses(this OrderStatus orderStatus)
@@ -83,8 +90,8 @@ namespace SpletnaTrgovinaDiploma.Helpers
             if (orderStatus == OrderStatus.ReadyForPickupOrSent)
                 yield return OrderStatus.Finished.GetSelectListItem();
 
-            if (orderStatus != OrderStatus.Finished && orderStatus != OrderStatus.Cancelled)
-                yield return OrderStatus.Cancelled.GetSelectListItem();
+            if (orderStatus != OrderStatus.Finished && orderStatus != OrderStatus.Canceled)
+                yield return OrderStatus.Canceled.GetSelectListItem();
         }
 
         static SelectListItem GetSelectListItem(this OrderStatus orderStatus)

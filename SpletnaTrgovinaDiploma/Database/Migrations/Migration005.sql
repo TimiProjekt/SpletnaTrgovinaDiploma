@@ -1,0 +1,14 @@
+﻿CREATE TABLE [dbo].[OrderStatusChangedLog]
+(
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[OrderId] [int] NOT NULL,
+	[OldStatus] [int] NOT NULL,
+	[NewStatus] [int] NOT NULL,
+	[Comment] [nvarchar](max) NOT NULL,
+	[UserId] [nvarchar](450) NOT NULL,
+	[Timestamp] [datetime2] NOT NULL DEFAULT CURRENT_TIMESTAMP
+ CONSTRAINT [PK_OrderStatusChangedLog] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY];

@@ -256,7 +256,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditStatus(int id, OrderStatusViewModel orderStatus)
+        public async Task<IActionResult> EditStatus(OrderStatusViewModel orderStatus)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var userRole = User.FindFirstValue(ClaimTypes.Role);
@@ -265,7 +265,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 return View("NotFound");
 
             var orders = await ordersService.GetOrdersByUserIdAndRoleAsync(userId, userRole);
-            var order = orders.SingleOrDefault(o => o.Id == id);
+            var order = orders.SingleOrDefault(o => o.Id == orderStatus.OrderId);
             if (order == null)
                 return RedirectToAction("Index", "Orders");
 
@@ -276,10 +276,17 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 return View(orderStatus);
             }
 
-            if (orderStatus.NewStatus.HasValue)
-                await ordersService.UpdateOrderStatus(id, orderStatus.NewStatus.Value);
+            if (orderStatus.CurrentStatus.HasValue && orderStatus.NewStatus.HasValue)
+            {
+                await ordersService.UpdateOrderStatus(
+                    orderStatus.OrderId,
+                    orderStatus.CurrentStatus.Value,
+                    orderStatus.NewStatus.Value,
+                    orderStatus.Comment,
+                    userId);
+            }
 
-            return RedirectToAction(nameof(GetById), new { id });
+            return RedirectToAction(nameof(GetById), new { id = orderStatus.OrderId });
         }
 
         static void SendConfirmationEmail(ShoppingCart myShoppingCart, ShippingAndPaymentViewModel viewModel)

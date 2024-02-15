@@ -15,6 +15,8 @@
             <div class="col-md-8 ml-2">
 
                 <form asp-action="EditStatus">
+                    @Html.HiddenFor(model => model.OrderId)
+                    @Html.HiddenFor(model => model.CurrentStatus)
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                     <div class="row">
@@ -22,7 +24,7 @@
 
                             <div class="form-group">
                                 <label asp-for="CurrentStatus"></label>:
-                                <br/>
+                                <br />
                                 <b>
                                     @Model.CurrentStatus.GetOrderStatusText()
                                 </b>
@@ -30,8 +32,14 @@
 
                             <div class="form-group">
                                 <label asp-for="NewStatus"></label>
-                                <select asp-for="NewStatus" class="form-control" asp-items="@ViewBag.Statuses"><</select>
+                                <select asp-for="NewStatus" class="form-control" asp-items="@ViewBag.Statuses"></select>
                                 <span asp-validation-for="NewStatus" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="Comment"></label>
+                                <textarea asp-for="Comment" rows="15" class="form-control"> </textarea>
+                                <span asp-validation-for="Comment" class="text-danger"></span>
                             </div>
                         </div>
                     </div>

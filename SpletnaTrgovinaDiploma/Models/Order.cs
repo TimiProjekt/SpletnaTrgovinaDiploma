@@ -46,5 +46,7 @@ namespace SpletnaTrgovinaDiploma.Models
         public ApplicationUser User { get; set; }
 
         public List<OrderItem> OrderItems { get; set; }
+
+        public List<OrderStatusChangedLog> StatusChangedLog { get; set; }
     }
 }

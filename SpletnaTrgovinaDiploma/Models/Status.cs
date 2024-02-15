@@ -7,6 +7,6 @@
         Paid, // Plačano
         ReadyForPickupOrSent, //Pripravljeno za prevzem/Poslano
         Finished, // Zaključeno
-        Cancelled // Preklicano
+        Canceled // Preklicano
     }
 }

@@ -13,6 +13,6 @@ namespace SpletnaTrgovinaDiploma.Data.Services
 
         Order GetOrderByIdAndRole(int orderId, string userRole);
 
-        Task UpdateOrderStatus(int orderId, OrderStatus status);
+        Task UpdateOrderStatus(int orderId, OrderStatus oldStatus, OrderStatus newStatus, string comment, string userId);
     }
 }
