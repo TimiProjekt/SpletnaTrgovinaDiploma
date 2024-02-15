@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SpletnaTrgovinaDiploma.Data.Cart;
 using SpletnaTrgovinaDiploma.Data.Services;
@@ -98,23 +97,12 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
         }
 
-        [AllowAnonymous]
-        public async Task<IActionResult> AddItemToShoppingCart(int id)
-        {
-            var item = await itemsService.GetItemByIdAsync(id);
-
-            if (item != null && !shoppingCart.IsItemInCart(item))
-                shoppingCart.AddItemToCart(item);
-
-            return View(item);
-        }
-
-        public async Task<IActionResult> IncreaseItemInShoppingCart(int id)
+        public async Task<IActionResult> IncreaseItemInShoppingCart(int id, int byAmount = 1)
         {
             var item = await itemsService.GetItemByIdAsync(id);
 
             if (item != null)
-                shoppingCart.IncreaseItemInCart(item);
+                shoppingCart.IncreaseItemInCart(item, byAmount);
 
             return RedirectToAction(nameof(ShoppingCart));
         }

@@ -1,4 +1,6 @@
 ﻿@using X.PagedList.Mvc.Core;
+@using System.Linq
+@using NuGet.Versioning
 @model X.PagedList.IPagedList<Item>
 
 <div class="row">
@@ -42,10 +44,15 @@
                                 <i class="bi bi-eye-fill"></i>
                                 Show Details
                             </a>
-                            <a class="btn btn-success text-white m-2" asp-controller="Orders" asp-action="AddItemToShoppingCart" asp-route-id="@item.Id">
-                                <i class="bi bi-cart-plus"></i>
-                                Add to Cart (@item.Price €)
-                            </a>
+
+                            <form asp-controller="Orders" asp-action="IncreaseItemInShoppingCart" asp-route-id="@item.Id">
+                                <input type="text" name="byAmount" class="text-center text-amount" style="width:30px" value="1" />
+
+                                <button type="submit" class="btn btn-success text-white m-2">
+                                    <i class="bi bi-cart-plus"></i>
+                                    Add to Cart (@item.Price €)
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>

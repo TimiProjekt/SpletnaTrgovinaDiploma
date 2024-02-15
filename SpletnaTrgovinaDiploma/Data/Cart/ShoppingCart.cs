@@ -33,7 +33,7 @@ namespace SpletnaTrgovinaDiploma.Data.Cart
             return new ShoppingCart(context) { ShoppingCartId = cartId };
         }
 
-        public void AddItemToCart(Item item)
+        public void IncreaseItemInCart(Item item, int byAmount)
         {
             var shoppingCartItem = context.ShoppingCartItems.FirstOrDefault(n => n.Item.Id == item.Id && n.ShoppingCartId == ShoppingCartId);
 
@@ -43,26 +43,16 @@ namespace SpletnaTrgovinaDiploma.Data.Cart
                 {
                     ShoppingCartId = ShoppingCartId,
                     Item = item,
-                    Amount = 1
+                    Amount = byAmount
                 };
 
                 context.ShoppingCartItems.Add(shoppingCartItem);
             }
             else
             {
-                shoppingCartItem.Amount++;
+                shoppingCartItem.Amount += byAmount;
             }
-            context.SaveChanges();
-        }
 
-        public void IncreaseItemInCart(Item item)
-        {
-            var shoppingCartItem = context.ShoppingCartItems.FirstOrDefault(n => n.Item.Id == item.Id && n.ShoppingCartId == ShoppingCartId);
-
-            if (shoppingCartItem != null)
-            {
-                shoppingCartItem.Amount++;
-            }
             context.SaveChanges();
         }
 

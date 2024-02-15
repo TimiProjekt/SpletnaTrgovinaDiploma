@@ -52,7 +52,7 @@
                                 {
                                     <i disabled class="bi bi-cart-dash text-muted"></i>
                                 }
-
+                                
                                 <input type="text" id="item_@item.Item.Id" class="text-center text-amount" style="width:30px" value="@item.Amount" />
 
                                 <a class="text-success" asp-controller="Orders" asp-action="IncreaseItemInShoppingCart" asp-route-id="@item.Item.Id">
@@ -91,15 +91,11 @@
                     </a>
                 </div>
             </div>
-
         </div>
     }
-
-
 </div>
 
 @section Scripts{
-
     <script type="text/javascript">
         $(function () {
             $(".text-amount").on('change', function () {
@@ -117,50 +113,5 @@
                 });
             });
         });
-    </script>
-
-    <script src="https://www.paypalobjects.com/api/checkout.js"></script>
-
-    <script>
-
-    let _total = @Html.Raw(Model.ShoppingCartTotal.ToString().Replace(",","."));
-
-    paypal.Button.render({
-        //Configure environment
-        env: 'sandbox',
-        client: {
-            sandbox: 'AedPHZGttEHwn3tIFuG408Gbtuh71-WkeoHC4f-BiKlrLTV9KZ8G_qZWXMF2dgFEbx-yQHskJa9zugSA'
-        },
-
-        //Customize button
-        locale: 'en_US',
-        style: {
-            size: 'small',
-            color: 'gold',
-            shape: 'pill'
-        },
-        commit: true,
-
-        //Set up a payment
-        payment: function (data, actions) {
-            return actions.payment.create({
-                transactions: [{
-                    amount: {
-                        total: _total,
-                        currency: 'EUR'
-                    }
-                }]
-            });
-        },
-
-        //Execute the payment
-        onAuthorize: function (data, actions) {
-            return actions.payment.execute().then(function () {
-                var url = '@Url.Action("CompleteOrder", "Orders", new { })';
-                window.location.href = url;
-            });
-        }
-
-    }, '#paypal-btn');
     </script>
 }
