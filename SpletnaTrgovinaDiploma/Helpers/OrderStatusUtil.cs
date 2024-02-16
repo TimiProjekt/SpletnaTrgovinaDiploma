@@ -40,7 +40,7 @@ namespace SpletnaTrgovinaDiploma.Helpers
             return paymentOption switch
             {
                 PaymentOption.CreditCard => orderStatus.GetCreditCardStatuses(),
-                PaymentOption.FundsTransfer => orderStatus.GetFundsTransferStatuses(),
+                PaymentOption.BankTransfer => orderStatus.GetBankTransferStatuses(),
                 PaymentOption.Cash => orderStatus.GetCashStatuses(),
                 _ => throw new NotSupportedException()
             };
@@ -64,7 +64,7 @@ namespace SpletnaTrgovinaDiploma.Helpers
                 yield return OrderStatus.Canceled.GetSelectListItem();
         }
 
-        static IEnumerable<SelectListItem> GetFundsTransferStatuses(this OrderStatus orderStatus)
+        static IEnumerable<SelectListItem> GetBankTransferStatuses(this OrderStatus orderStatus)
         {
             if (orderStatus == OrderStatus.Processing)
                 yield return OrderStatus.WaitingForPayment.GetSelectListItem();

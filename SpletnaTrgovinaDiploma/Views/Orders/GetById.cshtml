@@ -103,7 +103,7 @@
                 @Model.PaymentOption - @(Model.PaymentOption switch
                 {
                 PaymentOption.CreditCard => "Visa/Mastercard online payment",
-                PaymentOption.FundsTransfer => "Funds transfer",
+                PaymentOption.BankTransfer => "Funds transfer",
                 PaymentOption.Cash=> "Payment after arrival",
                 _ => throw new NotSupportedException()
                 })
