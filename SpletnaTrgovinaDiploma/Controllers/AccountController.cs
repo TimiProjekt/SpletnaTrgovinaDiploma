@@ -6,13 +6,10 @@ using SpletnaTrgovinaDiploma.Data.Static;
 using SpletnaTrgovinaDiploma.Data.ViewModels;
 using SpletnaTrgovinaDiploma.Models;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using SpletnaTrgovinaDiploma.Data.Services;
-using SpletnaTrgovinaDiploma.Data.Services.Classes;
 using SpletnaTrgovinaDiploma.Helpers;
 
 namespace SpletnaTrgovinaDiploma.Controllers
@@ -22,7 +19,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly AppDbContext context;
-        private readonly UserHelper userHelper;
+        private readonly SignInHelper signInHelper;
         private readonly ICountryService countryService;
         private readonly IOrdersService ordersService;
         private readonly INewsletterEmailService newsletterEmailService;
@@ -42,7 +39,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             this.ordersService = ordersService;
             this.newsletterEmailService = newsletterEmailService;
 
-            userHelper = new UserHelper(userManager, signInManager);
+            signInHelper = new SignInHelper(userManager, signInManager);
         }
 
         [Authorize(Roles = UserRoles.Admin)]
@@ -66,15 +63,16 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 var filteredResult = users
                     .Where(n => n.FullName.ToUpper().Contains(upperCaseSearchString) || n.EmailAddress.ToUpper().Contains(upperCaseSearchString));
 
-                SetPageDetails("Search result", $"Search result for \"{searchString}\"");
+                ViewData.SetPageDetails("Search result", $"Search result for \"{searchString}\"");
                 return View("Users", filteredResult);
             }
 
-            SetPageDetails("Users", "Search result");
+            ViewData.SetPageDetails("Users", "Search result");
             return View("Users", users);
         }
 
-        public IActionResult Login() => View(new LoginViewModel());
+        public IActionResult Login()
+            => View(new LoginViewModel());
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel loginViewModel)
@@ -82,15 +80,18 @@ namespace SpletnaTrgovinaDiploma.Controllers
             if (!ModelState.IsValid)
                 return View(loginViewModel);
 
-            var loginResult = await userHelper.Login(loginViewModel);
-            if (loginResult.Succeeded)
-                return RedirectToAction("Index", "Items");
+            var loginResult = await signInHelper.Login(loginViewModel);
+            if (!loginResult.Succeeded)
+            {
+                TempData.SetError("Wrong credentials. Please, try again!");
+                return View(loginViewModel);
+            }
 
-            TempData["Error"] = "Wrong credentials. Please, try again!";
-            return View(loginViewModel);
+            return RedirectToAction("Index", "Items");
         }
 
-        public IActionResult ForgotPassword() => View(new ResetPasswordViewModel());
+        public IActionResult ForgotPassword()
+            => View(new ResetPasswordViewModel());
 
         [HttpPost]
         public async Task<IActionResult> ForgotPassword(ResetPasswordViewModel resetPasswordViewModel)
@@ -98,32 +99,22 @@ namespace SpletnaTrgovinaDiploma.Controllers
             var email = resetPasswordViewModel.EmailAddress;
             if (string.IsNullOrEmpty(email))
             {
-                TempData["Error"] = "Email address should not be empty.";
+                TempData.SetError("Email address should not be empty.");
                 return View(resetPasswordViewModel);
             }
 
-            var user = await userManager.FindByNameAsync(email);
-            if (user == null)
+            var appUser = await userManager.FindByNameAsync(email);
+            if (appUser == null)
             {
-                TempData["Error"] = "Email does not exist.";
+                TempData.SetError("Email address does not exist.");
                 return View(resetPasswordViewModel);
             }
 
-            var token = await userManager.GeneratePasswordResetTokenAsync(user);
-            var callbackUrl = $"{ConfigurationService.PublishedUrl}/Account/ResetPassword?email={email}&token={HttpUtility.UrlEncode(token)}";
-
-            EmailProvider.SendEmail(
-                email,
-                "Reset password link",
-                $"Dear {user.FullName}, <br />" +
-                "You requested to reset your password." +
-                $"If you requested this then follow this <a href=\"{callbackUrl}\"> link </a> to reset your password." +
-                "If you did not request this, then we suggest that you immediately change your password."
-            );
+            await appUser.SendForgotPasswordEmail(email, userManager);
 
             return View(
                 "Success",
-                new EmailViewModel(
+                new SuccessViewModel(
                     $"An e-mail has been sent to {email}.",
                     "Please follow the link in the e-mail to reset your password."));
         }
@@ -133,9 +124,8 @@ namespace SpletnaTrgovinaDiploma.Controllers
             if (email == null || token == null)
                 return View("NotFound");
 
-            var user = await userManager.FindByNameAsync(email);
-
-            if (user == null)
+            var appUser = await userManager.FindByNameAsync(email);
+            if (appUser == null)
                 return View("NotFound");
 
             var registerViewModel = new ResetPasswordViewModel
@@ -152,201 +142,167 @@ namespace SpletnaTrgovinaDiploma.Controllers
         {
             if (resetPasswordViewModel.Password != resetPasswordViewModel.ConfirmPassword)
             {
-                TempData["Error"] = "Passwords do not match!";
+                TempData.SetError("Passwords do not match!");
                 return View(resetPasswordViewModel);
             }
 
-            var user = await userManager.FindByNameAsync(resetPasswordViewModel.EmailAddress);
-
-            if (user == null)
+            var appUser = await userManager.FindByNameAsync(resetPasswordViewModel.EmailAddress);
+            if (appUser == null)
             {
-                TempData["Error"] = "Internal error, please try again. If it persists, contact your administrator.";
+                TempData.SetError("Internal error, please try again. If it persists, contact your administrator.");
                 return View(resetPasswordViewModel);
             }
 
-            var result = await userManager.ResetPasswordAsync(user, resetPasswordViewModel.Token, resetPasswordViewModel.Password);
-
+            var result = await userManager.ResetPasswordAsync(appUser, resetPasswordViewModel.Token, resetPasswordViewModel.Password);
             if (!result.Succeeded)
             {
-                TempData["Error"] = "Error: " + result.Errors.First().Description;
+                TempData.SetError($"Error: {result.Errors.First().Description}");
                 return View(resetPasswordViewModel);
             }
 
             return View(
                 "Success",
-                new EmailViewModel(
+                new SuccessViewModel(
                     "Password reset success.",
                     "You can now login."));
         }
 
-        public IActionResult Register() => View(new RegisterViewModel());
+        public IActionResult Register()
+            => View(new RegisterViewModel());
 
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
         {
-            void SendConfirmationEmail()
-            {
-                var messageHtml = $"Hello {registerViewModel.FullName}! <br/>";
-                messageHtml += "You have successfully registered at Gaming svet <br/> ";
-                messageHtml += $"You can now <a href='{ConfigurationService.PublishedUrl}'> login! </a>";
-
-                EmailProvider.SendEmail(
-                    registerViewModel.EmailAddress,
-                    "Your registration is completed",
-                    messageHtml);
-            }
-
             if (!ModelState.IsValid)
                 return View(registerViewModel);
 
-            var registerResult = await userHelper.Register(registerViewModel);
+            var registerResult = await signInHelper.Register(registerViewModel);
             if (!registerResult.Succeeded)
             {
                 var error = registerResult.Errors.FirstOrDefault();
                 var errorMessage = error?.Description ?? "Unknown error.";
 
-                TempData["Error"] = errorMessage;
+                TempData.SetError(errorMessage);
                 return View(registerViewModel);
             }
 
-            SendConfirmationEmail();
-
+            registerViewModel.SendRegisterConfirmationEmail();
             return View("RegisterCompleted");
         }
 
         [HttpPost]
         public async Task<IActionResult> SubscribeToNewsletter(string email)
         {
-            void SendConfirmationEmail()
-            {
-                var messageHtml = $"Hello {email}! <br/>";
-                messageHtml += "You have successfully subscribed to our newsletter at Gaming svet <br/> ";
-
-                EmailProvider.SendEmail(
-                    email,
-                    "Your newsletter subscription",
-                    messageHtml);
-            }
-            
             var emailValidationSuccess = EmailProvider.IsValidEmail(email);
             if (!emailValidationSuccess)
-                return View("Failure", new EmailViewModel("Entered e-mail is invalid.", ""));
+                return View("Failure", new SuccessViewModel("Entered e-mail is invalid.", ""));
 
             var result = await newsletterEmailService.AddToMailingList(email);
             if (!result)
-                return View("Failure", new EmailViewModel("Email already subscribed to newsletter.", ""));
+                return View("Failure", new SuccessViewModel("Email already subscribed to newsletter.", ""));
 
-            SendConfirmationEmail();
-            return View("Success", new EmailViewModel("Successfully registered for the newsletter.", ""));
+            EmailSenderUtil.SendNewsletterSubscriptionConfirmationEmail(email);
+            return View("Success", new SuccessViewModel("Successfully registered for the newsletter.", ""));
         }
 
         public async Task<IActionResult> UnsubscribeFromNewsletter(string email)
         {
-            void SendConfirmationEmail()
-            {
-                var messageHtml = $"Hello {email}! <br/>";
-                messageHtml += "You have successfully unsubscribed from our newsletter at Gaming svet <br/> ";
-
-                EmailProvider.SendEmail(
-                    email,
-                    "Your newsletter subscription",
-                    messageHtml);
-            }
-
             var emailValidationSuccess = EmailProvider.IsValidEmail(email);
             if (!emailValidationSuccess)
-                return View("Failure", new EmailViewModel("Entered e-mail is invalid.", ""));
+                return View("Failure", new SuccessViewModel("Entered e-mail is invalid.", ""));
 
             var result = await newsletterEmailService.RemoveFromMailingList(email);
             if (!result)
-                return View("Failure", new EmailViewModel("Email not subscribed to our newsletter.", ""));
+                return View("Failure", new SuccessViewModel("Email not subscribed to our newsletter.", ""));
 
-            SendConfirmationEmail();
-            return View("Success", new EmailViewModel("Successfully unsubscribed from the newsletter.", ""));
+            EmailSenderUtil.SendNewsletterUnsubscribeConfirmationEmail(email);
+            return View("Success", new SuccessViewModel("Successfully unsubscribed from the newsletter.", ""));
         }
 
         [Authorize(Roles = UserRoles.Admin)]
-        public IActionResult SubscriberEmail() => View(new EmailViewModel("", ""));
+        public IActionResult SubscriberEmail()
+            => View(new SuccessViewModel("", ""));
 
         [HttpPost]
         [Authorize(Roles = UserRoles.Admin)]
-        public IActionResult SubscriberEmail(EmailViewModel emailViewModel)
+        public IActionResult SubscriberEmail(SuccessViewModel successViewModel)
         {
             var allEmailAddresses = newsletterEmailService.GetAllEmailAddressesFromMailingList();
+            var lastFiveEmailAddresses = allEmailAddresses.TakeLast(5).ToList();
 
-            var emailSent = 0;
-            foreach (var newsletterEmail in allEmailAddresses.TakeLast(5))
+            foreach (var newsletterEmail in lastFiveEmailAddresses)
             {
                 EmailProvider.SendEmail(
                     newsletterEmail.Email,
-                    emailViewModel.Header,
-                    emailViewModel.Body);
-                emailSent++;
+                    successViewModel.Header,
+                    successViewModel.Body);
             }
 
-            return View("Success", new EmailViewModel($"Emails successfully sent to all {emailSent} subscribers.", ""));
+            return View("Success", new SuccessViewModel($"Emails successfully sent to all {lastFiveEmailAddresses.Count} subscribers.", ""));
         }
 
         [Authorize]
         public IActionResult Settings()
         {
-            var emailAddress = userManager.GetUserName(User);
-            var user = userManager.FindByNameAsync(emailAddress).Result;
-
-            if (user != null)
+            var appUser = User.GetApplicationUser(userManager);
+            if (appUser == null)
             {
-                var settingsViewModel = new UserInfoViewModel
-                {
-                    EmailAddress = emailAddress,
-                    FullName = user.FullName,
-                    PhoneNumber = user.PhoneNumber,
-                    StreetName = user.StreetName,
-                    HouseNumber = user.HouseNumber,
-                    City = user.City,
-                    ZipCode = user.ZipCode,
-                    CountryId = user.CountryId
-                };
-
-                LoadCountriesDropdownData();
-                return View(settingsViewModel);
+                TempData.SetError("Cannot fetch settings or email.");
+                return View(new UserInfoViewModel());
             }
 
-            TempData["Error"] = "Cannot fetch settings or email.";
+            var settingsViewModel = new UserInfoViewModel
+            {
+                EmailAddress = appUser.EmailAddress,
+                FullName = appUser.FullName,
+                PhoneNumber = appUser.PhoneNumber,
+                StreetName = appUser.StreetName,
+                HouseNumber = appUser.HouseNumber,
+                City = appUser.City,
+                ZipCode = appUser.ZipCode,
+                CountryId = appUser.CountryId
+            };
 
-            return View(new UserInfoViewModel());
+            DropdownUtil.LoadCountriesDropdownData(countryService, ViewBag);
+            return View(settingsViewModel);
         }
 
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> Settings(UserInfoViewModel userInfoViewModel)
         {
-            LoadCountriesDropdownData();
             if (!ModelState.IsValid)
                 return View(userInfoViewModel);
 
-            if (userInfoViewModel.EmailAddress != null)
+            if (userInfoViewModel.EmailAddress == null)
             {
-                var user = await userManager.FindByNameAsync(userInfoViewModel.EmailAddress);
-                user.FullName = userInfoViewModel.FullName;
-                user.PhoneNumber = userInfoViewModel.PhoneNumber;
-                user.DeliveryPhoneNumber = userInfoViewModel.PhoneNumber;
-                user.StreetName = userInfoViewModel.StreetName;
-                user.HouseNumber = userInfoViewModel.HouseNumber;
-                user.City = userInfoViewModel.City;
-                user.ZipCode = userInfoViewModel.ZipCode;
-                user.Country = context.Countries.Single(c => c.Id == userInfoViewModel.CountryId);
-
-                var updateUserResponse = await userManager.UpdateAsync(user);
-                if (!updateUserResponse.Succeeded)
-                {
-                    ModelState.AddModelError("", updateUserResponse.Errors.First().Description);
-                    return View();
-                }
-
+                TempData.SetError("Cannot fetch settings or email");
                 return View();
             }
 
-            TempData["Error"] = "Cannot fetch settings or email";
+            var appUser = userManager.GetApplicationUserFromEmail(userInfoViewModel.EmailAddress);
+            if (appUser == null)
+            {
+                TempData.SetError("Cannot fetch settings or email");
+                return View();
+            }
+
+            appUser.FullName = userInfoViewModel.FullName;
+            appUser.PhoneNumber = userInfoViewModel.PhoneNumber;
+            appUser.DeliveryPhoneNumber = userInfoViewModel.PhoneNumber;
+            appUser.StreetName = userInfoViewModel.StreetName;
+            appUser.HouseNumber = userInfoViewModel.HouseNumber;
+            appUser.City = userInfoViewModel.City;
+            appUser.ZipCode = userInfoViewModel.ZipCode;
+            appUser.Country = context.Countries.Single(c => c.Id == userInfoViewModel.CountryId);
+
+            var updateUserResponse = await userManager.UpdateAsync(appUser);
+            if (!updateUserResponse.Succeeded)
+            {
+                ModelState.AddModelError("", updateUserResponse.Errors.First().Description);
+                return View();
+            }
+
             return View();
         }
 
@@ -358,70 +314,36 @@ namespace SpletnaTrgovinaDiploma.Controllers
         }
 
         public IActionResult AccessDenied()
-        {
-            return View();
-        }
-
-        void LoadCountriesDropdownData()
-        {
-            var defaultEmptyValue = new Country { Id = 0, Name = "-- Select a country --" };
-            var itemDropdownsData = countryService.GetDropdownValuesAsync().Result;
-            itemDropdownsData.Countries.Insert(0, defaultEmptyValue);
-            ViewBag.Countries = new SelectList(itemDropdownsData.Countries, "Id", "Name");
-        }
-
-        UserInfoViewModel CreateInfoViewModel(IDeliveryInfo deliveryInfo)
-        {
-            return new UserInfoViewModel
-            {
-                FullName = deliveryInfo.FullName,
-                EmailAddress = deliveryInfo.DeliveryEmailAddress,
-                PhoneNumber = deliveryInfo.DeliveryPhoneNumber,
-                StreetName = deliveryInfo.StreetName,
-                HouseNumber = deliveryInfo.HouseNumber,
-                City = deliveryInfo.City,
-                ZipCode = deliveryInfo.ZipCode,
-                CountryId = deliveryInfo.CountryId
-            };
-        }
+            => View();
 
         [Authorize(Roles = UserRoles.Admin)]
         public IActionResult GetUserInfo(string userId)
         {
-            LoadCountriesDropdownData();
-
-            var user = userManager.FindByIdAsync(userId).Result;
-            if (user == null)
+            IDeliveryInfo deliveryInfo = userManager.FindByIdAsync(userId).Result;
+            if (deliveryInfo == null)
             {
-                TempData["Error"] = "Cannot fetch user info";
+                TempData.SetError("Cannot fetch user information.");
                 return View(new UserInfoViewModel());
             }
 
-            var userInfoViewModel = CreateInfoViewModel(user);
+            var userInfoViewModel = deliveryInfo.CreateInfoViewModel();
+            DropdownUtil.LoadCountriesDropdownData(countryService, ViewBag);
             return View(userInfoViewModel);
         }
 
         [Authorize(Roles = UserRoles.Admin)]
         public IActionResult GetUnregisteredUserInfo(int orderId)
         {
-            LoadCountriesDropdownData();
-            var userRole = User.FindFirstValue(ClaimTypes.Role);
-
-            var order = ordersService.GetOrderByIdAndRole(orderId, userRole);
-            if (order == null)
+            IDeliveryInfo deliveryInfo = ordersService.GetOrderByIdAndRole(orderId, User);
+            if (deliveryInfo == null)
             {
-                TempData["Error"] = "Cannot fetch user info";
+                TempData.SetError("Cannot fetch user information.");
                 return View(new UserInfoViewModel());
             }
 
-            var userInfoViewModel = CreateInfoViewModel(order);
+            var userInfoViewModel = deliveryInfo.CreateInfoViewModel();
+            DropdownUtil.LoadCountriesDropdownData(countryService, ViewBag);
             return View(userInfoViewModel);
-        }
-
-        void SetPageDetails(string title, string description)
-        {
-            ViewData["Title"] = title;
-            ViewData["Description"] = description;
         }
     }
 }

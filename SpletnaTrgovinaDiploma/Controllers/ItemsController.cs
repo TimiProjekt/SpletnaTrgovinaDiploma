@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using SpletnaTrgovinaDiploma.Data.Services;
 using SpletnaTrgovinaDiploma.Data.Static;
 using SpletnaTrgovinaDiploma.Models;
@@ -33,6 +32,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         {
             var allItems = itemsService.GetAll(n => n.BrandsItems);
             var filteredItems = allItems.Where(item => item.BrandsItems.Any(bi => bi.BrandId == id));
+
             return View(filteredItems);
         }
 
@@ -40,24 +40,22 @@ namespace SpletnaTrgovinaDiploma.Controllers
         public IActionResult Index(string currentFilter, string searchString, int page = 1)
         {
             if (!string.IsNullOrEmpty(searchString))
-                SetPageDetails("Search result", $"Search result for \"{searchString}\"");
+                ViewData.SetPageDetails("Search result", $"Search result for \"{searchString}\"");
             else
-                SetPageDetails("Home page", "Home page of Gaming svet");
+                ViewData.SetPageDetails("Home page", "Home page of Gaming svet");
 
             var filteredItems = GetFilteredItems(currentFilter, searchString, page);
-
             return View(filteredItems);
         }
 
         public IActionResult EditIndex(string currentFilter, string searchString, int page = 1)
         {
             if (!string.IsNullOrEmpty(searchString))
-                SetPageDetails("Search result", $"Search result for \"{searchString}\"");
+                ViewData.SetPageDetails("Search result", $"Search result for \"{searchString}\"");
             else
-                SetPageDetails("All items", "Search result");
+                ViewData.SetPageDetails("All items", "Search result");
 
             var filteredItems = GetFilteredItems(currentFilter, searchString, page);
-
             return View(filteredItems);
         }
 
@@ -82,15 +80,14 @@ namespace SpletnaTrgovinaDiploma.Controllers
                                     || i.ShortDescription.Contains(searchString)
                                     || i.ProductCode.Contains(searchString));
 
-                SetPageDetails("Search result", $"Search result for \"{searchString}\"");
+                ViewData.SetPageDetails("Search result", $"Search result for \"{searchString}\"");
                 return filteredItems.ToPagedList(page, itemsPerPage);
             }
 
-            SetPageDetails("Home page", "Home page of Gaming svet");
+            ViewData.SetPageDetails("Home page", "Home page of Gaming svet");
             return allItems.ToPagedList(page, itemsPerPage);
         }
 
-        //GET: Items/Details/1(ItemId)
         [AllowAnonymous]
         public async Task<IActionResult> Details(int id)
         {
@@ -102,12 +99,9 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return View(itemDetail);
         }
 
-        //GET: Movies/Create
         public async Task<IActionResult> Create()
         {
-            var itemDropdownsData = await brandService.GetDropdownValuesAsync();
-
-            ViewBag.Brands = new SelectList(itemDropdownsData.Brands, "Id", "Name");
+            await DropdownUtil.LoadBrandsDropdownData(brandService, ViewBag);
 
             return View();
         }
@@ -117,9 +111,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var itemDropdownsData = await brandService.GetDropdownValuesAsync();
-
-                ViewBag.Brands = new SelectList(itemDropdownsData.Brands, "Id", "Name");
+                await DropdownUtil.LoadBrandsDropdownData(brandService, ViewBag);
 
                 return View(item);
             }
@@ -148,9 +140,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 Availability = itemDetails.Availability
             };
 
-            var itemDropdownsData = await brandService.GetDropdownValuesAsync();
-            ViewBag.Brands = new SelectList(itemDropdownsData.Brands, "Id", "Name");
-
+            await DropdownUtil.LoadBrandsDropdownData(brandService, ViewBag);
             return View(response);
         }
 
@@ -162,9 +152,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
             if (!ModelState.IsValid)
             {
-                var itemDropdownsData = await brandService.GetDropdownValuesAsync();
-
-                ViewBag.Brands = new SelectList(itemDropdownsData.Brands, "Id", "Name");
+                await DropdownUtil.LoadBrandsDropdownData(brandService, ViewBag);
 
                 return View(item);
             }
@@ -173,13 +161,6 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return RedirectToAction(nameof(Details), new { id });
         }
 
-        void SetPageDetails(string title, string description)
-        {
-            ViewData["Title"] = title;
-            ViewData["Description"] = description;
-        }
-
-        //Get: Items/Delete/1
         public async Task<IActionResult> Delete(int id)
         {
             var itemDetails = await itemsService.GetByIdAsync(id);
@@ -202,7 +183,8 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return RedirectToAction(nameof(EditIndex));
         }
 
-        public IActionResult Import() => View(new ImportXmlModel());
+        public IActionResult Import()
+            => View(new ImportXmlModel());
 
         [HttpPost]
         public async Task<IActionResult> Import(ImportXmlModel importXmlModel)
@@ -222,7 +204,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             var amountOfItems = await xmlImportUtil.TryImportItemDetails(doc, importXmlModel.IsUpdateExisting);
             amountOfItems += await xmlImportUtil.TryImportAvailability(doc, importXmlModel.IsUpdateExisting);
 
-            return View("Success", new EmailViewModel($"Successfully {(importXmlModel.IsUpdateExisting ? "updated" : "imported")} {amountOfItems} items.", ""));
+            return View("Success", new SuccessViewModel($"Successfully {(importXmlModel.IsUpdateExisting ? "updated" : "imported")} {amountOfItems} items.", ""));
         }
     }
 }

@@ -27,8 +27,8 @@ namespace SpletnaTrgovinaDiploma.Data.Cart
             var session = services.GetRequiredService<IHttpContextAccessor>()?.HttpContext?.Session;
             var context = services.GetService<AppDbContext>();
 
-            var cartId = session.GetString("CartId") ?? Guid.NewGuid().ToString();
-            session.SetString("CartId", cartId);
+            var cartId = session?.GetString("CartId") ?? Guid.NewGuid().ToString();
+            session?.SetString("CartId", cartId);
 
             return new ShoppingCart(context) { ShoppingCartId = cartId };
         }
@@ -91,24 +91,29 @@ namespace SpletnaTrgovinaDiploma.Data.Cart
             context.SaveChanges();
         }
 
-        public List<ShoppingCartItem> GetShoppingCartItems()
+        public ShoppingCart GetShoppingCartWithItems()
         {
-            return ShoppingCartItems ?? (ShoppingCartItems = context.ShoppingCartItems.Where(n => n.ShoppingCartId == ShoppingCartId).Include(n => n.Item).ToList());
+            GetShoppingCartItems();
+
+            return this;
         }
 
-        public decimal GetShoppingCartTotal() => context.ShoppingCartItems.Where(n => n.ShoppingCartId == ShoppingCartId).Select(n => n.Item.Price * n.Amount).Sum();
+        public List<ShoppingCartItem> GetShoppingCartItems() 
+            => ShoppingCartItems ??= context.ShoppingCartItems
+                .Where(n => n.ShoppingCartId == ShoppingCartId)
+                .Include(n => n.Item).ToList();
+
+        public decimal GetShoppingCartTotal() 
+            => context.ShoppingCartItems
+                .Where(n => n.ShoppingCartId == ShoppingCartId)
+                .Select(n => n.Item.Price * n.Amount)
+                .Sum();
 
         public async Task ClearShoppingCartAsync()
         {
             var items = await context.ShoppingCartItems.Where(n => n.ShoppingCartId == ShoppingCartId).ToListAsync();
             context.ShoppingCartItems.RemoveRange(items);
             await context.SaveChangesAsync();
-        }
-
-        public bool IsItemInCart(Item item)
-        {
-            var shoppingCartItem = context.ShoppingCartItems.FirstOrDefault(n => n.Item.Id == item.Id && n.ShoppingCartId == ShoppingCartId);
-            return shoppingCartItem != null;
         }
     }
 }

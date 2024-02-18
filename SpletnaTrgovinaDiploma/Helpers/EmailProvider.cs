@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
 using SpletnaTrgovinaDiploma.Data.Services.Classes;
 
-namespace SpletnaTrgovinaDiploma.Data.Services
+namespace SpletnaTrgovinaDiploma.Helpers
 {
     public static class EmailProvider
     {

@@ -3,11 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using SpletnaTrgovinaDiploma.Data.Cart;
 using SpletnaTrgovinaDiploma.Data.Services;
 using SpletnaTrgovinaDiploma.Data.ViewModels;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using SpletnaTrgovinaDiploma.Models;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using SpletnaTrgovinaDiploma.Helpers;
 
 namespace SpletnaTrgovinaDiploma.Controllers
@@ -18,67 +16,53 @@ namespace SpletnaTrgovinaDiploma.Controllers
         private readonly IItemsService itemsService;
         private readonly IOrdersService ordersService;
         private readonly ShoppingCart shoppingCart;
-        private readonly UserManager<ApplicationUser> userManager;
-        private readonly UserHelper userHelper;
+        private readonly SignInHelper signInHelper;
 
-        public OrdersController(ICountryService countryService, IItemsService itemsService, IOrdersService ordersService, ShoppingCart shoppingCart, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public OrdersController(
+            ICountryService countryService,
+            IItemsService itemsService,
+            IOrdersService ordersService,
+            ShoppingCart shoppingCart,
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager)
         {
             this.countryService = countryService;
             this.itemsService = itemsService;
             this.ordersService = ordersService;
             this.shoppingCart = shoppingCart;
-            this.userManager = userManager;
 
-            userHelper = new UserHelper(userManager, signInManager);
+            signInHelper = new SignInHelper(userManager, signInManager);
         }
 
         public async Task<IActionResult> Index()
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var userRole = User.FindFirstValue(ClaimTypes.Role);
-
-            var orders = await ordersService.GetOrdersByUserIdAndRoleAsync(userId, userRole);
-            SetPageDetails("Orders", "Orders");
-            return View(orders);
-        }
+            => await Filter(null);
 
         public async Task<IActionResult> Filter(string searchString)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var userRole = User.FindFirstValue(ClaimTypes.Role);
-            var allOrders = await ordersService.GetOrdersByUserIdAndRoleAsync(userId, userRole);
+            var allOrders = await ordersService.GetOrdersByUserAsync(User);
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                bool ContainsCaseInsensitiveString(string source, string contains) => source?.ToUpper().Contains(contains.ToUpper()) ?? false;
+                static bool ContainsCaseInsensitiveString(string source, string contains)
+                    => source?.ToUpper().Contains(contains.ToUpper()) ?? false;
 
                 var filteredOrders = allOrders.Where(n => ContainsCaseInsensitiveString(n.Id.ToString(), searchString) || ContainsCaseInsensitiveString(n.DeliveryEmailAddress, searchString));
 
-                SetPageDetails("Search result", $"Search result for \"{searchString}\"");
+                ViewData.SetPageDetails("Search result", $"Search result for \"{searchString}\"");
                 return View("Index", filteredOrders);
             }
 
-            SetPageDetails("Orders", "Orders");
+            ViewData.SetPageDetails("Orders", "Orders");
             return View("Index", allOrders);
         }
 
-        void SetPageDetails(string title, string description)
+        public IActionResult GetById(int id)
         {
-            ViewData["Title"] = title;
-            ViewData["Description"] = description;
-        }
-
-        public async Task<IActionResult> GetById(int id)
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var userRole = User.FindFirstValue(ClaimTypes.Role);
-
-            var orders = await ordersService.GetOrdersByUserIdAndRoleAsync(userId, userRole);
-            var order = orders.SingleOrDefault(o => o.Id == id);
+            var order = ordersService.GetOrderByIdAndRole(id, User);
             if (order == null)
                 return RedirectToAction("Index", "Items");
 
-            LoadCountriesDropdownData();
+            DropdownUtil.LoadCountriesDropdownData(countryService, ViewBag);
             return View(order);
         }
 
@@ -94,13 +78,11 @@ namespace SpletnaTrgovinaDiploma.Controllers
             };
 
             return View(response);
-
         }
 
         public async Task<IActionResult> IncreaseItemInShoppingCart(int id, int byAmount = 1)
         {
             var item = await itemsService.GetItemByIdAsync(id);
-
             if (item != null)
                 shoppingCart.IncreaseItemInCart(item, byAmount);
 
@@ -137,110 +119,91 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
         public IActionResult DeliveryInfo()
         {
-            var emailAddress = userManager.GetUserName(User);
-            if (emailAddress != null)
-            {
-                var user = userManager.FindByNameAsync(emailAddress).Result;
-
-                if (user != null)
-                    return RedirectToAction(nameof(ShippingAndPayment));
-            }
+            if (User.IsLoggedIn())
+                return RedirectToAction(nameof(ShippingAndPayment));
 
             var loginViewModel = new LoginViewModel();
-
-            LoadCountriesDropdownData();
-
+            DropdownUtil.LoadCountriesDropdownData(countryService, ViewBag);
             return View(loginViewModel);
         }
 
         [HttpPost]
         public async Task<IActionResult> DeliveryInfo(LoginViewModel loginViewModel)
         {
-            LoadCountriesDropdownData();
             if (!ModelState.IsValid)
+            {
+                DropdownUtil.LoadCountriesDropdownData(countryService, ViewBag);
                 return View(loginViewModel);
+            }
 
-            var loginResult = await userHelper.Login(loginViewModel);
+            var loginResult = await signInHelper.Login(loginViewModel);
             if (loginResult.Succeeded)
                 return RedirectToAction(nameof(ShippingAndPayment));
 
-            TempData["Error"] = "Wrong credentials. Please, try again!";
+            TempData.SetError("Wrong credentials. Please, try again!");
             return View(loginViewModel);
-        }
-
-        ShoppingCart GetShoppingCartWithItems()
-        {
-            var items = shoppingCart.GetShoppingCartItems();
-            shoppingCart.ShoppingCartItems = items;
-
-            return shoppingCart;
         }
 
         public IActionResult ShippingAndPayment()
         {
-            LoadCountriesDropdownData();
-            var myShoppingCart = GetShoppingCartWithItems();
-
-            var user = userHelper.GetApplicationUser(User);
+            var appUser = signInHelper.GetApplicationUser(User);
+            var myShoppingCart = shoppingCart.GetShoppingCartWithItems();
             var shoppingCartTotal = myShoppingCart.GetShoppingCartTotal();
+
             var response = new ShippingAndPaymentViewModel()
             {
                 ShoppingCart = myShoppingCart,
                 ShoppingCartTotal = shoppingCartTotal,
                 ShoppingCartTotalWithoutVat = shoppingCartTotal * 100 / 122,
-                EmailAddress = !string.IsNullOrEmpty(user?.DeliveryEmailAddress)
-                    ? user.DeliveryEmailAddress
-                    : user?.Email ?? "",
-                FullName = user?.FullName ?? "",
-                PhoneNumber = user?.PhoneNumber ?? "",
-                StreetName = user?.StreetName ?? "",
-                HouseNumber = user?.HouseNumber ?? "",
-                City = user?.City ?? "",
-                ZipCode = user?.ZipCode ?? "",
-                CountryId = user?.CountryId ?? 1
+                EmailAddress = !string.IsNullOrEmpty(appUser?.DeliveryEmailAddress)
+                    ? appUser.DeliveryEmailAddress
+                    : appUser?.Email ?? "",
+                FullName = appUser?.FullName ?? "",
+                PhoneNumber = appUser?.PhoneNumber ?? "",
+                StreetName = appUser?.StreetName ?? "",
+                HouseNumber = appUser?.HouseNumber ?? "",
+                City = appUser?.City ?? "",
+                ZipCode = appUser?.ZipCode ?? "",
+                CountryId = appUser?.CountryId ?? 1
             };
 
+            DropdownUtil.LoadCountriesDropdownData(countryService, ViewBag);
             return View(response);
         }
 
         [HttpPost]
         public async Task<IActionResult> ShippingAndPayment(ShippingAndPaymentViewModel shippingAndPaymentViewModel)
         {
-            LoadCountriesDropdownData();
-            var myShoppingCart = GetShoppingCartWithItems();
+            if (!ModelState.IsValid)
+            {
+                DropdownUtil.LoadCountriesDropdownData(countryService, ViewBag);
+                return View(shippingAndPaymentViewModel);
+            }
+
+            var myShoppingCart = shoppingCart.GetShoppingCartWithItems();
             shippingAndPaymentViewModel.ShoppingCart = myShoppingCart;
             shippingAndPaymentViewModel.ShoppingCartTotal = myShoppingCart.GetShoppingCartTotal();
 
-            if (!ModelState.IsValid)
-                return View(shippingAndPaymentViewModel);
+            await ordersService.StoreOrderAsync(shippingAndPaymentViewModel, myShoppingCart.ShoppingCartItems, User);
 
-            var items = myShoppingCart.GetShoppingCartItems();
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            await ordersService.StoreOrderAsync(shippingAndPaymentViewModel, items, userId);
-
-            SendConfirmationEmail(myShoppingCart, shippingAndPaymentViewModel);
+            shippingAndPaymentViewModel.SendOrderConfirmationEmail(myShoppingCart);
 
             await myShoppingCart.ClearShoppingCartAsync();
 
             return View(
                 "Success",
-                new EmailViewModel(
+                new SuccessViewModel(
                     "Order completed successfully.",
                     "You can check all your orders in the Orders section of your profile.",
                     "Thank you!"));
         }
 
-        public async Task<IActionResult> EditStatus(int id)
+        public IActionResult EditStatus(int id)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var userRole = User.FindFirstValue(ClaimTypes.Role);
-
-            if (userRole != "Admin")
+            if (!User.IsUserAdmin())
                 return View("NotFound");
 
-            var orders = await ordersService.GetOrdersByUserIdAndRoleAsync(userId, userRole);
-            var order = orders.SingleOrDefault(o => o.Id == id);
+            var order = ordersService.GetOrderByIdAndRole(id, User);
             if (order == null)
                 return RedirectToAction("Index", "Orders");
 
@@ -250,29 +213,23 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 CurrentStatus = order.Status
             };
 
-            ViewBag.Statuses = order.Status.GetDropdownValues(order.PaymentOption);
-
+            DropdownUtil.LoadStatusDropdownData(order, ViewBag);
             return View(orderStatus);
         }
 
         [HttpPost]
         public async Task<IActionResult> EditStatus(OrderStatusViewModel orderStatus)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var userRole = User.FindFirstValue(ClaimTypes.Role);
-
-            if (userRole != "Admin")
+            if (!User.IsUserAdmin())
                 return View("NotFound");
 
-            var orders = await ordersService.GetOrdersByUserIdAndRoleAsync(userId, userRole);
-            var order = orders.SingleOrDefault(o => o.Id == orderStatus.OrderId);
+            var order = ordersService.GetOrderByIdAndRole(orderStatus.OrderId, User);
             if (order == null)
                 return RedirectToAction("Index", "Orders");
 
             if (!ModelState.IsValid)
             {
-                ViewBag.Statuses = order.Status.GetDropdownValues(order.PaymentOption);
-
+                DropdownUtil.LoadStatusDropdownData(order, ViewBag);
                 return View(orderStatus);
             }
 
@@ -283,38 +240,10 @@ namespace SpletnaTrgovinaDiploma.Controllers
                     orderStatus.CurrentStatus.Value,
                     orderStatus.NewStatus.Value,
                     orderStatus.Comment,
-                    userId);
+                    User);
             }
 
             return RedirectToAction(nameof(GetById), new { id = orderStatus.OrderId });
-        }
-
-        static void SendConfirmationEmail(ShoppingCart myShoppingCart, ShippingAndPaymentViewModel viewModel)
-        {
-            var messageHtml = $"Hello {viewModel.FullName}! <br/>";
-            messageHtml += "The order which includes the following items: <br/> <ul>";
-
-            foreach (var item in myShoppingCart.ShoppingCartItems)
-                messageHtml += $"<li> {item.Item.Name} {item.Item.Price} € x ({item.Amount} kom) = {item.Item.Price * item.Amount} € </li>";
-
-            messageHtml += "</ul> has been completed and will be shipped out shortly. <br/>";
-            messageHtml += $"Total price: {myShoppingCart.GetShoppingCartTotal()} € <br/>";
-            messageHtml += $"Delivery method: {viewModel.ShippingOption}  <br/>";
-            messageHtml += $"Delivery address: {viewModel.GetFullAddress}  <br/>";
-            messageHtml += $"Payment method: {viewModel.PaymentOption}  <br/>";
-
-            EmailProvider.SendEmail(
-                viewModel.EmailAddress,
-                "Your order is completed.",
-                messageHtml);
-        }
-
-        void LoadCountriesDropdownData()
-        {
-            var defaultEmptyValue = new Country { Id = 0, Name = "-- Select a country --" };
-            var itemDropdownsData = countryService.GetDropdownValuesAsync().Result;
-            itemDropdownsData.Countries.Insert(0, defaultEmptyValue);
-            ViewBag.Countries = new SelectList(itemDropdownsData.Countries, "Id", "Name");
         }
     }
 }

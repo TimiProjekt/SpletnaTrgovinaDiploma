@@ -2,8 +2,10 @@
 using SpletnaTrgovinaDiploma.Models;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using SpletnaTrgovinaDiploma.Data.ViewModels;
+using SpletnaTrgovinaDiploma.Helpers;
 
 namespace SpletnaTrgovinaDiploma.Data.Services
 {
@@ -16,7 +18,7 @@ namespace SpletnaTrgovinaDiploma.Data.Services
             this.context = context;
         }
 
-        public async Task<List<Order>> GetOrdersByUserIdAndRoleAsync(string userId, string userRole)
+        public async Task<List<Order>> GetOrdersByUserAsync(ClaimsPrincipal user)
         {
             var orders = await context.Orders
                 .Include(n => n.OrderItems)
@@ -25,15 +27,15 @@ namespace SpletnaTrgovinaDiploma.Data.Services
                 .Include(n => n.StatusChangedLog)
                 .ToListAsync();
 
-            if (userRole != "Admin")
-                orders = orders.Where(n => n.UserId == userId).ToList();
+            if (!user.IsUserAdmin())
+                orders = orders.Where(n => n.UserId == user.GetUserId()).ToList();
 
             return orders;
         }
 
-        public Order GetOrderByIdAndRole(int orderId, string userRole)
+        public Order GetOrderByIdAndRole(int orderId, ClaimsPrincipal user)
         {
-            if (userRole != "Admin")
+            if (!user.IsUserAdmin())
                 return null;
 
             var order = context.Orders
@@ -42,7 +44,7 @@ namespace SpletnaTrgovinaDiploma.Data.Services
             return order;
         }
 
-        public async Task UpdateOrderStatus(int orderId, OrderStatus oldStatus, OrderStatus newStatus, string comment, string userId)
+        public async Task UpdateOrderStatus(int orderId, OrderStatus oldStatus, OrderStatus newStatus, string comment, ClaimsPrincipal user)
         {
             var order = context.Orders
                 .SingleOrDefault(o => o.Id == orderId);
@@ -52,24 +54,24 @@ namespace SpletnaTrgovinaDiploma.Data.Services
 
             order.Status = newStatus;
 
-            InsertOrderStatusChangedLog(orderId, oldStatus, newStatus, comment, userId);
+            InsertOrderStatusChangedLog(orderId, oldStatus, newStatus, comment, user);
 
             //add to log
             await context.SaveChangesAsync();
         }
 
-        void InsertOrderStatusChangedLog(int orderId, OrderStatus oldStatus, OrderStatus newStatus, string comment, string userId)
+        void InsertOrderStatusChangedLog(int orderId, OrderStatus oldStatus, OrderStatus newStatus, string comment, ClaimsPrincipal user)
         {
-            var newLog = new OrderStatusChangedLog(orderId, oldStatus, newStatus, comment, userId);
+            var newLog = new OrderStatusChangedLog(orderId, oldStatus, newStatus, comment, user.GetUserId());
 
             context.OrderStatusChangedLog.Add(newLog);
         }
 
-        public async Task StoreOrderAsync(ShippingAndPaymentViewModel shippingAndPaymentViewModel, List<ShoppingCartItem> items, string userId)
+        public async Task StoreOrderAsync(ShippingAndPaymentViewModel shippingAndPaymentViewModel, List<ShoppingCartItem> items, ClaimsPrincipal user)
         {
             var order = new Order()
             {
-                UserId = userId,
+                UserId = user.GetUserId(),
                 DeliveryEmailAddress = shippingAndPaymentViewModel.EmailAddress,
                 FullName = shippingAndPaymentViewModel.FullName,
                 DeliveryPhoneNumber = shippingAndPaymentViewModel.PhoneNumber,
@@ -96,7 +98,7 @@ namespace SpletnaTrgovinaDiploma.Data.Services
                 await context.OrderItems.AddAsync(orderItem);
             }
 
-            InsertOrderStatusChangedLog(order.Id, OrderStatus.Processing, OrderStatus.Processing, "Initial order placed", userId);
+            InsertOrderStatusChangedLog(order.Id, OrderStatus.Processing, OrderStatus.Processing, "Initial order placed", user);
             await context.SaveChangesAsync();
         }
     }

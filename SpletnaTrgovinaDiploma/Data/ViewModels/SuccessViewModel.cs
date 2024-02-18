@@ -1,6 +1,6 @@
 ﻿namespace SpletnaTrgovinaDiploma.Data.ViewModels
 {
-    public class EmailViewModel
+    public class SuccessViewModel
     {
         public string Header { get; set; }
 
@@ -8,12 +8,12 @@
 
         public string Footer { get; set; }
 
-        public EmailViewModel()
+        public SuccessViewModel()
         {
 
         }
 
-        public EmailViewModel(string header, string body, string footer = "")
+        public SuccessViewModel(string header, string body, string footer = "")
         {
             Header = header;
             Body = body;

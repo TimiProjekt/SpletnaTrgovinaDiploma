@@ -12,7 +12,7 @@
             <h4>Order with order Id @Model.Id</h4>
         </p>
 
-        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+        @if (User.IsUserAdmin())
         {
             <a asp-controller="Orders" asp-action="EditStatus" asp-route-id="@Model.Id">Edit status of the order</a>
         }
@@ -139,7 +139,7 @@
                         <tr>
                             <th>Items</th>
                             <th>Total</th>
-                            @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                            @if (User.IsUserAdmin())
                             {
                                 <th>User</th>
                             }
@@ -160,7 +160,7 @@
                             <td class="align-middle">
                                 @Model.OrderItems.Select(m => m.Item.Price * m.Amount).Sum().ToString("c")
                             </td>
-                            @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                            @if (User.IsUserAdmin())
                             {
                                 <td class="align-middle"> @Model.FullName </td>
                             }

@@ -6,7 +6,7 @@ using SpletnaTrgovinaDiploma.Models;
 
 namespace SpletnaTrgovinaDiploma.Helpers
 {
-    public static class OrderStatusUtil
+    public static class OrderStatusExtensionMethod
     {
         public static string GetOrderStatusText(this OrderStatus? orderStatus)
         {

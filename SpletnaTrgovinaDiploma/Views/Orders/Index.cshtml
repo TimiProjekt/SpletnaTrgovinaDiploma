@@ -1,4 +1,5 @@
-﻿@model IEnumerable<Order>
+﻿@using SpletnaTrgovinaDiploma.Helpers
+@model IEnumerable<Order>
 
 @{
     ViewData["Title"] = "Orders";
@@ -21,7 +22,7 @@
                     <th>Order Id</th>
                     <th>Items</th>
                     <th>Total</th>
-                    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                    @if (User.IsUserAdmin())
                     {
                         <th>User</th>
                     }
@@ -50,7 +51,7 @@
                         <td class="align-middle">
                             @order.OrderItems.Select(m => m.Item.Price * m.Amount).Sum().ToString("c")
                         </td>
-                        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                        @if (User.IsUserAdmin())
                         {
                             <td class="align-middle">
                                 @if (order.User != null)

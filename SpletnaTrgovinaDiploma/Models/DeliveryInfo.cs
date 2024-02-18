@@ -1,4 +1,6 @@
-﻿namespace SpletnaTrgovinaDiploma.Models
+﻿using SpletnaTrgovinaDiploma.Data.ViewModels;
+
+namespace SpletnaTrgovinaDiploma.Models
 {
     public interface IDeliveryInfo
     {
@@ -24,5 +26,20 @@
 
         public string GetFullAddress =>
             HasAddress ? $"{StreetName} {HouseNumber}, {ZipCode} {City}, {Country?.Name}" : "No address";
+
+        public UserInfoViewModel CreateInfoViewModel()
+        {
+            return new UserInfoViewModel
+            {
+                FullName = FullName,
+                EmailAddress = DeliveryEmailAddress,
+                PhoneNumber = DeliveryPhoneNumber,
+                StreetName = StreetName,
+                HouseNumber = HouseNumber,
+                City = City,
+                ZipCode = ZipCode,
+                CountryId = CountryId
+            };
+        }
     }
 }

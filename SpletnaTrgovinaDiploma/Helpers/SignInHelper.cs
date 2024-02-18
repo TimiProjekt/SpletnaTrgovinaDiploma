@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace SpletnaTrgovinaDiploma.Helpers
 {
-    public class UserHelper
+    public class SignInHelper
     {
         private const string UNREGISTERED_PASSWORD = "Lulek@123";
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
 
-        public UserHelper(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public SignInHelper(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;

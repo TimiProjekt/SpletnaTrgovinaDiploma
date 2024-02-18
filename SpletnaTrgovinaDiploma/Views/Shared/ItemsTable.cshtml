@@ -1,6 +1,7 @@
 ﻿@using X.PagedList.Mvc.Core;
 @using System.Linq
 @using NuGet.Versioning
+@using SpletnaTrgovinaDiploma.Helpers
 @model X.PagedList.IPagedList<Item>
 
 <div class="row">
@@ -17,7 +18,7 @@
                                         @item.Name
                                     </a>
 
-                                    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                                    @if (User.IsUserAdmin())
                                     {
                                         <a class="text-white float-right" asp-action="Edit" asp-route-id="@item.Id"><i class="bi bi-pencil-square"></i></a>
                                     }
