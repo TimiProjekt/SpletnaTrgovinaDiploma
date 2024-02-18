@@ -7,12 +7,12 @@
 <div class="row">
     <div class="col-md-8 offset-md-2">
         <p>
-            <h4>Import items from XML</h4>
+            <h4>@ViewData["Title"]</h4>
         </p>
 
         <div class="row">
             <div class="col-md-8 ml-2">
-                <form asp-action="Import" method="post" enctype = "multipart/form-data">
+                <form asp-action="Import" method="post" enctype="multipart/form-data">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                     <div class="row mt-2">
@@ -21,6 +21,7 @@
                             <input asp-for="File" class="form-control" />
                             <span asp-validation-for="File" class="text-danger"></span>
                         </div>
+
                         <div class="col-12">
                             <input asp-for="IsUpdateExisting" />
                             <label class="col-form-label">Update existing?</label>
@@ -36,11 +37,8 @@
                             <button type="submit" class="btn btn-success">Upload File</button>
                         </div>
                     </div>
-
                 </form>
-
             </div>
         </div>
-
     </div>
 </div>

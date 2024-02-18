@@ -5,6 +5,10 @@
 }
 
 <div class="row">
+    <p>
+        <h4>@ViewData["Title"]</h4>
+    </p>
+
     <div class="col-md-6 offset-md-2">
         <h3 class="pb-1"> @ViewData["Description"] </h3>
 
@@ -31,12 +35,15 @@
                                 @Html.DisplayFor(modelItem => user.FullName)
                             </a>
                         </td>
+
                         <td class="align-middle">
                             @Html.DisplayFor(modelItem => user.EmailAddress)
                         </td>
+
                         <td class="align-middle">
                             @Html.DisplayFor(modelItem => user.Email)
                         </td>
+
                         <td class="align-middle">
                             @Html.DisplayFor(modelItem => user.GetFullAddress)
                         </td>

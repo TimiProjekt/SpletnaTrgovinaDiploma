@@ -6,8 +6,6 @@
 }
 
 <div class="row">
-
-
     @if (Model.ShoppingCart.TotalAmountOfItems == 0)
     {
         <p class="alert alert-primary w-100 ml-4 mr-4"> You have no items in your shopping cart </p>
@@ -17,7 +15,7 @@
     {
         <div class="col-md-8 offset-md-2">
             <p>
-                <h2>Your shopping cart summary</h2>
+                <h4>@ViewData["Title"]</h4>
             </p>
             <table class="table">
                 <thead>
@@ -38,6 +36,7 @@
                                     @item.Item.Name
                                 </a>
                             </td>
+
                             <td class="align-middle">@item.Item.Price.ToString("c")</td>
 
                             <td class="align-middle">
@@ -52,7 +51,7 @@
                                 {
                                     <i disabled class="bi bi-cart-dash text-muted"></i>
                                 }
-                                
+
                                 <input type="text" id="item_@item.Item.Id" class="text-center text-amount" style="width:30px" value="@item.Amount" />
 
                                 <a class="text-success" asp-controller="Orders" asp-action="IncreaseItemInShoppingCart" asp-route-id="@item.Item.Id">
@@ -60,7 +59,9 @@
                                 </a>
 
                             </td>
+
                             <td class="align-middle text-right">@((item.Amount*item.Item.Price).ToString("c"))</td>
+
                             <td class="align-middle text-right">
                                 <a class="text-dark" asp-controller="Orders" asp-action="RemoveItemFromShoppingCart" asp-route-id="@item.Item.Id">
                                     <i class="bi bi-cart-x"></i>
@@ -72,11 +73,13 @@
                 <tfoot>
                     <tr class="text-right">
                         <td colspan="3"></td>
+
                         <td>
                             <b>
                                 Total: @Model.ShoppingCartTotal.ToString("c")
                             </b>
                         </td>
+
                         <td></td>
                     </tr>
                 </tfoot>
@@ -86,6 +89,7 @@
                     <a class="btn btn-primary" asp-controller="Items" asp-action="Index">
                         Add more items
                     </a>
+
                     <a class="btn btn-success ml-3" asp-controller="Orders" asp-action="DeliveryInfo">
                         Continue to the next step
                     </a>
@@ -96,22 +100,22 @@
 </div>
 
 @section Scripts{
-    <script type="text/javascript">
-        $(function () {
-            $(".text-amount").on('change', function () {
-                var amount = $(this).val();
-                var itemId = this.id.split("_")[1];
+<script type="text/javascript">
+    $(function () {
+        $(".text-amount").on('change', function () {
+            var amount = $(this).val();
+            var itemId = this.id.split("_")[1];
 
-                $.ajax({
-                    url: '/Orders/SetItemAmountInShoppingCart/' + itemId + '?amount=' + amount,
-                    type: "POST",
-                    dataType: "json",
-                    contentType: "application/json; charset=utf-8",
-                    complete: function () {
-                        location.reload();
-                    }
-                });
+            $.ajax({
+                url: '/Orders/SetItemAmountInShoppingCart/' + itemId + '?amount=' + amount,
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                complete: function () {
+                    location.reload();
+                }
             });
         });
-    </script>
+    });
+</script>
 }

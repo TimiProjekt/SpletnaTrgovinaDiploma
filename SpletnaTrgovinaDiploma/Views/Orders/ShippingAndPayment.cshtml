@@ -43,36 +43,43 @@
                                 <input asp-for="FullName" class="form-control" />
                                 <span asp-validation-for="FullName" class="text-danger"></span>
                             </div>
+
                             <div class="form-group">
                                 <label asp-for="EmailAddress" class="control-label"></label>
                                 <input asp-for="EmailAddress" class="form-control" />
                                 <span asp-validation-for="EmailAddress" class="text-danger"></span>
                             </div>
+
                             <div class="form-group">
                                 <label asp-for="PhoneNumber" class="control-label"></label>
                                 <input asp-for="PhoneNumber" class="form-control" />
                                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                             </div>
+
                             <div class="form-group">
                                 <label asp-for="StreetName" class="control-label"></label>
                                 <input asp-for="StreetName" class="form-control" />
                                 <span asp-validation-for="StreetName" class="text-danger"></span>
                             </div>
+
                             <div class="form-group">
                                 <label asp-for="HouseNumber" class="control-label"></label>
                                 <input asp-for="HouseNumber" class="form-control" />
                                 <span asp-validation-for="HouseNumber" class="text-danger"></span>
                             </div>
+
                             <div class="form-group">
                                 <label asp-for="ZipCode" class="control-label"></label>
                                 <input asp-for="ZipCode" class="form-control" />
                                 <span asp-validation-for="ZipCode" class="text-danger"></span>
                             </div>
+
                             <div class="form-group">
                                 <label asp-for="City" class="control-label"></label>
                                 <input asp-for="City" class="form-control" />
                                 <span asp-validation-for="City" class="text-danger"></span>
                             </div>
+
                             <div class="form-group">
                                 <label asp-for="CountryId"></label>
                                 <select asp-for="CountryId" class="form-control" asp-items="ViewBag.Countries"></select>
@@ -138,8 +145,11 @@
                                             @item.Item.Name
                                         </a>
                                     </td>
+
                                     <td class="align-middle text-center">@(item.Amount)</td>
+
                                     <td class="align-middle">@item.Item.Price.ToString("c")</td>
+
                                     <td class="align-middle text-right">@((item.Amount * item.Item.Price).ToString("c"))</td>
                                 </tr>
                             }
@@ -147,7 +157,9 @@
                         <tfoot>
                             <tr>
                                 <td colspan="2"></td>
+
                                 <td><b>Total:</b></td>
+
                                 <td class="text-right">
                                     <b>
                                         @Model.ShoppingCartTotal.ToString("c")
@@ -173,19 +185,18 @@
 </div>
 
 @section Scripts{
-
 <script type="text/javascript">
     function toggleSummary() {
-        var table = document.getElementById('items-table')
-        var btn = document.getElementById('btn-show-summary')
+        var table = document.getElementById('items-table');
+        var btn = document.getElementById('btn-show-summary');
         if (btn.innerText === 'Show summary') {
             btn.innerText = 'Hide summary';
             table.style.display = 'table';
         }
         else {
-            btn.innerText = 'Show summary'
-            table.style.display = 'none'
+            btn.innerText = 'Show summary';
+            table.style.display = 'none';
         }
     }
 </script>
-    }
+}

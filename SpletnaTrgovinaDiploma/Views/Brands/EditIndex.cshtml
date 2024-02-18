@@ -2,11 +2,14 @@
 @model IEnumerable<Brand>
 
 @{
-    ViewData["Title"] = "Brands";
+    ViewData["Title"] = "Edit Brands";
 }
 
 <div class="row">
     <div class="col-md-8 offset-md-2">
+        <p>
+            <h4>@ViewData["Title"]</h4>
+        </p>
 
         <h3 class="pb-1"> @ViewData["Description"] </h3>
 
@@ -34,9 +37,11 @@
                         <td class="align-middle">
                             <img class="rounded-circle" src="@item.ProfilePictureUrl" alt="@item.Name" style="max-width: 150px" />
                         </td>
+
                         <td class="align-middle">
                             @Html.DisplayFor(modelItem => item.Name)
                         </td>
+
                         @if (User.IsUserAdmin())
                         {
                             <td class="align-middle">
@@ -45,13 +50,10 @@
                                 <a class="btn btn-danger text-white" asp-action="Delete" asp-route-id="@item.Id"><i class="bi bi-trash"></i>Delete </a>
                             </td>
                         }
-
                     </tr>
                 }
             </tbody>
-
         </table>
-
     </div>
 </div>
 

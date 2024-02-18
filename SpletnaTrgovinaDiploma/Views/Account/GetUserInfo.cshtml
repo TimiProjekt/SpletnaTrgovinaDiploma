@@ -2,13 +2,13 @@
 @model UserInfoViewModel;
 
 @{
-    ViewData["TItle"] = "Update settings";
+    ViewData["Title"] = "Update settings";
 }
 
 <div class="row">
     <div class="col-md-6 offset-md-3">
         <p>
-            <h4>User information</h4>
+            <h4>@ViewData["Title"]</h4>
         </p>
 
         @if (TempData["Error"] != null)

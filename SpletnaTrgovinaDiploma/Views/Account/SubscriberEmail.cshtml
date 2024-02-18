@@ -1,13 +1,13 @@
 ﻿@model SpletnaTrgovinaDiploma.Data.ViewModels.SuccessViewModel
 
-@{ 
+@{
     ViewData["Title"] = "Send an email to your subscribers";
 }
 
 <div class="row">
     <div class="col-md-8 offset-md-2">
         <p>
-            <h4>Update item</h4>
+            <h4>@ViewData["Title"]</h4>
         </p>
 
         <div class="row">
@@ -46,16 +46,16 @@
     </div>
 </div>
 
-@section Scripts{ 
-    <script>
-        $(document).ready(function () {
-            var output = document.getElementById("ImageUrlPreview");
-            output.src = $("#ImageURL").val();
-        });
+@section Scripts{
+<script>
+    $(document).ready(function () {
+        var output = document.getElementById("ImageUrlPreview");
+        output.src = $("#ImageURL").val();
+    });
 
-        $("#ImageUrl").on("change", function () {
-            var output = document.getElementById("ImageUrlPreview");
-            output.src = $(this).val();
-        })
-    </script>
+    $("#ImageUrl").on("change", function () {
+        var output = document.getElementById("ImageUrlPreview");
+        output.src = $(this).val();
+    })
+</script>
 }

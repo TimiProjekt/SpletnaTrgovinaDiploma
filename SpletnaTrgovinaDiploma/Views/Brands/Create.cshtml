@@ -1,26 +1,30 @@
-﻿@model Brand 
+﻿@model Brand
 
-@{ 
+@{
     ViewData["Title"] = "Add a new brand";
-} 
+}
 
 <div class="row text">
     <div class="col-md-8 offset-md-2">
         <p>
-            <h1>Add a New Brand</h1>
+            <h4>@ViewData["Title"]</h4>
         </p>
+
         <div class="row">
             <div class="col-md-8 ml-2">
                 <form asp-action="Create">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
                     <div class="form-group text-center">
                         <img id="ProfilePicturePreview" class="border-info rounder-circle" style="max-width: 150px" />
                     </div>
+
                     <div class="form-group">
                         <label asp-for="ProfilePictureUrl"></label>
                         <input asp-for="ProfilePictureUrl" class="form-control" />
                         <span asp-validation-for="ProfilePictureUrl" class="text-danger"></span>
                     </div>
+
                     <div class="form-group">
                         <label asp-for="Name"></label>
                         <input asp-for="Name" class="form-control" />
@@ -38,16 +42,15 @@
 </div>
 
 @section Scripts{
-    <script>
+<script>
+    $(document).ready(function () {
+        var output = document.getElementById('ProfilePicturePreview');
+        output.src = $("#ProfilePictureURL").val();
+    })
 
-        $(document).ready(function () {
-            var output = document.getElementById('ProfilePicturePreview');
-            output.src = $("#ProfilePictureURL").val();
-        })
-
-        $("#ProfilePictureURL").on("change", function () {
-            var output = document.getElementById('ProfilePicturePreview');
-            output.src = $(this).val();
-        })
-    </script>
+    $("#ProfilePictureURL").on("change", function () {
+        var output = document.getElementById('ProfilePicturePreview');
+        output.src = $(this).val();
+    })
+</script>
 }

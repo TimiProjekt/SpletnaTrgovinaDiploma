@@ -1,6 +1,7 @@
-﻿@inject UserManager<ApplicationUser> userManager;
+﻿@using SpletnaTrgovinaDiploma.Helpers
+@inject UserManager<ApplicationUser> userManager;
 
-@if (!User.Identity.IsAuthenticated)
+@if (!User.IsLoggedIn())
 {
     <a class="btn btn-outline-success my-2 my-sm-0" asp-controller="Account" asp-action="Login">
         <i class="bi bi-box-arrow-in-right"></i> Log in
@@ -16,19 +17,21 @@ else
     <div class="dropdown margin-log-out">
         <button class="btn btn-outline-success dropdown-toggle" type="button" id="profile-btn" data-toggle="dropdown"
             aria-expanded="false">
-            <i class="bi bi-person-badge"></i> Hello @userManager.FindByEmailAsync(userManager.GetUserName(User)).Result?.FullName
+            <i class="bi bi-person-badge"></i> Hello @User.GetApplicationUser(userManager).FullName
         </button>
         <ul class="dropdown-menu" aria-labelledby="profile-btn">
             <li>
                 <a class="dropdown-item" asp-controller="Orders" asp-action="Index">
                     <i class="bi bi-list"></i> Orders
                 </a>
+
                 <a class="dropdown-item" asp-controller="Account" asp-action="Settings">
                     <i class="bi bi-wrench"></i> Settings
                 </a>
+
                 <a class="dropdown-item" asp-controller="Account" asp-action="Logout">
-                <i class="bi bi-box-arrow-in-right"></i> Log out
-            </a>
+                    <i class="bi bi-box-arrow-in-right"></i> Log out
+                </a>
             </li>
 
         </ul>
