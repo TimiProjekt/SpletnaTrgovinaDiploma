@@ -8,14 +8,14 @@ namespace SpletnaTrgovinaDiploma.Helpers
 {
     public static class OrderStatusExtensionMethod
     {
-        public static string GetOrderStatusText(this OrderStatus? orderStatus)
+        public static string GetText(this OrderStatus? orderStatus)
         {
             if (orderStatus == null) return string.Empty;
 
-            return orderStatus.Value.GetOrderStatusText();
+            return orderStatus.Value.GetText();
         }
 
-        public static string GetOrderStatusText(this OrderStatus orderStatus)
+        public static string GetText(this OrderStatus orderStatus)
         {
             var text = orderStatus switch
             {
@@ -95,6 +95,6 @@ namespace SpletnaTrgovinaDiploma.Helpers
         }
 
         static SelectListItem GetSelectListItem(this OrderStatus orderStatus)
-            => new(orderStatus.GetOrderStatusText(), orderStatus.ToString());
+            => new(orderStatus.GetText(), orderStatus.ToString());
     }
 }

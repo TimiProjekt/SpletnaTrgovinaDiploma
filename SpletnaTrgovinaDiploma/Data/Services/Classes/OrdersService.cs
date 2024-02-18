@@ -56,7 +56,6 @@ namespace SpletnaTrgovinaDiploma.Data.Services
 
             InsertOrderStatusChangedLog(orderId, oldStatus, newStatus, comment, user);
 
-            //add to log
             await context.SaveChangesAsync();
         }
 

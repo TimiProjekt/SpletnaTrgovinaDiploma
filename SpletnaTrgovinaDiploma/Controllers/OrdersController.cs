@@ -68,9 +68,6 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
         public IActionResult ShoppingCart()
         {
-            var items = shoppingCart.GetShoppingCartItems();
-            shoppingCart.ShoppingCartItems = items;
-
             var response = new ShoppingCartViewModel()
             {
                 ShoppingCart = shoppingCart,
@@ -147,12 +144,11 @@ namespace SpletnaTrgovinaDiploma.Controllers
         public IActionResult ShippingAndPayment()
         {
             var appUser = signInHelper.GetApplicationUser(User);
-            var myShoppingCart = shoppingCart.GetShoppingCartWithItems();
-            var shoppingCartTotal = myShoppingCart.GetShoppingCartTotal();
+            var shoppingCartTotal = shoppingCart.GetShoppingCartTotal();
 
             var response = new ShippingAndPaymentViewModel()
             {
-                ShoppingCart = myShoppingCart,
+                ShoppingCart = shoppingCart,
                 ShoppingCartTotal = shoppingCartTotal,
                 ShoppingCartTotalWithoutVat = shoppingCartTotal * 100 / 122,
                 EmailAddress = !string.IsNullOrEmpty(appUser?.DeliveryEmailAddress)
@@ -180,15 +176,14 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 return View(shippingAndPaymentViewModel);
             }
 
-            var myShoppingCart = shoppingCart.GetShoppingCartWithItems();
-            shippingAndPaymentViewModel.ShoppingCart = myShoppingCart;
-            shippingAndPaymentViewModel.ShoppingCartTotal = myShoppingCart.GetShoppingCartTotal();
+            shippingAndPaymentViewModel.ShoppingCart = shoppingCart;
+            shippingAndPaymentViewModel.ShoppingCartTotal = shoppingCart.GetShoppingCartTotal();
 
-            await ordersService.StoreOrderAsync(shippingAndPaymentViewModel, myShoppingCart.ShoppingCartItems, User);
+            await ordersService.StoreOrderAsync(shippingAndPaymentViewModel, shoppingCart.ShoppingCartItems, User);
 
-            shippingAndPaymentViewModel.SendOrderConfirmationEmail(myShoppingCart);
+            shippingAndPaymentViewModel.SendOrderConfirmationEmail(shoppingCart);
 
-            await myShoppingCart.ClearShoppingCartAsync();
+            await shoppingCart.ClearShoppingCartAsync();
 
             return View(
                 "Success",

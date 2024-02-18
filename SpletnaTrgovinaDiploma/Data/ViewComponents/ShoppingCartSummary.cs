@@ -12,10 +12,7 @@ namespace SpletnaTrgovinaDiploma.Data.ViewComponents
             this.shoppingCart = shoppingCart;
         }
 
-        public IViewComponentResult Invoke()
-        {
-            var items = shoppingCart.GetShoppingCartItems();
-            return View(items.Count);
-        }
+        public IViewComponentResult Invoke() 
+            => View(shoppingCart.ShoppingCartItems.Count);
     }
 }

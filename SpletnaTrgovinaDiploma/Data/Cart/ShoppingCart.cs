@@ -14,8 +14,23 @@ namespace SpletnaTrgovinaDiploma.Data.Cart
         private readonly AppDbContext context;
 
         public string ShoppingCartId { get; set; }
-        public List<ShoppingCartItem> ShoppingCartItems { get; set; }
-        public int TotalAmountOfItems => ShoppingCartItems.Select(i => i.Amount).Sum();
+
+        public List<ShoppingCartItem> ShoppingCartItems
+            => context.ShoppingCartItems
+                .Where(n => n.ShoppingCartId == ShoppingCartId)
+                .Include(n => n.Item)
+                .ToList();
+
+        public decimal GetShoppingCartTotal()
+            => context.ShoppingCartItems
+                .Where(n => n.ShoppingCartId == ShoppingCartId)
+                .Select(n => n.Item.Price * n.Amount)
+                .Sum();
+
+        public int TotalAmountOfItems
+            => ShoppingCartItems
+                .Select(i => i.Amount)
+                .Sum();
 
         public ShoppingCart(AppDbContext context)
         {
@@ -60,13 +75,9 @@ namespace SpletnaTrgovinaDiploma.Data.Cart
         {
             var shoppingCartItem = context.ShoppingCartItems.FirstOrDefault(n => n.Item.Id == item.Id && n.ShoppingCartId == ShoppingCartId);
 
-            if (shoppingCartItem != null)
-            {
-                if (shoppingCartItem.Amount > 1)
-                {
-                    shoppingCartItem.Amount--;
-                }
-            }
+            if (shoppingCartItem is {Amount: > 1})
+                shoppingCartItem.Amount--;
+
             context.SaveChanges();
         }
 
@@ -75,9 +86,8 @@ namespace SpletnaTrgovinaDiploma.Data.Cart
             var shoppingCartItem = context.ShoppingCartItems.FirstOrDefault(n => n.Item.Id == item.Id && n.ShoppingCartId == ShoppingCartId);
 
             if (shoppingCartItem != null)
-            {
                 context.ShoppingCartItems.Remove(shoppingCartItem);
-            }
+
             context.SaveChanges();
         }
 
@@ -85,34 +95,16 @@ namespace SpletnaTrgovinaDiploma.Data.Cart
         {
             var shoppingCartItem = context.ShoppingCartItems.FirstOrDefault(n => n.Item.Id == item.Id && n.ShoppingCartId == ShoppingCartId);
             if (shoppingCartItem != null)
-            {
                 shoppingCartItem.Amount = amount;
-            }
+
             context.SaveChanges();
         }
-
-        public ShoppingCart GetShoppingCartWithItems()
-        {
-            GetShoppingCartItems();
-
-            return this;
-        }
-
-        public List<ShoppingCartItem> GetShoppingCartItems() 
-            => ShoppingCartItems ??= context.ShoppingCartItems
-                .Where(n => n.ShoppingCartId == ShoppingCartId)
-                .Include(n => n.Item).ToList();
-
-        public decimal GetShoppingCartTotal() 
-            => context.ShoppingCartItems
-                .Where(n => n.ShoppingCartId == ShoppingCartId)
-                .Select(n => n.Item.Price * n.Amount)
-                .Sum();
 
         public async Task ClearShoppingCartAsync()
         {
             var items = await context.ShoppingCartItems.Where(n => n.ShoppingCartId == ShoppingCartId).ToListAsync();
             context.ShoppingCartItems.RemoveRange(items);
+
             await context.SaveChangesAsync();
         }
     }
