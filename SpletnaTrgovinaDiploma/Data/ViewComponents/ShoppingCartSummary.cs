@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 using SpletnaTrgovinaDiploma.Data.Cart;
 
 namespace SpletnaTrgovinaDiploma.Data.ViewComponents
@@ -13,6 +14,6 @@ namespace SpletnaTrgovinaDiploma.Data.ViewComponents
         }
 
         public IViewComponentResult Invoke() 
-            => View(shoppingCart.ShoppingCartItems.Count);
+            => View(shoppingCart.ShoppingCartItems.Count());
     }
 }

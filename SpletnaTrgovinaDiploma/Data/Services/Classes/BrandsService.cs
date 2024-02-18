@@ -20,7 +20,9 @@ namespace SpletnaTrgovinaDiploma.Data.Services
         {
             var response = new BrandDropdownViewModel()
             {
-                Brands = await context.Brands.OrderBy(n => n.Name).ToListAsync()
+                Brands = await context.Brands
+                    .OrderBy(n => n.Name)
+                    .ToListAsync()
             };
 
             return response;

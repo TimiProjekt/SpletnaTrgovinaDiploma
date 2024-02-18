@@ -6,7 +6,7 @@
 }
 
 <div class="row">
-    @if (Model.ShoppingCart.TotalAmountOfItems == 0)
+    @if (await Model.ShoppingCart.GetTotalAmountOfItemsAsync() == 0)
     {
         <p class="alert alert-primary w-100 ml-4 mr-4"> You have no items in your shopping cart </p>
         <a class="ml-4" asp-controller="Items" asp-action="Index"><u>Back to store</u></a>

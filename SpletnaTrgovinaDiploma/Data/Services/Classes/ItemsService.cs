@@ -11,10 +11,11 @@ namespace SpletnaTrgovinaDiploma.Data.Services
     {
         private readonly AppDbContext context;
 
-        IEnumerable<Item> GetAllItems() =>
-            context.Items
+        private IQueryable<Item> Items
+            => context.Items
                 .Include(am => am.Descriptions)
-                .Include(am => am.BrandsItems);
+                .Include(am => am.BrandsItems)
+                .ThenInclude(b => b.Brand);
 
         public ItemsService(AppDbContext context) : base(context)
         {
@@ -23,7 +24,7 @@ namespace SpletnaTrgovinaDiploma.Data.Services
 
         public async Task AddNewItemAsync(NewItemViewModel dataItem)
         {
-            var dbItem = new Item()
+            var dbItem = new Item
             {
                 Name = dataItem.Name,
                 Description = dataItem.Description,
@@ -34,21 +35,21 @@ namespace SpletnaTrgovinaDiploma.Data.Services
                 Descriptions = dataItem.ItemDescriptions,
                 BrandsItems = new List<BrandItem>()
             };
-            
+
             AssignBrandIdsFromBrandNames(dbItem, dataItem, context.Brands.ToList());
 
-            context.Items.Add(dbItem);
+            await context.Items.AddAsync(dbItem);
             await context.SaveChangesAsync();
         }
 
         public async Task AddNewItemsAsync(List<NewItemViewModel> dataList)
         {
             var newItems = new List<Item>();
-            var allBrands = context.Brands.ToList();
+            var allBrands = await context.Brands.ToListAsync();
 
             foreach (var dataItem in dataList)
             {
-                var dbItem = new Item()
+                var dbItem = new Item
                 {
                     Name = dataItem.Name,
                     Description = dataItem.Description,
@@ -61,22 +62,18 @@ namespace SpletnaTrgovinaDiploma.Data.Services
                     Descriptions = dataItem.ItemDescriptions,
                     BrandsItems = new List<BrandItem>()
                 };
-                
+
                 AssignBrandIdsFromBrandNames(dbItem, dataItem, allBrands);
                 newItems.Add(dbItem);
             }
 
-            context.Items.AddRange(newItems);
+            await context.Items.AddRangeAsync(newItems);
             await context.SaveChangesAsync();
         }
 
-
         public async Task<Item> GetItemByIdAsync(int id)
         {
-            var itemDetails = await context.Items
-                .Include(am => am.Descriptions)
-                .Include(am => am.BrandsItems)
-                .ThenInclude(b => b.Brand)
+            var itemDetails = await Items
                 .FirstOrDefaultAsync(n => n.Id == id);
 
             return itemDetails;
@@ -84,8 +81,8 @@ namespace SpletnaTrgovinaDiploma.Data.Services
 
         public async Task UpdateItemAsync(NewItemViewModel dataItem)
         {
-            var dbItem = GetAllItems()
-                .FirstOrDefault(n => n.Id == dataItem.Id);
+            var dbItem = await Items
+                .FirstOrDefaultAsync(n => n.Id == dataItem.Id);
 
             if (dbItem != null)
             {
@@ -108,16 +105,16 @@ namespace SpletnaTrgovinaDiploma.Data.Services
         public async Task<int> UpdateItemsNonNullValuesAsync(List<NewItemViewModel> dataList)
         {
             var amountOfUpdatedItems = 0;
-            var allItems = GetAllItems();
             var allBrands = context.Brands.ToList();
 
             foreach (var dataItem in dataList)
             {
-                var dbItem = allItems.FirstOrDefault(n => n.ProductCode == dataItem.ProductCode);
+                var dbItem = await Items
+                    .FirstOrDefaultAsync(n => n.ProductCode == dataItem.ProductCode);
 
-                if (!string.IsNullOrEmpty(dataItem.ProductCode) && dbItem != null)
+                if (dbItem != null && !string.IsNullOrEmpty(dataItem.ProductCode))
                 {
-                    //only if item found, it could be update, otherwise ignore
+                    //only if item found, it could be updated, otherwise ignore
                     amountOfUpdatedItems++;
 
                     dbItem.Name = dataItem.Name ?? dbItem.Name;
@@ -139,7 +136,7 @@ namespace SpletnaTrgovinaDiploma.Data.Services
             return amountOfUpdatedItems;
         }
 
-        void FindOrCreateItemDescriptions(Item item, List<ItemDescription> itemDescriptions, bool deleteOld = false)
+        static void FindOrCreateItemDescriptions(Item item, List<ItemDescription> itemDescriptions, bool deleteOld = false)
         {
             if (deleteOld)
                 item.Descriptions.Clear();
@@ -147,7 +144,8 @@ namespace SpletnaTrgovinaDiploma.Data.Services
             // find or create attribute
             foreach (var itemDescription in itemDescriptions)
             {
-                var findItemDescription = item.Descriptions.FirstOrDefault(d => d.Name == itemDescription.Name);
+                var findItemDescription = item.Descriptions
+                    .FirstOrDefault(d => d.Name == itemDescription.Name);
 
                 if (findItemDescription == null)
                     item.Descriptions.Add(itemDescription);

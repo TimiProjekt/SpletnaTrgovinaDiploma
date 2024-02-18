@@ -34,12 +34,12 @@ namespace SpletnaTrgovinaDiploma.Controllers
             signInHelper = new SignInHelper(userManager, signInManager);
         }
 
-        public async Task<IActionResult> Index()
-            => await Filter(null);
+        public IActionResult Index()
+            => Filter(null);
 
-        public async Task<IActionResult> Filter(string searchString)
+        public IActionResult Filter(string searchString)
         {
-            var allOrders = await ordersService.GetOrdersByUserAsync(User);
+            var allOrders = ordersService.GetOrdersByUserAsync(User);
 
             if (!string.IsNullOrEmpty(searchString))
             {
@@ -56,9 +56,9 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return View("Index", allOrders);
         }
 
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var order = ordersService.GetOrderByIdAndRole(id, User);
+            var order = await ordersService.GetOrderByIdAndRoleAsync(id, User);
             if (order == null)
                 return RedirectToAction("Index", "Items");
 
@@ -66,12 +66,12 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return View(order);
         }
 
-        public IActionResult ShoppingCart()
+        public async Task<IActionResult> ShoppingCart()
         {
             var response = new ShoppingCartViewModel()
             {
                 ShoppingCart = shoppingCart,
-                ShoppingCartTotal = shoppingCart.GetShoppingCartTotal(),
+                ShoppingCartTotal = await shoppingCart.GetShoppingCartTotalAsync(),
             };
 
             return View(response);
@@ -81,7 +81,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         {
             var item = await itemsService.GetItemByIdAsync(id);
             if (item != null)
-                shoppingCart.IncreaseItemInCart(item, byAmount);
+                await shoppingCart.IncreaseItemInCartAsync(item, byAmount);
 
             return RedirectToAction(nameof(ShoppingCart));
         }
@@ -91,7 +91,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             var item = await itemsService.GetItemByIdAsync(id);
 
             if (item != null)
-                shoppingCart.DecreaseItemInCart(item);
+                await shoppingCart.DecreaseItemInCartAsync(item);
 
             return RedirectToAction(nameof(ShoppingCart));
         }
@@ -101,7 +101,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             var item = await itemsService.GetItemByIdAsync(id);
 
             if (item != null)
-                shoppingCart.RemoveItemFromCart(item);
+                await shoppingCart.RemoveItemFromCartAsync(item);
 
             return RedirectToAction(nameof(ShoppingCart));
         }
@@ -111,7 +111,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             var item = await itemsService.GetItemByIdAsync(id);
 
             if (item != null)
-                shoppingCart.SetItemAmountInCart(item, amount);
+                await shoppingCart.SetItemAmountInCartAsync(item, amount);
         }
 
         public IActionResult DeliveryInfo()
@@ -141,10 +141,10 @@ namespace SpletnaTrgovinaDiploma.Controllers
             return View(loginViewModel);
         }
 
-        public IActionResult ShippingAndPayment()
+        public async Task<IActionResult> ShippingAndPayment()
         {
             var appUser = signInHelper.GetApplicationUser(User);
-            var shoppingCartTotal = shoppingCart.GetShoppingCartTotal();
+            var shoppingCartTotal = await shoppingCart.GetShoppingCartTotalAsync();
 
             var response = new ShippingAndPaymentViewModel()
             {
@@ -177,7 +177,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             }
 
             shippingAndPaymentViewModel.ShoppingCart = shoppingCart;
-            shippingAndPaymentViewModel.ShoppingCartTotal = shoppingCart.GetShoppingCartTotal();
+            shippingAndPaymentViewModel.ShoppingCartTotal = await shoppingCart.GetShoppingCartTotalAsync();
 
             await ordersService.StoreOrderAsync(shippingAndPaymentViewModel, shoppingCart.ShoppingCartItems, User);
 
@@ -193,12 +193,12 @@ namespace SpletnaTrgovinaDiploma.Controllers
                     "Thank you!"));
         }
 
-        public IActionResult EditStatus(int id)
+        public async Task<IActionResult> EditStatus(int id)
         {
             if (!User.IsUserAdmin())
                 return View("NotFound");
 
-            var order = ordersService.GetOrderByIdAndRole(id, User);
+            var order = await ordersService.GetOrderByIdAndRoleAsync(id, User);
             if (order == null)
                 return RedirectToAction("Index", "Orders");
 
@@ -218,7 +218,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             if (!User.IsUserAdmin())
                 return View("NotFound");
 
-            var order = ordersService.GetOrderByIdAndRole(orderStatus.OrderId, User);
+            var order = await ordersService.GetOrderByIdAndRoleAsync(orderStatus.OrderId, User);
             if (order == null)
                 return RedirectToAction("Index", "Orders");
 

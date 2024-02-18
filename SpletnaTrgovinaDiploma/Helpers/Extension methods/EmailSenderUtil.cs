@@ -20,7 +20,7 @@ namespace SpletnaTrgovinaDiploma.Helpers
                 messageHtml += $"<li> {item.Item.Name} {item.Item.Price} € x ({item.Amount} kom) = {item.Item.Price * item.Amount} € </li>";
 
             messageHtml += "</ul> has been completed and will be shipped out shortly. <br/>";
-            messageHtml += $"Total price: {myShoppingCart.GetShoppingCartTotal()} € <br/>";
+            messageHtml += $"Total price: {myShoppingCart.GetShoppingCartTotalAsync()} € <br/>";
             messageHtml += $"Delivery method: {viewModel.ShippingOption}  <br/>";
             messageHtml += $"Delivery address: {viewModel.GetFullAddress}  <br/>";
             messageHtml += $"Payment method: {viewModel.PaymentOption}  <br/>";

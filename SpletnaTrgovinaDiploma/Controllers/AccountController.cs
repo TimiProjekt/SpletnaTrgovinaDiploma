@@ -197,7 +197,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             if (!emailValidationSuccess)
                 return View("Failure", new SuccessViewModel("Entered e-mail is invalid.", ""));
 
-            var result = await newsletterEmailService.AddToMailingList(email);
+            var result = await newsletterEmailService.AddToMailingListAsync(email);
             if (!result)
                 return View("Failure", new SuccessViewModel("Email already subscribed to newsletter.", ""));
 
@@ -211,7 +211,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             if (!emailValidationSuccess)
                 return View("Failure", new SuccessViewModel("Entered e-mail is invalid.", ""));
 
-            var result = await newsletterEmailService.RemoveFromMailingList(email);
+            var result = await newsletterEmailService.RemoveFromMailingListAsync(email);
             if (!result)
                 return View("Failure", new SuccessViewModel("Email not subscribed to our newsletter.", ""));
 
@@ -227,7 +227,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         [Authorize(Roles = UserRoles.Admin)]
         public IActionResult SubscriberEmail(SuccessViewModel successViewModel)
         {
-            var allEmailAddresses = newsletterEmailService.GetAllEmailAddressesFromMailingList();
+            var allEmailAddresses = newsletterEmailService.AllEmailAddressesFromMailingList;
             var lastFiveEmailAddresses = allEmailAddresses.TakeLast(5).ToList();
 
             foreach (var newsletterEmail in lastFiveEmailAddresses)
@@ -332,9 +332,9 @@ namespace SpletnaTrgovinaDiploma.Controllers
         }
 
         [Authorize(Roles = UserRoles.Admin)]
-        public IActionResult GetUnregisteredUserInfo(int orderId)
+        public async Task<IActionResult> GetUnregisteredUserInfo(int orderId)
         {
-            IDeliveryInfo deliveryInfo = ordersService.GetOrderByIdAndRole(orderId, User);
+            IDeliveryInfo deliveryInfo = await ordersService.GetOrderByIdAndRoleAsync(orderId, User);
             if (deliveryInfo == null)
             {
                 TempData.SetError("Cannot fetch user information.");

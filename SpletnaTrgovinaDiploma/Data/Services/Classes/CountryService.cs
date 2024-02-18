@@ -18,9 +18,11 @@ namespace SpletnaTrgovinaDiploma.Data.Services
 
         public async Task<CountryDropdownViewModel> GetDropdownValuesAsync()
         {
-            var response = new CountryDropdownViewModel()
+            var response = new CountryDropdownViewModel
             {
-                Countries = await context.Countries.OrderBy(n => n.Name).ToListAsync()
+                Countries = await context.Countries
+                    .OrderBy(n => n.Name)
+                    .ToListAsync()
             };
 
             return response;

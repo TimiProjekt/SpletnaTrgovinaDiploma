@@ -111,13 +111,13 @@
                     </fieldset>
 
                     <div class="pt-3">
-                        @if (Model.ShoppingCart.TotalAmountOfItems == 1)
+                        @if (await Model.ShoppingCart.GetTotalAmountOfItemsAsync() == 1)
                         {
                             <b>1 Item in cart</b>
                         }
                         else
                         {
-                            <b>@Model.ShoppingCart.TotalAmountOfItems Items in cart</b>
+                            <b>await @Model.ShoppingCart.GetTotalAmountOfItemsAsync() Items in cart</b>
                         }
                         <br />
                         <a class="text-primary" id="btn-show-summary" href="#" onclick="toggleSummary()"><u>Show summary</u></a>

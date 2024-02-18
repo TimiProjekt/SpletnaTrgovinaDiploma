@@ -7,10 +7,11 @@ namespace SpletnaTrgovinaDiploma.Data.Services
 {
     public interface INewsletterEmailService : IEntityBaseRepository<NewsletterEmail>
     {
-        Task<bool> AddToMailingList(string emailAddress);
+        IEnumerable<NewsletterEmail> AllEmailAddressesFromMailingList { get; }
 
-        Task<bool> RemoveFromMailingList(string emailAddress);
+        Task<bool> AddToMailingListAsync(string emailAddress);
 
-        IEnumerable<NewsletterEmail> GetAllEmailAddressesFromMailingList();
+        Task<bool> RemoveFromMailingListAsync(string emailAddress);
+
     }
 }
