@@ -41,15 +41,15 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                var upperCaseSearchString = searchString.ToUpper();
                 var filteredResult = allBrands
-                    .Where(n => n.Name.ToUpper().Contains(upperCaseSearchString));
+                    .AsEnumerable()
+                    .Where(n => n.Name.ContainsCaseInsensitive(searchString));
 
-                ViewData.SetPageDetails("Search result", $"Search result for \"{searchString}\"");
+                ViewData.SetPageDetails("Brand search result", $"Brand search result for \"{searchString}\"");
                 return filteredResult.ToPagedList(page, itemsPerPage);
             }
 
-            ViewData.SetPageDetails("Home page", "Home page of Gaming svet");
+            ViewData.SetPageDetails("Brands page", "Brands overview");
             return allBrands.ToPagedList(page, itemsPerPage);
         }
 

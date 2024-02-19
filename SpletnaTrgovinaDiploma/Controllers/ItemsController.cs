@@ -28,17 +28,10 @@ namespace SpletnaTrgovinaDiploma.Controllers
         }
 
         [AllowAnonymous]
-        public IActionResult GetByBrand(int id)
-        {
-            var allItems = itemsService.GetAll(n => n.BrandsItems);
-            var filteredItems = allItems.Where(item => item.BrandsItems.Any(bi => bi.BrandId == id));
-
-            return View(filteredItems);
-        }
-
-        [AllowAnonymous]
         public IActionResult Index(string currentFilter, string searchString, int page = 1)
         {
+            ViewData.SetPageDetails("Home page", "");
+
             var filteredItems = GetFilteredItems(currentFilter, searchString, page);
             ViewBag.CurrentItemsFilter = searchString;
             return View(filteredItems);
@@ -46,6 +39,8 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
         public IActionResult EditIndex(string currentFilter, string searchString, int page = 1)
         {
+            ViewData.SetPageDetails("Items page", "Items overview");
+
             var filteredItems = GetFilteredItems(currentFilter, searchString, page);
             return View(filteredItems);
         }
@@ -66,16 +61,16 @@ namespace SpletnaTrgovinaDiploma.Controllers
             if (!string.IsNullOrEmpty(searchString))
             {
                 var filteredResult = allItems
-                    .Where(i => i.Name.Contains(searchString)
-                                    || i.Description.Contains(searchString)
-                                    || i.ShortDescription.Contains(searchString)
-                                    || i.ProductCode.Contains(searchString));
+                    .AsEnumerable()
+                    .Where(i => i.Name.ContainsCaseInsensitive(searchString)
+                                || i.Description.ContainsCaseInsensitive(searchString)
+                                || i.ShortDescription.ContainsCaseInsensitive(searchString)
+                                || i.ProductCode.ContainsCaseInsensitive(searchString));
 
                 ViewData.SetPageDetails("Search result", $"Search result for \"{searchString}\"");
                 return filteredResult.ToPagedList(page, itemsPerPage);
             }
 
-            ViewData.SetPageDetails("Users", "All users");
             return allItems.ToPagedList(page, itemsPerPage);
         }
 

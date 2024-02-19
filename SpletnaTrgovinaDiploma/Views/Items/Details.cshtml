@@ -78,11 +78,9 @@
                                 @foreach (var brand in Model.BrandsItems)
                                 {
                                     <div class="card-columns text-center">
-                                        <a asp-controller="Items" asp-action="GetByBrand" asp-route-id="@brand.BrandId">
-                                            <img class="border-info rounded-circle" src="@brand.Brand.ProfilePictureUrl" style="max-width: 150px" />
-                                        </a>
+                                        <img class="border-info rounded-circle" src="@brand.Brand.ProfilePictureUrl" style="max-width: 150px" />
                                         <br />
-                                        <a asp-controller="Items" asp-action="GetByBrand" asp-route-id="@brand.BrandId">@brand.Brand.Name</a>
+                                        @brand.Brand.Name
                                     </div>
                                 }
                             </div>

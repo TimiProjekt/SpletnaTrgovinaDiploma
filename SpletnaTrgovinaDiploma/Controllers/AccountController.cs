@@ -65,16 +65,16 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                var upperCaseSearchString = searchString.ToUpper();
                 var filteredResult = allUsers
-                    .Where(n => n.FullName.ToUpper().Contains(upperCaseSearchString)
-                                || n.EmailAddress.ToUpper().Contains(upperCaseSearchString));
+                    .AsEnumerable()
+                    .Where(n => n.FullName.ContainsCaseInsensitive(searchString)
+                                || n.EmailAddress.ContainsCaseInsensitive(searchString));
 
-                ViewData.SetPageDetails("Search result", $"Search result for \"{searchString}\"");
+                ViewData.SetPageDetails("User search result", $"User search result for \"{searchString}\"");
                 return filteredResult.ToPagedList(page, itemsPerPage);
             }
 
-            ViewData.SetPageDetails("Home page", "Home page of Gaming svet");
+            ViewData.SetPageDetails("Users page", "Users overview");
             return allUsers.ToPagedList(page, itemsPerPage);
         }
 

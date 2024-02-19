@@ -43,7 +43,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
         IPagedList<Order> GetFilteredOrders(string currentFilter, string searchString, int page)
         {
-            const int itemsPerPage = 12;
+            const int itemsPerPage = 3;
 
             if (searchString != null)
                 page = 1;
@@ -56,16 +56,16 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                static bool ContainsCaseInsensitiveString(string source, string contains)
-                    => source?.ToUpper().Contains(contains.ToUpper()) ?? false;
+                var filteredResult = allOrders
+                    .AsEnumerable()
+                    .Where(n => n.Id.ToString().ContainsCaseInsensitive(searchString)
+                                || n.DeliveryEmailAddress.ContainsCaseInsensitive(searchString));
 
-                var filteredResult = allOrders.Where(n => ContainsCaseInsensitiveString(n.Id.ToString(), searchString) || ContainsCaseInsensitiveString(n.DeliveryEmailAddress, searchString));
-
-                ViewData.SetPageDetails("Search result", $"Search result for \"{searchString}\"");
+                ViewData.SetPageDetails("Order search result", $"Order search result for \"{searchString}\"");
                 return filteredResult.ToPagedList(page, itemsPerPage);
             }
 
-            ViewData.SetPageDetails("Home page", "Home page of Gaming svet");
+            ViewData.SetPageDetails("Orders page", "Orders overview");
             return allOrders.ToPagedList(page, itemsPerPage);
         }
 
