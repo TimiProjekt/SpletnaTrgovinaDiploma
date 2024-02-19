@@ -8,4 +8,4 @@
 
 ALTER TABLE [dbo].[ItemDescriptions]  WITH CHECK ADD  CONSTRAINT [FK_ItemDescriptions_ItemId] FOREIGN KEY([ItemId])
 REFERENCES [dbo].[Items] ([Id])
-ON DELETE CASCADE
+ON DELETE CASCADE;
