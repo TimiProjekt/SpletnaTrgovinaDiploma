@@ -40,6 +40,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         public IActionResult Index(string currentFilter, string searchString, int page = 1)
         {
             var filteredItems = GetFilteredItems(currentFilter, searchString, page);
+            ViewBag.CurrentItemsFilter = searchString;
             return View(filteredItems);
         }
 
@@ -59,7 +60,6 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 searchString = currentFilter;
 
             ViewBag.CurrentFilter = searchString;
-            ViewBag.CurrentItemsFilter = searchString;
             var allItems = itemsService
                 .GetAll(n => n.BrandsItems);
 
