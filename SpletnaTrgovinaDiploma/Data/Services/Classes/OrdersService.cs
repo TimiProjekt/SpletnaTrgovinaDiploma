@@ -25,7 +25,7 @@ namespace SpletnaTrgovinaDiploma.Data.Services
             this.context = context;
         }
 
-        public IEnumerable<Order> GetOrdersByUserAsync(ClaimsPrincipal user)
+        public IEnumerable<Order> GetOrdersByUser(ClaimsPrincipal user)
         {
             if (user.IsUserAdmin())
                 return Orders;
@@ -76,7 +76,7 @@ namespace SpletnaTrgovinaDiploma.Data.Services
             await context.SaveChangesAsync();
         }
 
-        public async Task UpdateOrderStatus(int orderId, OrderStatus oldStatus, OrderStatus newStatus, string comment, ClaimsPrincipal user)
+        public async Task UpdateOrderStatusAsync(int orderId, OrderStatus oldStatus, OrderStatus newStatus, string comment, ClaimsPrincipal user)
         {
             var order = context.Orders
                 .SingleOrDefault(o => o.Id == orderId);

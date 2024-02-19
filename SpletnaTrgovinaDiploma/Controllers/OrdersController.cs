@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using SpletnaTrgovinaDiploma.Models;
 using SpletnaTrgovinaDiploma.Helpers;
+using X.PagedList;
 
 namespace SpletnaTrgovinaDiploma.Controllers
 {
@@ -34,26 +35,38 @@ namespace SpletnaTrgovinaDiploma.Controllers
             signInHelper = new SignInHelper(userManager, signInManager);
         }
 
-        public IActionResult Index()
-            => Filter(null);
-
-        public IActionResult Filter(string searchString)
+        public IActionResult Index(string currentFilter, string searchString, int page = 1)
         {
-            var allOrders = ordersService.GetOrdersByUserAsync(User);
+            var filteredOrders = GetFilteredOrders(currentFilter, searchString, page);
+            return View(filteredOrders);
+        }
+
+        IPagedList<Order> GetFilteredOrders(string currentFilter, string searchString, int page)
+        {
+            const int itemsPerPage = 12;
+
+            if (searchString != null)
+                page = 1;
+            else
+                searchString = currentFilter;
+
+            ViewBag.CurrentFilter = searchString;
+            var allOrders = ordersService
+                .GetOrdersByUser(User);
 
             if (!string.IsNullOrEmpty(searchString))
             {
                 static bool ContainsCaseInsensitiveString(string source, string contains)
                     => source?.ToUpper().Contains(contains.ToUpper()) ?? false;
 
-                var filteredOrders = allOrders.Where(n => ContainsCaseInsensitiveString(n.Id.ToString(), searchString) || ContainsCaseInsensitiveString(n.DeliveryEmailAddress, searchString));
+                var filteredResult = allOrders.Where(n => ContainsCaseInsensitiveString(n.Id.ToString(), searchString) || ContainsCaseInsensitiveString(n.DeliveryEmailAddress, searchString));
 
                 ViewData.SetPageDetails("Search result", $"Search result for \"{searchString}\"");
-                return View("Index", filteredOrders);
+                return filteredResult.ToPagedList(page, itemsPerPage);
             }
 
-            ViewData.SetPageDetails("Orders", "Orders");
-            return View("Index", allOrders);
+            ViewData.SetPageDetails("Home page", "Home page of Gaming svet");
+            return allOrders.ToPagedList(page, itemsPerPage);
         }
 
         public async Task<IActionResult> GetById(int id)
@@ -230,7 +243,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
             if (orderStatus.CurrentStatus.HasValue && orderStatus.NewStatus.HasValue)
             {
-                await ordersService.UpdateOrderStatus(
+                await ordersService.UpdateOrderStatusAsync(
                     orderStatus.OrderId,
                     orderStatus.CurrentStatus.Value,
                     orderStatus.NewStatus.Value,

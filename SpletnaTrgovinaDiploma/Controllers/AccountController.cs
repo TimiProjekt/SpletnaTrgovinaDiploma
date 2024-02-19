@@ -11,6 +11,7 @@ using System.Web;
 using Microsoft.AspNetCore.Authorization;
 using SpletnaTrgovinaDiploma.Data.Services;
 using SpletnaTrgovinaDiploma.Helpers;
+using X.PagedList;
 
 namespace SpletnaTrgovinaDiploma.Controllers
 {
@@ -43,32 +44,38 @@ namespace SpletnaTrgovinaDiploma.Controllers
         }
 
         [Authorize(Roles = UserRoles.Admin)]
-        public async Task<IActionResult> Users()
+        public IActionResult Users(string currentFilter, string searchString, int page = 1)
         {
-            var users = await context.Users.ToListAsync();
-
-            foreach (var user in users)
-                user.Country = context.Countries.SingleOrDefault(c => c.Id == user.CountryId);
-
-            return View(users);
+            var filteredUsers = GetFilteredUsers(currentFilter, searchString, page);
+            return View(filteredUsers);
         }
 
-        public async Task<IActionResult> Filter(string searchString)
+        IPagedList<ApplicationUser> GetFilteredUsers(string currentFilter, string searchString, int page)
         {
-            var users = await context.Users.ToListAsync();
+            const int itemsPerPage = 12;
+
+            if (searchString != null)
+                page = 1;
+            else
+                searchString = currentFilter;
+
+            ViewBag.CurrentFilter = searchString;
+            var allUsers = context.Users
+                .Include(u => u.Country);
 
             if (!string.IsNullOrEmpty(searchString))
             {
                 var upperCaseSearchString = searchString.ToUpper();
-                var filteredResult = users
-                    .Where(n => n.FullName.ToUpper().Contains(upperCaseSearchString) || n.EmailAddress.ToUpper().Contains(upperCaseSearchString));
+                var filteredResult = allUsers
+                    .Where(n => n.FullName.ToUpper().Contains(upperCaseSearchString)
+                                || n.EmailAddress.ToUpper().Contains(upperCaseSearchString));
 
                 ViewData.SetPageDetails("Search result", $"Search result for \"{searchString}\"");
-                return View("Users", filteredResult);
+                return filteredResult.ToPagedList(page, itemsPerPage);
             }
 
-            ViewData.SetPageDetails("Users", "Search result");
-            return View("Users", users);
+            ViewData.SetPageDetails("Home page", "Home page of Gaming svet");
+            return allUsers.ToPagedList(page, itemsPerPage);
         }
 
         public IActionResult Login()

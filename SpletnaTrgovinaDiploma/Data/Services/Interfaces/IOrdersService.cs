@@ -8,12 +8,12 @@ namespace SpletnaTrgovinaDiploma.Data.Services
 {
     public interface IOrdersService
     {
-        IEnumerable<Order> GetOrdersByUserAsync(ClaimsPrincipal user);
+        IEnumerable<Order> GetOrdersByUser(ClaimsPrincipal user);
 
         Task<Order> GetOrderByIdAndRoleAsync(int orderId, ClaimsPrincipal user);
 
         Task StoreOrderAsync(ShippingAndPaymentViewModel shippingAndPaymentViewModel, IEnumerable<ShoppingCartItem> items, ClaimsPrincipal user);
 
-        Task UpdateOrderStatus(int orderId, OrderStatus oldStatus, OrderStatus newStatus, string comment, ClaimsPrincipal user);
+        Task UpdateOrderStatusAsync(int orderId, OrderStatus oldStatus, OrderStatus newStatus, string comment, ClaimsPrincipal user);
     }
 }

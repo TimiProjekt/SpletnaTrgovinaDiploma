@@ -75,7 +75,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 return filteredResult.ToPagedList(page, itemsPerPage);
             }
 
-            ViewData.SetPageDetails("Home page", "Home page of Gaming svet");
+            ViewData.SetPageDetails("Users", "All users");
             return allItems.ToPagedList(page, itemsPerPage);
         }
 

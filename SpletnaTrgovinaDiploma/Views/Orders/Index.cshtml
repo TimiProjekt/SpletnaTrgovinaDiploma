@@ -1,8 +1,10 @@
 ﻿@using SpletnaTrgovinaDiploma.Helpers
-@model IEnumerable<Order>
+@model X.PagedList.IPagedList<Order>
 
 @{
     ViewData["Title"] = "Orders";
+    ViewBag.PagingActionName = "Index";
+    ViewBag.PagingControllerName = "Orders";
 }
 
 <div class="row">
@@ -11,7 +13,7 @@
             <h3 class="pb-1"> @ViewData["Description"] </h3>
         </p>
 
-        <form class="form-inline my-2 my-lg-0" asp-controller="Orders" asp-action="Filter" style="padding-right: 10px;">
+        <form class="form-inline my-2 my-lg-0" asp-controller="Orders" asp-action="Index" style="padding-right: 10px;">
             <input name="searchString" type="text" class="form-control" placeholder="Search for an order...">
             <button class="btn btn-outline-info my-2 my-sm-0 ml-2" type="submit"><i class="bi bi-search"></i></button>
         </form>
@@ -75,5 +77,7 @@
                 }
             </tbody>
         </table>
+
+        @await Html.PartialAsync("Components/PagingComponent", Model)
     </div>
 </div>
