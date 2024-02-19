@@ -120,7 +120,6 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 ShortDescription = itemDetails.ShortDescription,
                 Price = itemDetails.Price,
                 ImageUrl = itemDetails.ImageUrl,
-                ItemCategory = itemDetails.ItemCategory,
                 BrandIds = itemDetails.BrandsItems.Select(n => n.BrandId).ToList(),
                 ProductCode = itemDetails.ProductCode,
                 Availability = itemDetails.Availability

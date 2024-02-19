@@ -46,12 +46,6 @@
                         <p class="card-text"><b>Product code: </b>@Model.ProductCode</p>
                         <p class="card-text"><b>In stock: </b>@(Model.Availability ?? 0)</p>
                         <p class="card-text"><b>Price: </b>@Model.Price €</p>
-                        <p class="card-text">
-                            <b>Category: </b>
-                            <a class="nav-link text-dark @ActiveLink.GetCssClassIfActiveCategory(Url.Action(), (int) Model.ItemCategory)" asp-controller="Category" asp-action="Index" asp-route-id="@((int) Model.ItemCategory)">
-                                @ActiveLink.GetChevronIfActiveCategory(Url.Action(), (int)Model.ItemCategory) @Model.ItemCategory.ToString()
-                            </a>
-                        </p>
                     </div>
                 </div>
                 <div class="col-md-12">

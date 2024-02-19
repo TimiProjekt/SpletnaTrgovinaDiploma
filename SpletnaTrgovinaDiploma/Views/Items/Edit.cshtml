@@ -51,12 +51,6 @@
                             </div>
 
                             <div class="form-group">
-                                <label asp-for="ItemCategory"></label>
-                                <select asp-for="ItemCategory" class="form-control" asp-items="Html.GetEnumSelectList<ItemCategory>()"><</select>
-                                <span asp-validation-for="ItemCategory" class="text-danger"></span>
-                            </div>
-
-                            <div class="form-group">
                                 <label asp-for="BrandIds"></label>
                                 <select asp-for="BrandIds" class="form-control" asp-items="ViewBag.Brands" multiple></select>
                                 <span asp-validation-for="BrandIds" class="text-danger"></span>

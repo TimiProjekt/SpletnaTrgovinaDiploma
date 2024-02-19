@@ -1,6 +1,4 @@
-﻿using SpletnaTrgovinaDiploma.Data;
-
-namespace SpletnaTrgovinaDiploma.Helpers
+﻿namespace SpletnaTrgovinaDiploma.Helpers
 {
     public static class ActiveLink
     {
@@ -35,9 +33,9 @@ namespace SpletnaTrgovinaDiploma.Helpers
 
             if (splitLink.Length == 4 && splitLink[1].ToLower() == "category")
             {
-                var isParsed = int.TryParse(splitLink[3], out var number);
+                var isParsed = int.TryParse(splitLink[3], out _);
                 if (isParsed)
-                    return " > " + ((ItemCategory)number).ToString();
+                    return " > ";
             }
 
             return "";

@@ -18,7 +18,6 @@ namespace SpletnaTrgovinaDiploma.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }
         public string ImageUrl { get; set; }
-        public ItemCategory ItemCategory { get; set; }
 
         public string ProductCode { get; set; }
         public int? Availability { get; set; }

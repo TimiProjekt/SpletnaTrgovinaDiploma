@@ -1,5 +1,4 @@
-﻿using SpletnaTrgovinaDiploma.Data;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace SpletnaTrgovinaDiploma.Models
@@ -34,10 +33,6 @@ namespace SpletnaTrgovinaDiploma.Models
         [Display(Name = "Item image URL")]
         [Required(ErrorMessage = "Item image URL is required")]
         public string ImageUrl { get; set; }
-
-        [Display(Name = "Select a category")]
-        [Required(ErrorMessage = "Item category is required")]
-        public ItemCategory? ItemCategory { get; set; }
 
         [Display(Name = "Product code")]
         public string ProductCode { get; set; }

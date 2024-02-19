@@ -31,7 +31,6 @@ namespace SpletnaTrgovinaDiploma.Data.Services
                 ShortDescription = dataItem.ShortDescription,
                 Price = dataItem.Price ?? 0,
                 ImageUrl = dataItem.ImageUrl,
-                ItemCategory = dataItem.ItemCategory ?? ItemCategory.Unknown,
                 Descriptions = dataItem.ItemDescriptions,
                 BrandsItems = new List<BrandItem>()
             };
@@ -56,7 +55,6 @@ namespace SpletnaTrgovinaDiploma.Data.Services
                     ShortDescription = dataItem.ShortDescription,
                     Price = dataItem.Price ?? 0,
                     ImageUrl = dataItem.ImageUrl,
-                    ItemCategory = dataItem.ItemCategory ?? ItemCategory.Unknown,
                     ProductCode = dataItem.ProductCode,
                     Availability = dataItem.Availability,
                     Descriptions = dataItem.ItemDescriptions,
@@ -91,7 +89,6 @@ namespace SpletnaTrgovinaDiploma.Data.Services
                 dbItem.ShortDescription = dataItem.ShortDescription;
                 dbItem.Price = dataItem.Price ?? 0;
                 dbItem.ImageUrl = dataItem.ImageUrl;
-                dbItem.ItemCategory = dataItem.ItemCategory ?? ItemCategory.Unknown;
                 dbItem.ProductCode = dataItem.ProductCode;
                 dbItem.Availability = dataItem.Availability;
 
@@ -122,7 +119,6 @@ namespace SpletnaTrgovinaDiploma.Data.Services
                     dbItem.ShortDescription = dataItem.ShortDescription ?? dbItem.ShortDescription;
                     dbItem.Price = dataItem.Price ?? dbItem.Price;
                     dbItem.ImageUrl = dataItem.ImageUrl ?? dbItem.ImageUrl;
-                    dbItem.ItemCategory = dataItem.ItemCategory ?? dbItem.ItemCategory;
                     dbItem.ProductCode = dataItem.ProductCode ?? dbItem.ProductCode;
                     dbItem.Availability = dataItem.Availability ?? dbItem.Availability;
 

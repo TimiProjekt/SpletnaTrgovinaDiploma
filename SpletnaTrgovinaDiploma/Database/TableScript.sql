@@ -242,7 +242,6 @@ CREATE TABLE [dbo].[Items](
 	[ShortDescription] [nvarchar](max) NULL,
 	[Price] [decimal](18, 2) NOT NULL,
 	[ImageUrl] [nvarchar](max) NULL,
-	[ItemCategory] [int] NOT NULL,
 	[ProductCode] [nvarchar](max) NULL,
 	[Availability] [int] NOT NULL DEFAULT 0,
  CONSTRAINT [PK_Items] PRIMARY KEY CLUSTERED 
