@@ -6,30 +6,38 @@ using SpletnaTrgovinaDiploma.Models;
 using System.Linq;
 using System.Threading.Tasks;
 using SpletnaTrgovinaDiploma.Helpers;
+using X.PagedList;
 
 namespace SpletnaTrgovinaDiploma.Controllers
 {
     [Authorize(Roles = UserRoles.Admin)]
     public class BrandsController : Controller
     {
-        private readonly IBrandsService service;
+        private readonly IBrandsService brandsService;
 
-        public BrandsController(IBrandsService service)
+        public BrandsController(IBrandsService brandsService)
         {
-            this.service = service;
+            this.brandsService = brandsService;
         }
 
-        public IActionResult EditIndex()
+        public IActionResult EditIndex(string currentFilter, string searchString, int page = 1)
         {
-            var data = service.GetAll();
-            var orderedData = data.OrderBy(brand => brand.Name);
-
-            return View(orderedData);
+            var filteredBrands = GetFilteredBrands(currentFilter, searchString, page);
+            return View(filteredBrands);
         }
 
-        public IActionResult Filter(string searchString)
+        IPagedList<Brand> GetFilteredBrands(string currentFilter, string searchString, int page)
         {
-            var allBrands = service.GetAll(n => n.BrandsItems);
+            const int itemsPerPage = 12;
+
+            if (searchString != null)
+                page = 1;
+            else
+                searchString = currentFilter;
+
+            ViewBag.CurrentFilter = searchString;
+            var allBrands = brandsService
+                .GetAll(n => n.BrandsItems);
 
             if (!string.IsNullOrEmpty(searchString))
             {
@@ -38,11 +46,11 @@ namespace SpletnaTrgovinaDiploma.Controllers
                     .Where(n => n.Name.ToUpper().Contains(upperCaseSearchString));
 
                 ViewData.SetPageDetails("Search result", $"Search result for \"{searchString}\"");
-                return View("EditIndex", filteredResult);
+                return filteredResult.ToPagedList(page, itemsPerPage);
             }
 
             ViewData.SetPageDetails("Home page", "Home page of Gaming svet");
-            return View("EditIndex", allBrands);
+            return allBrands.ToPagedList(page, itemsPerPage);
         }
 
         public IActionResult Create()
@@ -54,13 +62,13 @@ namespace SpletnaTrgovinaDiploma.Controllers
             if (!ModelState.IsValid)
                 return View(brand);
 
-            await service.AddAsync(brand);
+            await brandsService.AddAsync(brand);
             return RedirectToAction(nameof(EditIndex));
         }
 
         public async Task<IActionResult> Details(int id)
         {
-            var brandDetails = await service.GetByIdAsync(id);
+            var brandDetails = await brandsService.GetByIdAsync(id);
 
             if (brandDetails == null)
                 return View("NotFound");
@@ -70,7 +78,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
         public async Task<IActionResult> Edit(int id)
         {
-            var brandDetails = await service.GetByIdAsync(id);
+            var brandDetails = await brandsService.GetByIdAsync(id);
 
             if (brandDetails == null)
                 return View("NotFound");
@@ -84,13 +92,13 @@ namespace SpletnaTrgovinaDiploma.Controllers
             if (!ModelState.IsValid)
                 return View(brand);
 
-            await service.UpdateAsync(id, brand);
+            await brandsService.UpdateAsync(id, brand);
             return RedirectToAction(nameof(Details), new { id });
         }
 
         public async Task<IActionResult> Delete(int id)
         {
-            var brandDetails = await service.GetByIdAsync(id);
+            var brandDetails = await brandsService.GetByIdAsync(id);
 
             if (brandDetails == null)
                 return View("NotFound");
@@ -101,12 +109,12 @@ namespace SpletnaTrgovinaDiploma.Controllers
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var brandDetails = await service.GetByIdAsync(id);
+            var brandDetails = await brandsService.GetByIdAsync(id);
 
             if (brandDetails == null)
                 return View("NotFound");
 
-            await service.DeleteAsync(id);
+            await brandsService.DeleteAsync(id);
             return RedirectToAction(nameof(EditIndex));
         }
     }

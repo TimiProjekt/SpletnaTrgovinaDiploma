@@ -1,8 +1,11 @@
 ﻿@using SpletnaTrgovinaDiploma.Helpers
-@model IEnumerable<Brand>
+@using System.Linq
+@model X.PagedList.IPagedList<Brand>
 
 @{
     ViewData["Title"] = "Edit Brands";
+    ViewBag.PagingActionName = "EditIndex";
+    ViewBag.PagingControllerName = "Brands";
 }
 
 <div class="row">
@@ -13,7 +16,7 @@
 
         <h3 class="pb-1"> @ViewData["Description"] </h3>
 
-        <form class="form-inline my-2 my-lg-0" asp-controller="Brands" asp-action="Filter" style="padding-right: 10px;">
+        <form class="form-inline my-2 my-lg-0" asp-controller="Brands" asp-action="EditIndex" style="padding-right: 10px;">
             <input name="searchString" type="text" class="form-control" placeholder="Search for a brand...">
             <button class="btn btn-outline-info my-2 my-sm-0 ml-2" type="submit"><i class="bi bi-search"></i></button>
         </form>
@@ -22,8 +25,8 @@
 
             <thead>
                 <tr>
-                    <th>@Html.DisplayNameFor(model => model.ProfilePictureUrl)</th>
-                    <th>@Html.DisplayNameFor(model => model.Name)</th>
+                    <th>@Html.DisplayNameFor(model => model.FirstOrDefault().ProfilePictureUrl)</th>
+                    <th>@Html.DisplayNameFor(model => model.FirstOrDefault().Name)</th>
                     @if (User.IsUserAdmin())
                     {
                         <th>Actions</th>
@@ -55,6 +58,8 @@
             </tbody>
         </table>
     </div>
+
+    @await Html.PartialAsync("Components/PagingComponent", Model)
 </div>
 
 @await Html.PartialAsync("_CreateItem", "Brands") 

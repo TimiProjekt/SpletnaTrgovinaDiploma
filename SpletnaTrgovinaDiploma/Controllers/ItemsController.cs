@@ -39,22 +39,12 @@ namespace SpletnaTrgovinaDiploma.Controllers
         [AllowAnonymous]
         public IActionResult Index(string currentFilter, string searchString, int page = 1)
         {
-            if (!string.IsNullOrEmpty(searchString))
-                ViewData.SetPageDetails("Search result", $"Search result for \"{searchString}\"");
-            else
-                ViewData.SetPageDetails("Home page", "Home page of Gaming svet");
-
             var filteredItems = GetFilteredItems(currentFilter, searchString, page);
             return View(filteredItems);
         }
 
         public IActionResult EditIndex(string currentFilter, string searchString, int page = 1)
         {
-            if (!string.IsNullOrEmpty(searchString))
-                ViewData.SetPageDetails("Search result", $"Search result for \"{searchString}\"");
-            else
-                ViewData.SetPageDetails("All items", "Search result");
-
             var filteredItems = GetFilteredItems(currentFilter, searchString, page);
             return View(filteredItems);
         }
@@ -69,19 +59,20 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 searchString = currentFilter;
 
             ViewBag.CurrentFilter = searchString;
+            ViewBag.CurrentItemsFilter = searchString;
             var allItems = itemsService
                 .GetAll(n => n.BrandsItems);
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                var filteredItems = allItems
+                var filteredResult = allItems
                     .Where(i => i.Name.Contains(searchString)
                                     || i.Description.Contains(searchString)
                                     || i.ShortDescription.Contains(searchString)
                                     || i.ProductCode.Contains(searchString));
 
                 ViewData.SetPageDetails("Search result", $"Search result for \"{searchString}\"");
-                return filteredItems.ToPagedList(page, itemsPerPage);
+                return filteredResult.ToPagedList(page, itemsPerPage);
             }
 
             ViewData.SetPageDetails("Home page", "Home page of Gaming svet");

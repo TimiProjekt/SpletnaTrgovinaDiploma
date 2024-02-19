@@ -1,11 +1,16 @@
 ﻿@using X.PagedList.Mvc.Core
 @model X.PagedList.IPagedList
 
+@{
+    var pagingActionName = ViewBag.PagingActionName as string;
+    var pagingControllerName = ViewBag.PagingControllerName as string;
+}
+
 <br />
 <div class="text-center w-100">
     Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
     <br />
     Total items: @Model.TotalItemCount
     <br />
-    @Html.PagedListPager(Model, page => Url.Action("Index", "Items", new { page, currentFilter = ViewBag.CurrentFilter }))
+    @Html.PagedListPager(Model, page => Url.Action(pagingActionName, pagingControllerName, new { page, currentFilter = ViewBag.CurrentFilter }))
 </div>

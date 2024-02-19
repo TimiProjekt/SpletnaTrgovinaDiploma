@@ -1,6 +1,11 @@
 ﻿@using SpletnaTrgovinaDiploma.Helpers
 @model X.PagedList.IPagedList<Item>
 
+@{
+    ViewBag.PagingActionName = "Index";
+    ViewBag.PagingControllerName = "Items";
+}
+
 <div class="row">
     @foreach (var item in Model)
     {
