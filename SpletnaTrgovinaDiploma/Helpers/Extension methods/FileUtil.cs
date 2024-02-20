@@ -11,19 +11,25 @@ namespace SpletnaTrgovinaDiploma
 
         public static string UploadImageFile(this IFormFile imageFile, IHostEnvironment hostEnvironment)
         {
+            const string relativePath = "/uploadedFiles/";
+
             if (imageFile == null)
                 return null;
 
             var fileInfo = new FileInfo(imageFile.FileName);
-            var relativePath = "/uploadedFiles/" + Path.GetRandomFileName() + fileInfo.Extension;
-            var fileNameWithPath = GetRootWebDirectoryName(hostEnvironment) + relativePath;
+            var fileName = Path.GetRandomFileName() + fileInfo.Extension;
+            var absolutePath = GetRootWebDirectoryName(hostEnvironment) + relativePath;
+            var fileNameWithPath = absolutePath + fileName;
+
+            if (!Directory.Exists(absolutePath))
+                Directory.CreateDirectory(absolutePath);
 
             using (var stream = new FileStream(fileNameWithPath, FileMode.Create))
             {
                 imageFile.CopyTo(stream);
             }
 
-            return relativePath;
+            return relativePath + fileName;
         }
     }
 }

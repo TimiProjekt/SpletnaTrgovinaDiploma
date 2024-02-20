@@ -10,12 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="wwwroot\uploadedFiles\test.jpg" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
-    <None Include="wwwroot\uploadedFiles\test.jpg" />
   </ItemGroup>
 
   <ItemGroup>
