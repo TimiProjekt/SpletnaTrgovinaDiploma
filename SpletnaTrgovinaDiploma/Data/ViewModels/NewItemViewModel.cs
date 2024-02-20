@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 
 namespace SpletnaTrgovinaDiploma.Models
 {
@@ -31,8 +33,11 @@ namespace SpletnaTrgovinaDiploma.Models
         public decimal? Price { get; set; }
 
         [Display(Name = "Item image URL")]
-        [Required(ErrorMessage = "Item image URL is required")]
         public string ImageUrl { get; set; }
+
+        [Display(Name = "Item image")]
+        [Required(ErrorMessage = "Item image is required")]
+        public IFormFile ImageFile { get; set; }
 
         [Display(Name = "Product code")]
         public string ProductCode { get; set; }
@@ -51,5 +56,15 @@ namespace SpletnaTrgovinaDiploma.Models
         // [Display(Name = "Select brand(s)")]
         // [Required(ErrorMessage = "Item brand(s) is required")]
         public List<ItemDescription> ItemDescriptions { get; set; }
+
+        public void UploadImageAndSetImageUrl(IHostEnvironment hostEnvironment)
+        {
+            if (ImageFile == null)
+                return;
+
+            var imageUrl = ImageFile.UploadImageFile(hostEnvironment);
+            if (!string.IsNullOrEmpty(imageUrl))
+                ImageUrl = imageUrl;
+        }
     }
 }

@@ -6,6 +6,7 @@ using SpletnaTrgovinaDiploma.Models;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
+using Microsoft.Extensions.Hosting;
 using SpletnaTrgovinaDiploma.Data.ViewModels;
 using SpletnaTrgovinaDiploma.Helpers;
 using X.PagedList;
@@ -17,12 +18,14 @@ namespace SpletnaTrgovinaDiploma.Controllers
     {
         private readonly IItemsService itemsService;
         private readonly IBrandsService brandService;
+        private readonly IHostEnvironment hostEnvironment;
         private readonly XmlImportUtil xmlImportUtil;
 
-        public ItemsController(IItemsService itemsService, IBrandsService brandService)
+        public ItemsController(IItemsService itemsService, IBrandsService brandService, IHostEnvironment hostEnvironment)
         {
             this.itemsService = itemsService;
             this.brandService = brandService;
+            this.hostEnvironment = hostEnvironment;
 
             xmlImportUtil = new XmlImportUtil(itemsService);
         }
@@ -78,7 +81,6 @@ namespace SpletnaTrgovinaDiploma.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var itemDetail = await itemsService.GetItemByIdAsync(id);
-
             if (itemDetail == null)
                 return View("NotFound");
 
@@ -88,7 +90,6 @@ namespace SpletnaTrgovinaDiploma.Controllers
         public async Task<IActionResult> Create()
         {
             await DropdownUtil.LoadBrandsDropdownData(brandService, ViewBag);
-
             return View();
         }
 
@@ -98,9 +99,10 @@ namespace SpletnaTrgovinaDiploma.Controllers
             if (!ModelState.IsValid)
             {
                 await DropdownUtil.LoadBrandsDropdownData(brandService, ViewBag);
-
                 return View(item);
             }
+
+            item.UploadImageAndSetImageUrl(hostEnvironment);
 
             await itemsService.AddNewItemAsync(item);
             return RedirectToAction(nameof(Index));
@@ -138,9 +140,10 @@ namespace SpletnaTrgovinaDiploma.Controllers
             if (!ModelState.IsValid)
             {
                 await DropdownUtil.LoadBrandsDropdownData(brandService, ViewBag);
-
                 return View(item);
             }
+
+            item.UploadImageAndSetImageUrl(hostEnvironment);
 
             await itemsService.UpdateItemAsync(item);
             return RedirectToAction(nameof(Details), new { id });
@@ -149,7 +152,6 @@ namespace SpletnaTrgovinaDiploma.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var itemDetails = await itemsService.GetByIdAsync(id);
-
             if (itemDetails == null)
                 return View("NotFound");
 
@@ -160,7 +162,6 @@ namespace SpletnaTrgovinaDiploma.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var itemDetails = await itemsService.GetByIdAsync(id);
-
             if (itemDetails == null)
                 return View("NotFound");
 
