@@ -32,12 +32,7 @@ namespace SpletnaTrgovinaDiploma.Models
         [Required(ErrorMessage = "Price is required")]
         public decimal? Price { get; set; }
 
-        [Display(Name = "Item image URL")]
         public string ImageUrl { get; set; }
-
-        [Display(Name = "Item image")]
-        [Required(ErrorMessage = "Item image is required")]
-        public IFormFile ImageFile { get; set; }
 
         [Display(Name = "Product code")]
         public string ProductCode { get; set; }
@@ -48,8 +43,8 @@ namespace SpletnaTrgovinaDiploma.Models
         //Relationships
         [Display(Name = "Select brand(s)")]
         [Required(ErrorMessage = "Item brand(s) is required")]
-        public List<int> BrandIds { get; set; }       
-        
+        public List<int> BrandIds { get; set; }
+
         //Relationships
         public List<string> BrandNames { get; set; }
 
@@ -57,14 +52,40 @@ namespace SpletnaTrgovinaDiploma.Models
         // [Required(ErrorMessage = "Item brand(s) is required")]
         public List<ItemDescription> ItemDescriptions { get; set; }
 
-        public void UploadImageAndSetImageUrl(IHostEnvironment hostEnvironment)
-        {
-            if (ImageFile == null)
-                return;
+        public string ImageUrl1 { get; set; }
+        public string ImageUrl2 { get; set; }
+        public string ImageUrl3 { get; set; }
+        public string ImageUrl4 { get; set; }
+        public string ImageUrl5 { get; set; }
 
-            var imageUrl = ImageFile.UploadImageFile(hostEnvironment);
-            if (!string.IsNullOrEmpty(imageUrl))
-                ImageUrl = imageUrl;
+        [Display(Name = "Item image")]
+        public IFormFile ImageFile1 { get; set; }
+        [Display(Name = "Item image")]
+        public IFormFile ImageFile2 { get; set; }
+        [Display(Name = "Item image")]
+        public IFormFile ImageFile3 { get; set; }
+        [Display(Name = "Item image")]
+        public IFormFile ImageFile4 { get; set; }
+        [Display(Name = "Item image")]
+        public IFormFile ImageFile5 { get; set; }
+
+        public void UploadImagesAndSetImageUrls(IHostEnvironment hostEnvironment)
+        {
+            var commaSeparatedImageUrls = UploadImage(ImageFile1, ImageUrl1, hostEnvironment) + ",";
+            commaSeparatedImageUrls += UploadImage(ImageFile2, ImageUrl2, hostEnvironment) + ",";
+            commaSeparatedImageUrls += UploadImage(ImageFile3, ImageUrl3, hostEnvironment) + ",";
+            commaSeparatedImageUrls += UploadImage(ImageFile4, ImageUrl4, hostEnvironment) + ",";
+            commaSeparatedImageUrls += UploadImage(ImageFile5, ImageUrl5, hostEnvironment);
+
+            ImageUrl = commaSeparatedImageUrls;
+        }
+
+        public string UploadImage(IFormFile imageFile, string oldImageUrl, IHostEnvironment hostEnvironment)
+        {
+            if (imageFile == null)
+                return oldImageUrl;
+
+            return imageFile.UploadImageFile(hostEnvironment);
         }
     }
 }

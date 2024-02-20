@@ -1,5 +1,4 @@
 ﻿@model NewItemViewModel
-@using SpletnaTrgovinaDiploma.Data;
 
 @{
     ViewData["Title"] = $"Update item {Model.Name}";
@@ -13,8 +12,13 @@
 
         <div class="row">
             <div class="col-md-8 ml-2">
-                <form asp-action="Edit" enctype = "multipart/form-data">
+                <form asp-action="Edit" enctype="multipart/form-data">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    @Html.HiddenFor(v => v.ImageUrl1)
+                    @Html.HiddenFor(v => v.ImageUrl2)
+                    @Html.HiddenFor(v => v.ImageUrl3)
+                    @Html.HiddenFor(v => v.ImageUrl4)
+                    @Html.HiddenFor(v => v.ImageUrl5)
 
                     <div class="row">
                         <div class="col-md-6">
@@ -67,16 +71,55 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="form-group">
-                        <label class="col-form-label">Select File</label>
-                        <input asp-for="ImageFile" class="form-control" accept=".jpg" />
-                        <span asp-validation-for="ImageFile" class="text-danger"></span>
-                    </div>
 
+                    <div class="form-group">
+                        <label class="col-form-label">Select File for Image 1</label>
+                        <input asp-for="ImageFile1" class="form-control" accept=".jpg" />
+                        <span asp-validation-for="ImageFile1" class="text-danger"></span>
+                    </div>
                     <div class="col-md-4 text-left">
                         <label class="col-form-label">Old image</label>
-                        <img class="w-100 text-center" src="@Model.ImageUrl" id="ImageUrlPreview"/>
+                        <img class="w-100 text-center" src="@Model.ImageUrl1" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-form-label">Select File for Image 2</label>
+                        <input asp-for="ImageFile2" class="form-control" accept=".jpg" />
+                        <span asp-validation-for="ImageFile2" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4 text-left">
+                        <label class="col-form-label">Old image</label>
+                        <img class="w-100 text-center" src="@Model.ImageUrl2" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-form-label">Select File for Image 3</label>
+                        <input asp-for="ImageFile3" class="form-control" accept=".jpg" />
+                        <span asp-validation-for="ImageFile3" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4 text-left">
+                        <label class="col-form-label">Old image</label>
+                        <img class="w-100 text-center" src="@Model.ImageUrl3" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-form-label">Select File for Image 4</label>
+                        <input asp-for="ImageFile4" class="form-control" accept=".jpg" />
+                        <span asp-validation-for="ImageFile4" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4 text-left">
+                        <label class="col-form-label">Old image</label>
+                        <img class="w-100 text-center" src="@Model.ImageUrl4" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-form-label">Select File for Image 5</label>
+                        <input asp-for="ImageFile5" class="form-control" accept=".jpg" />
+                        <span asp-validation-for="ImageFile5" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4 text-left">
+                        <label class="col-form-label">Old image</label>
+                        <img class="w-100 text-center" src="@Model.ImageUrl5" />
                     </div>
 
                     <div class="form-group">

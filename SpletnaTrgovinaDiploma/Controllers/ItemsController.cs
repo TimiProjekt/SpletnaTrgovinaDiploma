@@ -102,7 +102,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 return View(item);
             }
 
-            item.UploadImageAndSetImageUrl(hostEnvironment);
+            item.UploadImagesAndSetImageUrls(hostEnvironment);
 
             await itemsService.AddNewItemAsync(item);
             return RedirectToAction(nameof(Index));
@@ -114,18 +114,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             if (itemDetails == null)
                 return View("NotFound");
 
-            var response = new NewItemViewModel()
-            {
-                Id = itemDetails.Id,
-                Name = itemDetails.Name,
-                Description = itemDetails.Description,
-                ShortDescription = itemDetails.ShortDescription,
-                Price = itemDetails.Price,
-                ImageUrl = itemDetails.ImageUrl,
-                BrandIds = itemDetails.BrandsItems.Select(n => n.BrandId).ToList(),
-                ProductCode = itemDetails.ProductCode,
-                Availability = itemDetails.Availability
-            };
+            var response = itemDetails.CreateItemViewModel();
 
             await DropdownUtil.LoadBrandsDropdownData(brandService, ViewBag);
             return View(response);
@@ -143,7 +132,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 return View(item);
             }
 
-            item.UploadImageAndSetImageUrl(hostEnvironment);
+            item.UploadImagesAndSetImageUrls(hostEnvironment);
 
             await itemsService.UpdateItemAsync(item);
             return RedirectToAction(nameof(Details), new { id });

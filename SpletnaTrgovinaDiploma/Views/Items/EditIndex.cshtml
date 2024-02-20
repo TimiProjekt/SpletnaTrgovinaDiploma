@@ -21,7 +21,7 @@
 
             <thead>
                 <tr>
-                    <th>@Html.DisplayNameFor(model => model.FirstOrDefault().ImageUrl)</th>
+                    <th>@Html.DisplayNameFor(model => model.FirstOrDefault().MainImageUrl)</th>
                     <th>@Html.DisplayNameFor(model => model.FirstOrDefault().Name)</th>
                     <th>@Html.DisplayNameFor(model => model.FirstOrDefault().Price)</th>
                     @if (User.IsUserAdmin())
@@ -35,7 +35,7 @@
                 {
                     <tr>
                         <td class="align-middle">
-                            <img class="rounded-circle" src="@item.ImageUrl" alt="@item.Name" style="max-width: 150px" />
+                            <img class="rounded-circle" src="@item.MainImageUrl" alt="@item.Name" style="max-width: 150px" />
                         </td>
                         <td class="align-middle">
                             @Html.DisplayFor(modelItem => item.Name)

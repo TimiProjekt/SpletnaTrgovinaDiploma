@@ -2,6 +2,9 @@
 {
     public static class StringExtensionMethod
     {
+        public static string GetIndexOfArrayOrEmpty(this string[] array, int index)
+            => array.Length > index ? array[index] : "";
+
         public static bool ContainsCaseInsensitive(this string text, string contains)
         {
             if (string.IsNullOrEmpty(text))
@@ -12,5 +15,6 @@
 
             return text.ToUpper().Contains(contains.ToUpper());
         }
+
     }
 }
