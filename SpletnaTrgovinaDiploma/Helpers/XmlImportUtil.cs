@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
+using Microsoft.Extensions.Hosting;
 using SpletnaTrgovinaDiploma.Data.Services;
 using SpletnaTrgovinaDiploma.Models;
 
@@ -10,10 +11,12 @@ namespace SpletnaTrgovinaDiploma.Helpers
     public class XmlImportUtil
     {
         private readonly IItemsService itemsService;
+        private readonly IHostEnvironment hostEnvironment;
 
-        public XmlImportUtil(IItemsService itemsService)
+        public XmlImportUtil(IItemsService itemsService, IHostEnvironment hostEnvironment)
         {
             this.itemsService = itemsService;
+            this.hostEnvironment = hostEnvironment;
         }
 
         public async Task<int> TryImportItemDetails(XmlDocument doc, bool isUpdateExisting)
@@ -44,7 +47,7 @@ namespace SpletnaTrgovinaDiploma.Helpers
             {
                 if (product != null)
                 {
-                    var newItemViewModel = TryReadingAttributesFrom(product);
+                    var newItemViewModel = await TryReadingAttributesFrom(product);
                     newItems.Add(newItemViewModel);
                 }
             }
@@ -62,9 +65,9 @@ namespace SpletnaTrgovinaDiploma.Helpers
             return nonExistentNewItems.Count;
         }
 
-        NewItemViewModel TryReadingAttributesFrom(XmlNode dataNode)
+        async Task<NewItemViewModel> TryReadingAttributesFrom(XmlNode dataNode)
         {
-            var newItem = new NewItemViewModel()
+            var newItem = new NewItemViewModel
             {
                 ItemDescriptions = new List<ItemDescription>()
             };
@@ -73,12 +76,13 @@ namespace SpletnaTrgovinaDiploma.Helpers
             {
                 TryItemListAttributeNames(newItem, productAttribute);
                 TryPricesAvailabilityAttributeNames(newItem, productAttribute);
+                await TryImportingImageList(newItem, productAttribute);
             }
 
             return newItem;
         }
 
-        void TryItemListAttributeNames(NewItemViewModel newItem, XmlNode productAttribute)
+        static void TryItemListAttributeNames(NewItemViewModel newItem, XmlNode productAttribute)
         {
             // Based on itemList.xml
             if (productAttribute.Name == "ProductType")
@@ -113,6 +117,20 @@ namespace SpletnaTrgovinaDiploma.Helpers
 
                     newItem.ItemDescriptions.Add(itemDescription);
                 }
+            }
+        }
+
+        async Task TryImportingImageList(NewItemViewModel newItem, XmlNode productAttribute)
+        {
+            if (productAttribute.Name == "Images")
+            {
+                foreach (XmlNode image in productAttribute.ChildNodes)
+                {
+                    var uploadedUrl = await FileUtil.DownloadImageAndStoreIt(image.InnerText, hostEnvironment);
+                    newItem.ImageUrl += "," + uploadedUrl;
+                }
+
+                newItem.ImageUrl = newItem.ImageUrl.Trim(',');
             }
         }
 

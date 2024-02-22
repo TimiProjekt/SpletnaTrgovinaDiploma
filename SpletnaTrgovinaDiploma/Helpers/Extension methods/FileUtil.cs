@@ -1,4 +1,6 @@
 ﻿using System.IO;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 
@@ -30,6 +32,21 @@ namespace SpletnaTrgovinaDiploma
             }
 
             return relativePath + fileName;
+        }
+
+        public static async Task<string> DownloadImageAndStoreIt(string imageUrl, IHostEnvironment hostEnvironment)
+        {
+            if (string.IsNullOrEmpty(imageUrl))
+                return "";
+
+            var extension = imageUrl.Substring(imageUrl.Length - 3);
+
+            using var client = new HttpClient();
+            var imageByteArray = await client.GetByteArrayAsync(imageUrl);
+            var memoryStream = new MemoryStream(imageByteArray);
+            var imageFile = new FormFile(memoryStream, 0, memoryStream.Length, "streamImage", $"streamImage.{extension}");
+
+            return imageFile.UploadImageFile(hostEnvironment);
         }
     }
 }

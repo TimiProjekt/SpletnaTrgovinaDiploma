@@ -27,7 +27,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             this.brandService = brandService;
             this.hostEnvironment = hostEnvironment;
 
-            xmlImportUtil = new XmlImportUtil(itemsService);
+            xmlImportUtil = new XmlImportUtil(itemsService, hostEnvironment);
         }
 
         [AllowAnonymous]

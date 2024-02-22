@@ -80,7 +80,7 @@ namespace SpletnaTrgovinaDiploma.Models
             ImageUrl = commaSeparatedImageUrls;
         }
 
-        public string UploadImage(IFormFile imageFile, string oldImageUrl, IHostEnvironment hostEnvironment)
+        static string UploadImage(IFormFile imageFile, string oldImageUrl, IHostEnvironment hostEnvironment)
         {
             if (imageFile == null)
                 return oldImageUrl;
