@@ -27,11 +27,16 @@ namespace SpletnaTrgovinaDiploma
             if (!Directory.Exists(absolutePath))
                 Directory.CreateDirectory(absolutePath);
 
-            //if extension == png then convert to jpg
-
-            using (var image = Image.ThumbnailStream(imageFile.OpenReadStream(), 400, crop: Enums.Interesting.Attention))
+            try
             {
-                image.WriteToFile(fileNameWithPath);
+                using (var image = Image.ThumbnailStream(imageFile.OpenReadStream(), 400, crop: Enums.Interesting.Attention))
+                {
+                    image.WriteToFile(fileNameWithPath);
+                }
+            }
+            catch (VipsException)
+            {
+
             }
 
             return relativePath + fileName;
@@ -42,12 +47,20 @@ namespace SpletnaTrgovinaDiploma
             if (string.IsNullOrEmpty(imageUrl))
                 return "";
 
-            var extension = imageUrl.Substring(imageUrl.Length - 3);
-
             using var client = new HttpClient();
-            var imageByteArray = await client.GetByteArrayAsync(imageUrl);
+            var response = await client.GetAsync(imageUrl);
+            var mediaType = response.Content.Headers.ContentType?.MediaType ?? "";
+            var splittedMediaType = mediaType.Split('/');
+            var extension = splittedMediaType.Length > 1 ? splittedMediaType[1] : "jpg";
+
+            var imageByteArray = await response.Content.ReadAsByteArrayAsync();
             var memoryStream = new MemoryStream(imageByteArray);
-            var imageFile = new FormFile(memoryStream, 0, memoryStream.Length, "streamImage", $"streamImage.{extension}");
+            var imageFile = new FormFile(
+                memoryStream,
+                0,
+                memoryStream.Length,
+                "streamImage",
+                $"streamImage.{extension}");
 
             return imageFile.UploadImageFile(hostEnvironment);
         }

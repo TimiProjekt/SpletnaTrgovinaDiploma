@@ -121,6 +121,8 @@ namespace SpletnaTrgovinaDiploma.Helpers
         {
             if (productAttribute.Name == "Images")
             {
+                newItem.ImageUrl = "";
+
                 foreach (XmlNode image in productAttribute.ChildNodes)
                 {
                     var uploadedUrl = await ImageFileUtil.DownloadImageAndStoreIt(image.InnerText, hostEnvironment);

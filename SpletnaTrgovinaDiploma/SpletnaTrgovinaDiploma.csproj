@@ -25,6 +25,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.16" />
     <PackageReference Include="NetVips" Version="2.4.0" />
     <PackageReference Include="NetVips.Native.win-x64" Version="8.15.1" />
+    <PackageReference Include="NetVips.Native.win-x86" Version="8.15.1" />
     <PackageReference Include="X.PagedList" Version="8.4.7" />
     <PackageReference Include="X.PagedList.Mvc.Core" Version="8.4.7" />
   </ItemGroup>
