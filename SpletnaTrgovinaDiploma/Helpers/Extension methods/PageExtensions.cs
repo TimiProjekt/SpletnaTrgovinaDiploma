@@ -2,7 +2,7 @@
 
 namespace SpletnaTrgovinaDiploma.Helpers
 {
-    public static class PageExtensionMethod
+    public static class PageExtensions
     {
         public static void SetError(this ITempDataDictionary tempData, string errorMessage)
             => tempData["Error"] = errorMessage;

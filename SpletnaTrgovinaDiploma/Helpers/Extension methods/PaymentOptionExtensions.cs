@@ -3,7 +3,7 @@ using SpletnaTrgovinaDiploma.Data.ViewModels;
 
 namespace SpletnaTrgovinaDiploma.Helpers
 {
-    public static class PaymentOptionExtensionMethod
+    public static class PaymentOptionExtensions
     {
         public static string GetText(this PaymentOption paymentOption)
         {

@@ -1,6 +1,6 @@
 ﻿namespace SpletnaTrgovinaDiploma.Helpers
 {
-    public static class StringExtensionMethod
+    public static class StringExtensions
     {
         public static string GetIndexOfArrayOrEmpty(this string[] array, int index)
             => array.Length > index ? array[index] : "";
