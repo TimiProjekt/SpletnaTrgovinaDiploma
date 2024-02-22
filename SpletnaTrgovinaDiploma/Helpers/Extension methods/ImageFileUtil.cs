@@ -3,10 +3,11 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
+using NetVips;
 
 namespace SpletnaTrgovinaDiploma
 {
-    public static class FileUtil
+    public static class ImageFileUtil
     {
         static string GetRootWebDirectoryName(IHostEnvironment hostEnvironment)
             => hostEnvironment.ContentRootPath + "/wwwroot";
@@ -26,9 +27,11 @@ namespace SpletnaTrgovinaDiploma
             if (!Directory.Exists(absolutePath))
                 Directory.CreateDirectory(absolutePath);
 
-            using (var stream = new FileStream(fileNameWithPath, FileMode.Create))
+            //if extension == png then convert to jpg
+
+            using (var image = Image.ThumbnailStream(imageFile.OpenReadStream(), 400, crop: Enums.Interesting.Attention))
             {
-                imageFile.CopyTo(stream);
+                image.WriteToFile(fileNameWithPath);
             }
 
             return relativePath + fileName;

@@ -94,9 +94,6 @@ namespace SpletnaTrgovinaDiploma.Helpers
             if (productAttribute.Name == "ProductDescription")
                 newItem.Name = productAttribute.InnerText;
 
-            if (productAttribute.Name == "Image")
-                newItem.ImageUrl = productAttribute.InnerText;
-
             if (productAttribute.Name == "Vendor")
                 newItem.BrandNames.Add(productAttribute.InnerText);
 
@@ -109,7 +106,7 @@ namespace SpletnaTrgovinaDiploma.Helpers
             {
                 foreach (XmlNode attribute in productAttribute.ChildNodes)
                 {
-                    var itemDescription = new ItemDescription()
+                    var itemDescription = new ItemDescription
                     {
                         Name = attribute.Attributes?[0].InnerText ?? "",
                         Description = attribute.Attributes?[1].InnerText ?? ""
@@ -126,7 +123,7 @@ namespace SpletnaTrgovinaDiploma.Helpers
             {
                 foreach (XmlNode image in productAttribute.ChildNodes)
                 {
-                    var uploadedUrl = await FileUtil.DownloadImageAndStoreIt(image.InnerText, hostEnvironment);
+                    var uploadedUrl = await ImageFileUtil.DownloadImageAndStoreIt(image.InnerText, hostEnvironment);
                     newItem.ImageUrl += "," + uploadedUrl;
                 }
 
