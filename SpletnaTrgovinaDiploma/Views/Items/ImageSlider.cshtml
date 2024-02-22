@@ -1,0 +1,98 @@
+﻿@model Item
+
+@functions
+{
+    void MainImage(string url)
+    {
+        if (string.IsNullOrEmpty(url))
+            return;
+
+        <div class="slides">
+            <img src="@url" alt="" />
+        </div>
+    }
+
+    void RowImage(string url, int currentSlide)
+    {
+        if (string.IsNullOrEmpty(url))
+            return;
+
+        <div class="column">
+            <img class="slide-thumbnail" src="@url" onclick="currentSlide(@currentSlide)">
+        </div>
+    }
+}
+
+<div class="container">
+    <!-- main images -->
+    <div class="holder">
+        @{
+            MainImage(Model.MainImageUrl);
+            MainImage(Model.ImageUrl1);
+            MainImage(Model.ImageUrl2);
+            MainImage(Model.ImageUrl3);
+            MainImage(Model.ImageUrl4);
+        }
+    </div>
+
+    <div class="prevContainer">
+        <a class="prev" onclick="plusSlides(-1)">
+            <svg viewBox="0 0 24 24">
+                <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"></path>
+            </svg>
+        </a>
+    </div>
+    <div class="nextContainer">
+        <a class="next" onclick="plusSlides(1)">
+            <svg viewBox="0 0 24 24">
+                <path d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"></path>
+            </svg>
+        </a>
+    </div>
+
+    <!-- thumnails in a row -->
+    <div class="row">
+        @{
+            RowImage(Model.MainImageUrl, 1);
+            RowImage(Model.ImageUrl1, 2);
+            RowImage(Model.ImageUrl2, 3);
+            RowImage(Model.ImageUrl3, 4);
+            RowImage(Model.ImageUrl4, 5);
+        }
+    </div>
+</div>
+
+<script type="text/javascript">
+    var slideIndex = 1;
+    showSlides(slideIndex);
+
+    function plusSlides(n) {
+        showSlides(slideIndex += n);
+    }
+
+    function currentSlide(n) {
+        showSlides(slideIndex = n);
+    }
+
+    function showSlides(n) {
+        var i;
+        var slides = document.getElementsByClassName("slides");
+        var dots = document.getElementsByClassName("slide-thumbnail");
+        var captionText = document.getElementById("caption");
+        if (n > slides.length) {slideIndex = 1}
+        if (n < 1) {slideIndex = slides.length}
+        console.log(slideIndex);
+
+        for (i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none";
+            // slides[i].style.display = "inline";
+        }
+        for (i = 0; i < dots.length; i++) {
+            dots[i].className = dots[i].className.replace(" active", "");
+        }
+        slides[slideIndex-1].style.display = "block";
+        // slides[slideIndex-1].style.display = "inline";
+        dots[slideIndex-1].className += " active";
+        captionText.innerHTML = dots[slideIndex-1].alt;
+    }
+</script>

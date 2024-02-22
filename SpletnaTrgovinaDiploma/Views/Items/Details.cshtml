@@ -22,10 +22,12 @@
                         </p>
                     </div>
                 </div>
-                <div class="col-md-4" style="display: flex; justify-content: center; align-items: center;">
-                    <img src="@Model.MainImageUrl" class="ml-5 mr-2" style="width: 100%" alt="@Model.Name">
+
+                <div class="col-md-7">
+                    @await Html.PartialAsync("ImageSlider", @Model)
                 </div>
-                <div class="col-md-8">
+
+                <div class="col-md-5">
                     <div class="card-body">
                         <p class="card-text" style="white-space: pre-wrap;">@Model.Description</p>
 

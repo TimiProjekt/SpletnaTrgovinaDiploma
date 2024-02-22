@@ -23,6 +23,10 @@ namespace SpletnaTrgovinaDiploma.Models
         string[] ImageUrls => ImageUrl.Split(',');
 
         public string MainImageUrl => ImageUrls.GetIndexOfArrayOrEmpty(0);
+        public string ImageUrl1 => ImageUrls.GetIndexOfArrayOrEmpty(1);
+        public string ImageUrl2 => ImageUrls.GetIndexOfArrayOrEmpty(2);
+        public string ImageUrl3 => ImageUrls.GetIndexOfArrayOrEmpty(3);
+        public string ImageUrl4 => ImageUrls.GetIndexOfArrayOrEmpty(4);
 
         public string ProductCode { get; set; }
         public int? Availability { get; set; }
