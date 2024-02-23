@@ -75,7 +75,7 @@ namespace SpletnaTrgovinaDiploma.Helpers
             foreach (XmlNode productAttribute in dataNode.ChildNodes)
             {
                 TryItemListAttributeNames(newItem, productAttribute);
-                TryPricesAvailabilityAttributeNames(newItem, productAttribute);
+                await TryPricesAvailabilityAttributeNames(newItem, productAttribute);
                 await TryImportingImageList(newItem, productAttribute);
             }
 
@@ -133,7 +133,7 @@ namespace SpletnaTrgovinaDiploma.Helpers
             }
         }
 
-        static void TryPricesAvailabilityAttributeNames(NewItemViewModel newItem, XmlNode productAttribute)
+        async Task TryPricesAvailabilityAttributeNames(NewItemViewModel newItem, XmlNode productAttribute)
         {
             // Based on PricesAvail.xml
             if (productAttribute.Name == "WIC")
@@ -152,6 +152,13 @@ namespace SpletnaTrgovinaDiploma.Helpers
             {
                 if (int.TryParse(productAttribute.InnerText, out var intValue))
                     newItem.Availability = intValue;
+            }
+
+            if (productAttribute.Name == "SMALL_IMAGE")
+            {
+                newItem.ImageUrl = await ImageFileUtil.DownloadImageAndStoreIt(
+                    productAttribute.InnerText,
+                    hostEnvironment);
             }
         }
     }
