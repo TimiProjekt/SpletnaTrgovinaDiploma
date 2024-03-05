@@ -270,7 +270,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 CountryId = appUser.CountryId
             };
 
-            DropdownUtil.LoadCountriesDropdownData(countryService, ViewBag);
+            await DropdownUtil.LoadCountriesDropdownData(countryService, ViewBag);
             return View(settingsViewModel);
         }
 
@@ -334,7 +334,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             }
 
             var userInfoViewModel = deliveryInfo.CreateInfoViewModel();
-            DropdownUtil.LoadCountriesDropdownData(countryService, ViewBag);
+            await DropdownUtil.LoadCountriesDropdownData(countryService, ViewBag);
             return View(userInfoViewModel);
         }
 
@@ -349,7 +349,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             }
 
             var userInfoViewModel = deliveryInfo.CreateInfoViewModel();
-            DropdownUtil.LoadCountriesDropdownData(countryService, ViewBag);
+            await DropdownUtil.LoadCountriesDropdownData(countryService, ViewBag);
             return View(userInfoViewModel);
         }
     }

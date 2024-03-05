@@ -75,7 +75,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             if (order == null)
                 return RedirectToAction("Index", "Items");
 
-            DropdownUtil.LoadCountriesDropdownData(countryService, ViewBag);
+            await DropdownUtil.LoadCountriesDropdownData(countryService, ViewBag);
             return View(order);
         }
 
@@ -123,13 +123,13 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 await shoppingCartService.SetItemAmountInCartAsync(item, amount);
         }
 
-        public IActionResult DeliveryInfo()
+        public async Task<IActionResult> DeliveryInfo()
         {
             if (User.IsLoggedIn())
                 return RedirectToAction(nameof(ShippingAndPayment));
 
             var loginViewModel = new LoginViewModel();
-            DropdownUtil.LoadCountriesDropdownData(countryService, ViewBag);
+            await DropdownUtil.LoadCountriesDropdownData(countryService, ViewBag);
             return View(loginViewModel);
         }
 
@@ -138,7 +138,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         {
             if (!ModelState.IsValid)
             {
-                DropdownUtil.LoadCountriesDropdownData(countryService, ViewBag);
+                await DropdownUtil.LoadCountriesDropdownData(countryService, ViewBag);
                 return View(loginViewModel);
             }
 
@@ -170,7 +170,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 CountryId = appUser?.CountryId ?? 1
             };
 
-            DropdownUtil.LoadCountriesDropdownData(countryService, ViewBag);
+            await DropdownUtil.LoadCountriesDropdownData(countryService, ViewBag);
             return View(response);
         }
 
@@ -179,7 +179,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         {
             if (!ModelState.IsValid)
             {
-                DropdownUtil.LoadCountriesDropdownData(countryService, ViewBag);
+                await DropdownUtil.LoadCountriesDropdownData(countryService, ViewBag);
                 return View(shippingAndPaymentViewModel);
             }
 
