@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using SpletnaTrgovinaDiploma.Data.Static;
 using SpletnaTrgovinaDiploma.Models;
@@ -16,14 +17,19 @@ namespace SpletnaTrgovinaDiploma.Helpers
         public static string GetUserId(this ClaimsPrincipal user)
             => user.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        public static ApplicationUser GetApplicationUserFromEmail(this UserManager<ApplicationUser> userManager, string email)
-            => userManager.FindByNameAsync(email).Result;
+        public static async Task<ApplicationUser> GetApplicationUserFromEmail(this UserManager<ApplicationUser> userManager, string email)
+            => await userManager.FindByNameAsync(email);
 
-        public static ApplicationUser GetApplicationUser(this ClaimsPrincipal user, UserManager<ApplicationUser> userManager)
+        public static async Task<ApplicationUser> GetApplicationUser(this ClaimsPrincipal user, UserManager<ApplicationUser> userManager)
         {
             var email = userManager.GetUserName(user);
-            return userManager.GetApplicationUserFromEmail(email);
+            return await userManager.GetApplicationUserFromEmail(email);
         }
 
+        public static async Task<string> GetApplicationUserFullName(this ClaimsPrincipal user, UserManager<ApplicationUser> userManager)
+        {
+            var appUser = await user.GetApplicationUser(userManager);
+            return appUser.FullName;
+        }
     }
 }

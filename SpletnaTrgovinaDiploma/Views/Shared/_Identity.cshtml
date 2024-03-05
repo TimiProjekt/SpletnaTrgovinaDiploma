@@ -17,7 +17,7 @@ else
     <div class="dropdown margin-log-out">
         <button class="btn btn-outline-success dropdown-toggle" type="button" id="profile-btn" data-toggle="dropdown"
             aria-expanded="false">
-            <i class="bi bi-person-badge"></i> Hello @User.GetApplicationUser(userManager).FullName
+            <i class="bi bi-person-badge"></i> Hello @await User.GetApplicationUserFullName(userManager)
         </button>
         <ul class="dropdown-menu" aria-labelledby="profile-btn">
             <li>

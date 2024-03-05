@@ -1,19 +1,23 @@
-﻿using System.Linq;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using SpletnaTrgovinaDiploma.Data.Cart;
+using SpletnaTrgovinaDiploma.Data.Services.Classes;
 
 namespace SpletnaTrgovinaDiploma.Data.ViewComponents
 {
     public class ShoppingCartSummary : ViewComponent
     {
-        private readonly ShoppingCart shoppingCart;
+        private readonly ShoppingCartService shoppingCartService;
 
-        public ShoppingCartSummary(ShoppingCart shoppingCart)
+        public ShoppingCartSummary(ShoppingCartService shoppingCartService)
         {
-            this.shoppingCart = shoppingCart;
+            this.shoppingCartService = shoppingCartService;
         }
 
-        public IViewComponentResult Invoke() 
-            => View(shoppingCart.ShoppingCartItems.Count());
+        public async Task<IViewComponentResult> InvokeAsync()
+        {
+            var shoppingCartViewModel = await shoppingCartService.GetShoppingCartViewModel();
+
+            return View(shoppingCartViewModel.TotalAmountOfItems);
+        }
     }
 }

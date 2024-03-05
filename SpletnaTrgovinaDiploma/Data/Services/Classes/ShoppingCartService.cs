@@ -1,44 +1,22 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using SpletnaTrgovinaDiploma.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using SpletnaTrgovinaDiploma.Data.ViewModels;
+using SpletnaTrgovinaDiploma.Models;
 
-namespace SpletnaTrgovinaDiploma.Data.Cart
+namespace SpletnaTrgovinaDiploma.Data.Services.Classes
 {
-    public class ShoppingCart
+    public class ShoppingCartService
     {
         private readonly AppDbContext context;
 
         public string ShoppingCartId { get; set; }
 
-        IQueryable<ShoppingCartItem> CurrentShoppingCartItems
-            => context.ShoppingCartItems
-                .Where(n => n.ShoppingCartId == ShoppingCartId);
-
-        public IEnumerable<ShoppingCartItem> ShoppingCartItems
-            => CurrentShoppingCartItems
-                .Include(n => n.Item);
-
-        public async Task<decimal> GetShoppingCartTotalAsync()
-            => await CurrentShoppingCartItems
-                .Select(n => n.Item.Price * n.Amount)
-                .SumAsync();
-
-        public async Task<int> GetTotalAmountOfItemsAsync()
-            => await CurrentShoppingCartItems
-                .Select(i => i.Amount)
-                .SumAsync();
-
-        public ShoppingCart(AppDbContext context)
-        {
-            this.context = context;
-        }
-
-        public static ShoppingCart GetShoppingCart(IServiceProvider services)
+        public static ShoppingCartService GetShoppingCart(IServiceProvider services)
         {
             var session = services.GetRequiredService<IHttpContextAccessor>()?.HttpContext?.Session;
             var context = services.GetService<AppDbContext>();
@@ -46,8 +24,25 @@ namespace SpletnaTrgovinaDiploma.Data.Cart
             var cartId = session?.GetString("CartId") ?? Guid.NewGuid().ToString();
             session?.SetString("CartId", cartId);
 
-            return new ShoppingCart(context) { ShoppingCartId = cartId };
+            return new ShoppingCartService(context) { ShoppingCartId = cartId };
         }
+
+        ShoppingCartService(AppDbContext context)
+        {
+            this.context = context;
+        }
+
+        public async Task<ShoppingCartViewModel> GetShoppingCartViewModel()
+            => new()
+            {
+                Items = await GetShoppingCartItems()
+            };
+
+        async Task<List<ShoppingCartItem>> GetShoppingCartItems()
+            => await context.ShoppingCartItems
+                .Where(n => n.ShoppingCartId == ShoppingCartId)
+                .Include(n => n.Item)
+                .ToListAsync();
 
         public async Task IncreaseItemInCartAsync(Item item, int byAmount)
         {

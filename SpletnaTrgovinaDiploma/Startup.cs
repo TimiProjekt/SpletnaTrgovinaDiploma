@@ -8,8 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SpletnaTrgovinaDiploma.Data;
-using SpletnaTrgovinaDiploma.Data.Cart;
 using SpletnaTrgovinaDiploma.Data.Services;
+using SpletnaTrgovinaDiploma.Data.Services.Classes;
 using SpletnaTrgovinaDiploma.Models;
 
 namespace SpletnaTrgovinaDiploma
@@ -37,7 +37,7 @@ namespace SpletnaTrgovinaDiploma
             services.AddScoped<INewsletterEmailService, NewsletterEmailService>();
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddScoped(ShoppingCart.GetShoppingCart);
+            services.AddScoped(ShoppingCartService.GetShoppingCart);
 
             //Authentication and authorization
             services.AddIdentity<ApplicationUser, IdentityRole>()

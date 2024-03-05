@@ -1,10 +1,10 @@
 ﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using SpletnaTrgovinaDiploma.Data.Cart;
 using SpletnaTrgovinaDiploma.Data.Services;
 using SpletnaTrgovinaDiploma.Data.ViewModels;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using SpletnaTrgovinaDiploma.Data.Services.Classes;
 using SpletnaTrgovinaDiploma.Models;
 using SpletnaTrgovinaDiploma.Helpers;
 using X.PagedList;
@@ -16,21 +16,21 @@ namespace SpletnaTrgovinaDiploma.Controllers
         private readonly ICountryService countryService;
         private readonly IItemsService itemsService;
         private readonly IOrdersService ordersService;
-        private readonly ShoppingCart shoppingCart;
         private readonly SignInHelper signInHelper;
+        private readonly ShoppingCartService shoppingCartService;
 
         public OrdersController(
             ICountryService countryService,
             IItemsService itemsService,
             IOrdersService ordersService,
-            ShoppingCart shoppingCart,
+            ShoppingCartService shoppingCartService,
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager)
         {
             this.countryService = countryService;
             this.itemsService = itemsService;
             this.ordersService = ordersService;
-            this.shoppingCart = shoppingCart;
+            this.shoppingCartService = shoppingCartService;
 
             signInHelper = new SignInHelper(userManager, signInManager);
         }
@@ -81,11 +81,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
         public async Task<IActionResult> ShoppingCart()
         {
-            var response = new ShoppingCartViewModel()
-            {
-                ShoppingCart = shoppingCart,
-                ShoppingCartTotal = await shoppingCart.GetShoppingCartTotalAsync(),
-            };
+            var response = await shoppingCartService.GetShoppingCartViewModel();
 
             return View(response);
         }
@@ -94,7 +90,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
         {
             var item = await itemsService.GetItemByIdAsync(id);
             if (item != null)
-                await shoppingCart.IncreaseItemInCartAsync(item, byAmount);
+                await shoppingCartService.IncreaseItemInCartAsync(item, byAmount);
 
             return RedirectToAction(nameof(ShoppingCart));
         }
@@ -104,7 +100,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             var item = await itemsService.GetItemByIdAsync(id);
 
             if (item != null)
-                await shoppingCart.DecreaseItemInCartAsync(item);
+                await shoppingCartService.DecreaseItemInCartAsync(item);
 
             return RedirectToAction(nameof(ShoppingCart));
         }
@@ -114,7 +110,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             var item = await itemsService.GetItemByIdAsync(id);
 
             if (item != null)
-                await shoppingCart.RemoveItemFromCartAsync(item);
+                await shoppingCartService.RemoveItemFromCartAsync(item);
 
             return RedirectToAction(nameof(ShoppingCart));
         }
@@ -124,7 +120,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
             var item = await itemsService.GetItemByIdAsync(id);
 
             if (item != null)
-                await shoppingCart.SetItemAmountInCartAsync(item, amount);
+                await shoppingCartService.SetItemAmountInCartAsync(item, amount);
         }
 
         public IActionResult DeliveryInfo()
@@ -156,14 +152,12 @@ namespace SpletnaTrgovinaDiploma.Controllers
 
         public async Task<IActionResult> ShippingAndPayment()
         {
-            var appUser = signInHelper.GetApplicationUser(User);
-            var shoppingCartTotal = await shoppingCart.GetShoppingCartTotalAsync();
+            var appUser = await signInHelper.GetApplicationUser(User);
+            var shoppingCartViewModel = await shoppingCartService.GetShoppingCartViewModel();
 
             var response = new ShippingAndPaymentViewModel()
             {
-                ShoppingCart = shoppingCart,
-                ShoppingCartTotal = shoppingCartTotal,
-                ShoppingCartTotalWithoutVat = shoppingCartTotal * 100 / 122,
+                ShoppingCart = shoppingCartViewModel,
                 EmailAddress = !string.IsNullOrEmpty(appUser?.DeliveryEmailAddress)
                     ? appUser.DeliveryEmailAddress
                     : appUser?.Email ?? "",
@@ -189,14 +183,14 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 return View(shippingAndPaymentViewModel);
             }
 
-            shippingAndPaymentViewModel.ShoppingCart = shoppingCart;
-            shippingAndPaymentViewModel.ShoppingCartTotal = await shoppingCart.GetShoppingCartTotalAsync();
+            var shoppingCartViewModel = await shoppingCartService.GetShoppingCartViewModel();
+            shippingAndPaymentViewModel.ShoppingCart = shoppingCartViewModel;
 
-            await ordersService.StoreOrderAsync(shippingAndPaymentViewModel, shoppingCart.ShoppingCartItems, User);
+            await ordersService.StoreOrderAsync(shippingAndPaymentViewModel, shoppingCartViewModel.Items, User);
 
-            shippingAndPaymentViewModel.SendOrderConfirmationEmail(shoppingCart);
+            shippingAndPaymentViewModel.SendOrderConfirmationEmail(shippingAndPaymentViewModel.ShoppingCart);
 
-            await shoppingCart.ClearShoppingCartAsync();
+            await shoppingCartService.ClearShoppingCartAsync();
 
             return View(
                 "Success",

@@ -1,14 +1,10 @@
-﻿using SpletnaTrgovinaDiploma.Data.Cart;
+﻿using SpletnaTrgovinaDiploma.Data.Services.Classes;
 
 namespace SpletnaTrgovinaDiploma.Data.ViewModels
 {
     public class ShippingAndPaymentViewModel : UserInfoViewModel
     {
-        public ShoppingCart ShoppingCart { get; set; }
-
-        public decimal ShoppingCartTotal { get; set; }
-
-        public decimal ShoppingCartTotalWithoutVat { get; set; }
+        public ShoppingCartViewModel ShoppingCart { get; set; }
 
         public ShippingOption ShippingOption { get; set; }
 

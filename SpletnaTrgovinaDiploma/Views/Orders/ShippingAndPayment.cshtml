@@ -6,8 +6,6 @@
         <form asp-action="ShippingAndPayment">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             @Html.HiddenFor(v => v.ShoppingCart)
-            @Html.HiddenFor(v => v.ShoppingCartTotal)
-            @Html.HiddenFor(v => v.ShoppingCartTotalWithoutVat)
 
             <div class="row">
                 <div class="col-md-8 offset-md-2">
@@ -111,19 +109,19 @@
                     </fieldset>
 
                     <div class="pt-3">
-                        @if (await Model.ShoppingCart.GetTotalAmountOfItemsAsync() == 1)
+                        @if (Model.ShoppingCart.TotalAmountOfItems == 1)
                         {
                             <b>1 Item in cart</b>
                         }
                         else
                         {
-                            <b>await @Model.ShoppingCart.GetTotalAmountOfItemsAsync() Items in cart</b>
+                            <b>@Model.ShoppingCart.TotalAmountOfItems Items in cart</b>
                         }
                         <br />
                         <a class="text-primary" id="btn-show-summary" href="#" onclick="toggleSummary()"><u>Show summary</u></a>
                         <div class="float-right">
-                            <b class="float-right" style="font-size: 1.2em">Total: @Model.ShoppingCartTotal.ToString("c")</b> <br />
-                            <div class="d-inline-block">Ex. VAT (22%): @Model.ShoppingCartTotalWithoutVat.ToString("c")</div>
+                            <b class="float-right" style="font-size: 1.2em">Total: @Model.ShoppingCart.Total.ToString("c")</b> <br />
+                            <div class="d-inline-block">Ex. VAT (22%): @Model.ShoppingCart.TotalWithoutVat.ToString("c")</div>
                         </div>
                     </div>
 
@@ -137,7 +135,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var item in Model.ShoppingCart.ShoppingCartItems)
+                            @foreach (var item in Model.ShoppingCart.Items)
                             {
                                 <tr>
                                     <td class="align-middle">
@@ -162,7 +160,7 @@
 
                                 <td class="text-right">
                                     <b>
-                                        @Model.ShoppingCartTotal.ToString("c")
+                                        @Model.ShoppingCart.Total.ToString("c")
                                     </b>
                                 </td>
                             </tr>

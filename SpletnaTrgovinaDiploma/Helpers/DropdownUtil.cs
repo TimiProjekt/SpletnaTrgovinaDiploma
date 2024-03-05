@@ -17,10 +17,10 @@ namespace SpletnaTrgovinaDiploma.Helpers
             viewBag.Brands = new SelectList(itemDropdownsData.Brands, "Id", "Name");
         }
 
-        public static void LoadCountriesDropdownData(ICountryService countryService, dynamic viewBag)
+        public static async Task LoadCountriesDropdownData(ICountryService countryService, dynamic viewBag)
         {
             var defaultEmptyValue = new Country { Id = 0, Name = "-- Select a country --" };
-            var itemDropdownsData = countryService.GetDropdownValuesAsync().Result;
+            var itemDropdownsData = await countryService.GetDropdownValuesAsync();
             itemDropdownsData.Countries.Insert(0, defaultEmptyValue);
 
             viewBag.Countries = new SelectList(itemDropdownsData.Countries, "Id", "Name");

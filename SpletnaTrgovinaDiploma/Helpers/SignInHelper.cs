@@ -94,11 +94,11 @@ namespace SpletnaTrgovinaDiploma.Helpers
             return await Register(newUser, UNREGISTERED_PASSWORD);
         }
 
-        public ApplicationUser GetApplicationUser(ClaimsPrincipal userPrincipal)
+        public async Task<ApplicationUser> GetApplicationUser(ClaimsPrincipal userPrincipal)
         {
             var userEmailAddress = userPrincipal.FindFirstValue(ClaimTypes.Email);
             if (userEmailAddress != null)
-                return userManager.FindByEmailAsync(userEmailAddress).Result;
+                return await userManager.FindByEmailAsync(userEmailAddress);
 
             return null;
         }

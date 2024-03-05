@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNetCore.Identity;
-using SpletnaTrgovinaDiploma.Data.Cart;
 using SpletnaTrgovinaDiploma.Data.Services.Classes;
 using SpletnaTrgovinaDiploma.Data.ViewModels;
 using SpletnaTrgovinaDiploma.Models;
@@ -11,16 +10,16 @@ namespace SpletnaTrgovinaDiploma.Helpers
     public static class EmailSenderUtil
     {
         //TODO: Send email when status changes and NOT when ShippingAndPayment is called
-        public static void SendOrderConfirmationEmail(this ShippingAndPaymentViewModel viewModel, ShoppingCart myShoppingCart)
+        public static void SendOrderConfirmationEmail(this ShippingAndPaymentViewModel viewModel, ShoppingCartViewModel myShoppingCart)
         {
             var messageHtml = $"Hello {viewModel.FullName}! <br/>";
             messageHtml += "The order which includes the following items: <br/> <ul>";
 
-            foreach (var item in myShoppingCart.ShoppingCartItems)
+            foreach (var item in myShoppingCart.Items)
                 messageHtml += $"<li> {item.Item.Name} {item.Item.Price} € x ({item.Amount} kom) = {item.Item.Price * item.Amount} € </li>";
 
             messageHtml += "</ul> has been completed and will be shipped out shortly. <br/>";
-            messageHtml += $"Total price: {myShoppingCart.GetShoppingCartTotalAsync()} € <br/>";
+            messageHtml += $"Total price: {myShoppingCart.Total} € <br/>";
             messageHtml += $"Delivery method: {viewModel.ShippingOption}  <br/>";
             messageHtml += $"Delivery address: {viewModel.GetFullAddress}  <br/>";
             messageHtml += $"Payment method: {viewModel.PaymentOption}  <br/>";

@@ -249,9 +249,9 @@ namespace SpletnaTrgovinaDiploma.Controllers
         }
 
         [Authorize]
-        public IActionResult Settings()
+        public async Task<IActionResult> Settings()
         {
-            var appUser = User.GetApplicationUser(userManager);
+            var appUser = await User.GetApplicationUser(userManager);
             if (appUser == null)
             {
                 TempData.SetError("Cannot fetch settings or email.");
@@ -287,7 +287,7 @@ namespace SpletnaTrgovinaDiploma.Controllers
                 return View();
             }
 
-            var appUser = userManager.GetApplicationUserFromEmail(userInfoViewModel.EmailAddress);
+            var appUser = await userManager.GetApplicationUserFromEmail(userInfoViewModel.EmailAddress);
             if (appUser == null)
             {
                 TempData.SetError("Cannot fetch settings or email");
@@ -324,9 +324,9 @@ namespace SpletnaTrgovinaDiploma.Controllers
             => View();
 
         [Authorize(Roles = UserRoles.Admin)]
-        public IActionResult GetUserInfo(string userId)
+        public async Task<IActionResult> GetUserInfo(string userId)
         {
-            IDeliveryInfo deliveryInfo = userManager.FindByIdAsync(userId).Result;
+            IDeliveryInfo deliveryInfo = await userManager.FindByIdAsync(userId);
             if (deliveryInfo == null)
             {
                 TempData.SetError("Cannot fetch user information.");
